@@ -10,6 +10,7 @@
             $.ajax(uri, {
                     type:"POST",
                     data:data,
+                    dataType:"text",
                     success:function (data) {
                         $("#output").html(data);
                     },
