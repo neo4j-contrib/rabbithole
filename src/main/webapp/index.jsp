@@ -5,7 +5,7 @@
     <title>Neo4j Console</title>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script type="text/javascript">
-        function post(uri, data) {
+        function post(uri, data, done) {
             console.log("Post data: "+data);
             $.ajax(uri, {
                     type:"POST",
@@ -13,24 +13,43 @@
                     dataType:"text",
                     success:function (data) {
                         $("#output").html(data);
+						if (done) { done(); }
                     },
                     error: function(data,error) {
                         $("#output").html("Error: \n"+data);
                     }
                 });
 		}
+		function getParameters() {
+			var pairs = window.location.search.substr(1).split('&');
+			if (!pairs) return {};
+			var result = {};
+       		for (var i = 0; i < pairs.length; ++i) {
+				var pair=pairs[i].split('=');
+				console.log(pair);
+	           	if (pair.length != 2) continue;
+				result[pair[0]] = decodeURIComponent(pair[1].replace(/\+/g, " "));
+			}
+			return result;
+       	}
 		function initData() {
-			var uri = document.location.href;
-            var idx = uri.indexOf("?");
- 			if (idx==-1) return "(A) {\"name\":\"Neo\"}; (B) {\"name\" : \"Trinity\"}; (A)-[:LOVES]->(B)";
-			return decodeURI(uri.slice(idx+1));
 		}
-		function reset() {
-			$.ajax("/console", { type:"DELETE" });
+		function reset(done) {
+			$.ajax("/console", { type:"DELETE", success: done });
 			return false;
 		}
         $(document).ready(function () {
-			post("/console/geoff", initData());
+			console.log(getParameters());
+			reset(function() {
+				var params=getParameters();
+				post("/console/geoff", params.init || "(A) {\"name\":\"Neo\"}; (B) {\"name\" : \"Trinity\"}; (A)-[:LOVES]->(B)",
+					function() {
+						var query=params.query || "start n=node(*) return n";
+						post("/console/cypher", query);
+						$("#form input").val(query);
+					}
+				);
+			});
             $("#form").submit(function () {
                 var query = $("#form input").val();
 				if (query.indexOf("start") == -1)
