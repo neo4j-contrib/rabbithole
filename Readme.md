@@ -12,3 +12,7 @@ Endpoints:
 * post /console/cypher
 * post /console/geoff
 * delete /console
+
+Running locally:
+
+* mvn clean install exec:java 
