@@ -21,7 +21,7 @@
 		function initData() {
 			var uri = document.location.href;
             var idx = uri.indexOf("?");
- 			if (idx==-1) return "(A) {\"name\":\"Neo\"}";
+ 			if (idx==-1) return "(A) {\"name\":\"Neo\"}; (B) {\"name\" : \"Trinity\"}; (A)-[:LOVES]->(B)";
 			return decodeURI(uri.slice(idx+1));
 		}
         $(document).ready(function () {
@@ -40,7 +40,7 @@
 <body>
 
 <form id="form" action="#">
-    Run <input type="text" name="text" size="180" value="start n=node(0) return n"/> Geoff or Cypher.
+    Run <input type="text" name="text" size="180" value="start n=node(*) return n"/> Geoff or Cypher.
 </form>
 <div>
     <pre style="width:500;height:400;color:white;background-color: black;overflow: auto;" id="output">

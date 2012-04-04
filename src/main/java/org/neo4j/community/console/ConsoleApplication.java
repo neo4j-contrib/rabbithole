@@ -83,7 +83,7 @@ public class ConsoleApplication implements SparkApplication
                 {
                     GraphDatabaseService gdb = getGDB( request );
                     java.util.Map<String, PropertyContainer> res;
-                    res = Geoff.mergeIntoNeo4j( new Subgraph( request.body() ),
+                    res = Geoff.mergeIntoNeo4j( new Subgraph( request.body().replaceAll("\\s*;\\s*","\n") ),
                             gdb, null );
                     return new Gson().toJson( res );
                 }
