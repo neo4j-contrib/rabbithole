@@ -5,18 +5,22 @@
     <title>Neo4j Console</title>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
     <script type="text/javascript">
+		function append(element, text) {
+			element.html(element.html() + "\n" + text);
+		}
         function post(uri, data, done) {
             console.log("Post data: "+data);
+            append($("#output"),"> "+data);
             $.ajax(uri, {
                     type:"POST",
                     data:data,
                     dataType:"text",
                     success:function (data) {
-                        $("#output").html(data);
+                        append($("#output"),data);
 						if (done) { done(); }
                     },
                     error: function(data,error) {
-                        $("#output").html("Error: \n"+data);
+                        append($("#output"),"Error: \n"+data);
                     }
                 });
 		}
@@ -32,7 +36,10 @@
 			}
 			return result;
        	}
-		function initData() {
+		function share() {
+			$.ajax("/console/share", { type:"GET", success: function(data) {
+				window.open("http://console.neo4j.org?init="+encodeURIComponent(data),"Share Neo4j Database");
+			}});
 		}
 		function reset(done) {
 			$.ajax("/console", { type:"DELETE", success: done });
@@ -86,6 +93,6 @@
 	</form>
 </div>
 Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> or <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a>.
-<a href="#" onclick="reset()">Reset</a> the database.
+<a href="#" onclick="reset()">Reset</a> or <a href="#" onclick="share()">Share</a> the database.
 </body>
 </html>
