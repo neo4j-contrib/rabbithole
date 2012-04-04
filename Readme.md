@@ -1,6 +1,6 @@
 Interactive Neo4j Console
 
-Heroku App: http://rabbithole.heroku.com
+Heroku App: http://rabbithole.heroku.com or http://console.neo4j.org
 
 to embed in iframes, see [usage.jsp](http://rabbithole.herokuapp.com/usage.jsp)
 
