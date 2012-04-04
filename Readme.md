@@ -1,10 +1,14 @@
-Uses:
+Interactive Neo4j Console
 
-* maven
-* sparkjava
-* guice
-* java-mail
+Heroku App: http://rabbithole.heroku.com
 
-/api/import to import emails
+to embed in iframes
 
-/query for cypher queries (or /)
+    <iframe src="http://rabbithole.heroku.com?URI%20ENCODED%20GEOFF" width="500" height="400" id="window"/>
+    
+    
+Endpoints:
+
+* post /console/cypher
+* post /console/geoff
+* delete /console
