@@ -40,7 +40,7 @@
        	}
 		function share() {
 			$.ajax("/console/share", { type:"GET", success: function(data) {
-				window.open("http://console.neo4j.org?init="+encodeURIComponent(data),"Share Neo4j Database");
+				$('#share').val("http://console.neo4j.org?init="+encodeURIComponent(data));
 			}});
 		}
 		function isCypher(query) {
@@ -107,8 +107,8 @@
 		overflow: auto;height:90%;
 	  }
 	  #graph {
-/*		display:none;*/
-		width:100%;
+/*		display:none; */
+		width:50%;
 		height:90%;
 		position:absolute;
 		background:none;
@@ -128,14 +128,18 @@
 	    stroke-width: 1.5px;
 	  }
 	  #info {
+		font-family: monospace;
+		background-color: 202020;
+		color:white;
+		border: 2px solid darkgrey;
 		position:absolute;
 		top:25%;
 		left:25%;
 		display:none;
-		background:#E0E0E0;
 		width:50%;
 		height:50%;
-		z-index:20;
+		z-index:50;
+		padding: 20px;
 	  }
       img {
 		z-index:100;
@@ -153,7 +157,7 @@
    </style>
 </head>
 <body>
-<div>
+<div id="main">
 	<img title="Info" onclick="$('#info').toggle();" class="info" src="/img/info.png"/>
 	<img title="Graph" onclick="toggleGraph();" class="graph" src="/img/graph.png"/>
     <pre id="output" class="console">
@@ -164,8 +168,15 @@
 	<div id="graph">
 	</div>
 	<div id="info">
-		Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> or <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a>.<br/>
-		<a href="#" onclick="reset()">Reset</a> or <a href="#" onclick="share()">Share</a> the database.
+		This is an interactive console (REPL) for graphs with integrated visualization.
+		It is hosted on Heroku at <a href="http://console.neo4j.org">http://console.neo4j.org</a> the source
+		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.<br/><br/>
+		To add to the Graph you can issue
+		Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
+		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships.<br/><br/>
+		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend.<br/><br/>
+		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
+		<input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share()">Share</button>
 	</div>
 </div>
 </body>
