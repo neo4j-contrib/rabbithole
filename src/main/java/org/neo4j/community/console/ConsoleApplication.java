@@ -122,13 +122,13 @@ public class ConsoleApplication implements SparkApplication
                 try
                 {
                     GraphDatabaseService gdb = getGDB( request );
-                    java.util.Map<String, PropertyContainer> res;
-                    res = Geoff.mergeIntoNeo4j(new Subgraph(request.body().replaceAll("\\s*;\\s*", "\n")),
-                            gdb, Collections.<String,PropertyContainer>singletonMap("0", gdb.getReferenceNode()));
+                    Map res = Geoff.mergeIntoNeo4j(new Subgraph(request.body().replaceAll("\\s*;\\s*", "\n")),
+                            gdb, geoffNodeParams(gdb));
                     return new Gson().toJson( res );
                 }
                 catch ( Exception e )
                 {
+					e.printStackTrace();
                     halt( 400, e.getMessage() );
                     return e.getMessage();
                 }
@@ -138,6 +138,13 @@ public class ConsoleApplication implements SparkApplication
 
     }
 
+	private Map geoffNodeParams(GraphDatabaseService gdb) {
+		Map result=new HashMap();
+        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
+			result.put("("+node.getId()+")",node);
+        }
+		return result;
+	}
     private String toGeoff(GraphDatabaseService gdb) {
         StringBuilder sb=new StringBuilder();
         final Node refNode = gdb.getReferenceNode();
@@ -160,13 +167,7 @@ public class ConsoleApplication implements SparkApplication
     }
 
     private void formatNode(StringBuilder sb, Node n) {
-        final long id = n.getId();
-        if (id == 0) {
-            sb.append("{").append(id).append("}");
-        }
-        else {
-            sb.append("(").append(id).append(")");
-        }
+        sb.append("(").append(n.getId()).append(")");
     }
 
 	private Map toMap(PropertyContainer pc) {
@@ -221,18 +222,8 @@ public class ConsoleApplication implements SparkApplication
     }
 
     private void formatProperties(StringBuilder sb, PropertyContainer pc) {
-        sb.append(" {");
-//		sb.append(new Gson().toJson( toMap(pc) ));
-        final Iterable<String> propertyKeys = pc.getPropertyKeys();
-        for (Iterator<String> it = propertyKeys.iterator(); it.hasNext(); ) {
-            String prop = it.next();
-            sb.append(QUOTE).append(prop).append("\" : ");
-            final Object value = pc.getProperty(prop);
-            if (value instanceof String) sb.append(QUOTE).append(value).append(QUOTE);
-            else sb.append(value);
-            if (it.hasNext()) sb.append(", ");
-        }
-        sb.append("}");
+        sb.append(" ");
+		sb.append(new Gson().toJson( toMap(pc) ));
     }
 
     private ExecutionEngine getEE( Request request )

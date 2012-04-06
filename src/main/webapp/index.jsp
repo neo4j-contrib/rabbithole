@@ -80,13 +80,8 @@
 			});
             $("#form").submit(function () {
                 var query = $("#form input").val();
-				if (isCypher(query)) {
-					post("/console/cypher", query);
-				}
-				else {
-         			post("/console/geoff", query);
-				}
-				viz();
+				var url=isCypher(query) ? "/console/cypher" : "/console/geoff";
+				post(url,query, function() { viz(); });
                 return false;
             });
 			$("#form input").focus();
@@ -172,9 +167,9 @@
 		It is hosted on Heroku at <a href="http://console.neo4j.org">http://console.neo4j.org</a> the source
 		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.<br/><br/>
 		To add to the Graph you can issue
-		Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
-		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships.<br/><br/>
-		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend.<br/><br/>
+		<a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
+		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
+		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10 <br/><br/>
 		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
 		<input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share()">Share</button>
 	</div>
