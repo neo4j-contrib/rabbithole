@@ -9,6 +9,7 @@
     <script type="text/javascript">
 		function append(element, text) {
 			element.html(element.html() + "\n" + text);
+			element.prop("scrollTop", element.prop("scrollHeight") - element.height() );
 		}
         function post(uri, data, done) {
             console.log("Post data: "+data);
@@ -69,9 +70,9 @@
 			console.log(getParameters());
 			reset(function() {
 				var params=getParameters();
-				post("/console/geoff", params.init || "(A) {\"name\":\"Neo\"}; (B) {\"name\" : \"Trinity\"}; (A)-[:LOVES]->(B)",
+				post("/console/geoff", params.init || "(Neo) {\"name\": \"Neo\" }; (Morpheus) {\"name\":\"Morpheus\"}; (Trinity) {\"name\":\"Trinity\"}; (Cypher) {\"name\":\"Cypher\"}; (Smith) {\"name\" : \"Agent Smith\"}; (Architect) {\"name\":\"The Architect\"};(0)-[:ROOT]->(Neo);(Neo)-[:KNOWS]->(Morpheus);(Neo)-[:LOVES]->(Trinity);(Morpheus)-[:KNOWS]->(Trinity);(Morpheus)-[:KNOWS]->(Cypher);(Cypher)-[:KNOWS]->(Smith);(Smith)-[:CODED_BY]->(Architect)",
 					function() {
-						var query=params.query || "start n=node(*) return n";
+						var query=params.query || "start n=node(*) match n-[r]->m return n,type(r),m";
 						post("/console/cypher", query);
 						$("#form input").val(query);
 						viz();
