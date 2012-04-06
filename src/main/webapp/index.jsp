@@ -4,6 +4,8 @@
 <head>
     <title>Neo4j Console</title>
     <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+	<script type="text/javascript" src="/javascripts/visualization.js"></script>
     <script type="text/javascript">
 		function append(element, text) {
 			element.html(element.html() + "\n" + text);
@@ -41,9 +43,27 @@
 				window.open("http://console.neo4j.org?init="+encodeURIComponent(data),"Share Neo4j Database");
 			}});
 		}
+		function isCypher(query) {
+			return query && query.indexOf("start") != -1;
+		}
+		function viz() {
+			if ($('#graph').is(":hidden")) return;
+            var query = $("#form input").val();
+			if (!isCypher(query)) query="";
+			var graph=$("#graph");
+			graph.empty();
+			render("graph",graph.width(),graph.height(),"/console/visualization?query="+encodeURIComponent(query));
+			graph.show();
+		}
 		function reset(done) {
 			$.ajax("/console", { type:"DELETE", success: done });
 			return false;
+		}
+		function toggleGraph() {
+			$('#graph').toggle();
+			if ($('#graph').is(":visible")) {
+				viz();
+			}
 		}
         $(document).ready(function () {
 			console.log(getParameters());
@@ -54,17 +74,21 @@
 						var query=params.query || "start n=node(*) return n";
 						post("/console/cypher", query);
 						$("#form input").val(query);
+						viz();
 					}
 				);
 			});
             $("#form").submit(function () {
                 var query = $("#form input").val();
-				if (query.indexOf("start") == -1)
+				if (isCypher(query)) {
+					post("/console/cypher", query);
+				}
+				else {
          			post("/console/geoff", query);
-				else
-         			post("/console/cypher", query);
+				}
+				viz();
                 return false;
-            })
+            });
 			$("#form input").focus();
         })
     </script>
@@ -75,24 +99,74 @@
      .console {
 		width:100%;color:white;background-color: black;
 		font-family: monospace;
+		height:10%;
 		margin:0px;
 		border:none;
 	}
 	  #output {
-		overflow: auto;height:80%;
+		overflow: auto;height:90%;
+	  }
+	  #graph {
+/*		display:none;*/
+		width:100%;
+		height:90%;
+		position:absolute;
+		background:none;
+		z-index:10;
+		top:0px;
+		right:0px;
+/*
+		filter:alpha(opacity=20);
+		-moz-opacity:0.2;
+		opacity:0.2;
+*/		
+	  }
+	  .link { stroke: #ccc; }
+	
+	  .selected {
+	    stroke: red;
+	    stroke-width: 1.5px;
+	  }
+	  #info {
+		position:absolute;
+		top:25%;
+		left:25%;
+		display:none;
+		background:#E0E0E0;
+		width:50%;
+		height:50%;
+		z-index:20;
+	  }
+      img {
+		z-index:100;
+		position:absolute;
+		top:5px;
+		width:16px;
+		height:16px;
+	  }
+	  img.info {
+		right:26px;
+	  }
+	  img.graph {
+		right:5px;
 	  }
    </style>
 </head>
 <body>
-
 <div>
+	<img title="Info" onclick="$('#info').toggle();" class="info" src="/img/info.png"/>
+	<img title="Graph" onclick="toggleGraph();" class="graph" src="/img/graph.png"/>
     <pre id="output" class="console">
     </pre>
 	<form id="form" action="#">
 	    <input class="console" type="text" name="text" size="180" value="start n=node(*) return n"/>
 	</form>
+	<div id="graph">
+	</div>
+	<div id="info">
+		Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> or <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a>.<br/>
+		<a href="#" onclick="reset()">Reset</a> or <a href="#" onclick="share()">Share</a> the database.
+	</div>
 </div>
-Run <a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> or <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a>.
-<a href="#" onclick="reset()">Reset</a> or <a href="#" onclick="share()">Share</a> the database.
 </body>
 </html>

@@ -2,11 +2,7 @@ package org.neo4j.community.console;
 
 import static spark.Spark.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -20,6 +16,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.MapUtil;
+import static org.neo4j.helpers.collection.MapUtil.map;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -66,7 +63,24 @@ public class ConsoleApplication implements SparkApplication
                 catch ( Exception e )
                 {
                     halt( 400, e.getMessage() );
-                    return "400";
+                    return e.getMessage();
+                }
+            }
+
+        } );
+        get( new Route( "/console/visualization" )
+        {
+            public Object handle( Request request, Response response )
+            {
+                try
+                {
+                    String query = request.queryParams( "query" );
+                    return new Gson().toJson( cypherQueryViz( request, query ) );
+                }
+                catch ( Exception e )
+                {
+                    halt( 400, e.getMessage() );
+                    return e.getMessage();
                 }
             }
 
@@ -115,9 +129,8 @@ public class ConsoleApplication implements SparkApplication
                 }
                 catch ( Exception e )
                 {
-                    e.printStackTrace();
                     halt( 400, e.getMessage() );
-                    return "bad bad";
+                    return e.getMessage();
                 }
             }
 
@@ -156,8 +169,60 @@ public class ConsoleApplication implements SparkApplication
         }
     }
 
+	private Map toMap(PropertyContainer pc) {
+		Map result=new HashMap();
+		for (String prop : pc.getPropertyKeys()) {
+			result.put(prop,pc.getProperty(prop));
+		}
+		return result;
+	}
+	
+    private Map cypherQueryViz( Request request, String query )
+    {
+        GraphDatabaseService gdb = getGDB( request );
+		Map<Long,Map> nodes=new TreeMap<Long,Map>();
+		for (Node n : GlobalGraphOperations.at(gdb).getAllNodes()) {
+			nodes.put(n.getId(), toMap(n));
+		}
+		List nodeIndex = new ArrayList(nodes.keySet());
+
+		Map<Long,Map> rels=new TreeMap<Long,Map>();
+		for (Relationship rel : GlobalGraphOperations.at(gdb).getAllRelationships()) {
+			Map data=toMap(rel);
+			data.put("source",nodeIndex.indexOf(rel.getStartNode().getId()));
+			data.put("target",nodeIndex.indexOf(rel.getEndNode().getId()));
+			data.put("type", rel.getType().name());
+			data.put(rel.getType().name(),"type");
+			rels.put(rel.getId(), data);
+		}
+		if (query!=null && !query.trim().isEmpty()) {
+		int count=0;
+        ExecutionResult result = getEE( request ).execute( query );
+		for ( Map<String, Object> row : result )
+        {
+            for (Map.Entry<String,Object> entry : row.entrySet()) {
+				String column=entry.getKey();
+				Object value=entry.getValue();
+				if (value instanceof Node) {
+					Map map=nodes.get(((Node)value).getId());
+					// map.put(column,count);
+					map.put("selected",column);
+				}
+				if (value instanceof Relationship) {
+					Map map=rels.get(((Relationship)value).getId());
+					// map.put(column,count);
+					map.put("selected",column);
+				}
+			}
+			count++;
+        }
+		}
+        return map("nodes",nodes.values(), "links", rels.values());
+    }
+
     private void formatProperties(StringBuilder sb, PropertyContainer pc) {
         sb.append(" {");
+//		sb.append(new Gson().toJson( toMap(pc) ));
         final Iterable<String> propertyKeys = pc.getPropertyKeys();
         for (Iterator<String> it = propertyKeys.iterator(); it.hasNext(); ) {
             String prop = it.next();
