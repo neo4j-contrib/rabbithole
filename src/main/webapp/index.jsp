@@ -89,18 +89,28 @@
         })
     </script>
    <style type="text/css">
-	 body,html,div {
+	 body,html,div,form,input {
 		margin:0px;
 	  }
      .console {
-		width:100%;color:white;background-color: black;
+		width:100%;color:EEE;
+		background-color: black;
 		font-family: monospace;
 		height:10%;
 		margin:0px;
 		border:none;
-	}
+	  }
+ 	  a:link, a:visited {
+	     color:white;
+	  }
 	  #output {
-		overflow: auto;height:90%;
+		overflow-y:auto;
+		height:90%;
+		white-space: pre-wrap;       /* css-3 */
+	 	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	 	white-space: -pre-wrap;      /* Opera 4-6 */
+	 	white-space: -o-pre-wrap;    /* Opera 7 */
+	 	word-wrap: break-word;       /* Internet Explorer 5.5+ */
 	  }
 	  #graph {
 /*		display:none; */
@@ -126,7 +136,7 @@
 	  #info {
 		font-family: monospace;
 		background-color: 202020;
-		color:white;
+		color:EEE;
 		border: 2px solid darkgrey;
 		position:absolute;
 		top:25%;
