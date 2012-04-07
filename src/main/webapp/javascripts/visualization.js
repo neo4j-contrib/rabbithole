@@ -33,6 +33,18 @@ function toString(ob) {
 	return ret;
 }
 
+function title(ob) {
+	if (ob.name) return ob.name;
+	if (ob.title) return ob.title;
+	for (var prop in ob) {
+		if (ignore.hasOwnProperty(prop)) continue;
+		if (ob.hasOwnProperty(prop)) {
+			return ob[prop];
+		}
+	}
+	return ob.id;
+}
+
 function render(id,w,h,url) {
 d3.json(url, function(data) {
   var vis = d3.select("#"+id).append("svg")
@@ -43,15 +55,33 @@ d3.json(url, function(data) {
         .nodes(data.nodes)
         .links(data.links)
         .gravity(.05)
-        .distance(100)
-        .charge(-100)
+        .distance(120)
+        .charge(-200)
         .size([w, h])
         .start();
+
+
+	// end-of-line arrow
+		vis.append("svg:defs").selectAll("marker")
+		    .data(["end-marker"]) // link types if needed
+		    .enter().append("svg:marker")
+		    .attr("id", String)
+		    .attr("viewBox", "0 -5 10 10")
+		    .attr("refX", 25)
+		    .attr("refY", -1.5)
+		    .attr("markerWidth", 4)
+		    .attr("markerHeight", 4)
+		    .attr("class","marker")
+		    .attr("orient", "auto")
+		    .append("svg:path")
+		    .attr("d", "M0,-5L10,0L0,5");
 
     var link = vis.selectAll("line.link")
         .data(data.links)
         .enter().append("svg:line")
         .attr("class", "link")
+	  	.attr("marker-end", function(d) { return "url(#" + "end-marker" + ")"; }) // was d.type
+	  	.style("stroke", function(d) { var sel = d["selected"]; return sel ? "red" : null; })
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
@@ -69,21 +99,36 @@ d3.json(url, function(data) {
 	  node.append("title")
 	      .text(function(d) { return toString(d); });
 
-/*
-    node.append("svg:image")
-        .attr("class", "circle")
-        .attr("xlink:href", "https://d3nwyuy0nl342s.cloudfront.net/images/icons/public.png")
-        .attr("x", "-8px")
-        .attr("y", "-8px")
-        .attr("width", "16px")
-        .attr("height", "16px");
+	  var text = vis.append("svg:g").selectAll("g")
+		    .data(force.nodes())
+		    .enter().append("svg:g");
 
-    node.append("svg:text")
-        .attr("class", "nodetext")
-        .attr("dx", 12)
-        .attr("dy", ".35em")
-        .text(function(d) { return d.name });
-*/
+		// A copy of the text with a thick white stroke for legibility.
+		text.append("svg:text")
+		    .attr("x", 8)
+		    .attr("y", ".31em")
+		    .attr("class", "text shadow")
+		    .text(function(d) { return title(d); });
+
+		text.append("svg:text")
+		    .attr("x", 8)
+		    .attr("y", ".31em")
+			.attr("class","text")
+		    .text(function(d) { return title(d); });
+
+
+			var path_text = vis.append("svg:g").selectAll("g")
+				    .data(force.links())
+				    .enter().append("svg:g");
+
+
+			path_text.append("svg:text")
+					.attr("class","path-text shadow")
+					.text(function(d) { return d.type; });
+
+			path_text.append("svg:text")
+					.attr("class","path-text")
+					.text(function(d) { return d.type; });
 
     force.on("tick", function() {
       link.attr("x1", function(d) { return d.source.x; })
@@ -91,7 +136,23 @@ d3.json(url, function(data) {
           .attr("x2", function(d) { return d.target.x; })
           .attr("y2", function(d) { return d.target.y; });
 
+	  text.attr("transform", function(d) {
+		    return "translate(" + d.x + "," + d.y + ")";
+	  });
+
       node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+	  path_text.attr("transform", function(d) {
+	    var dx = (d.target.x - d.source.x),
+	        dy = (d.target.y - d.source.y);
+		var dr = Math.sqrt(dx * dx + dy * dy);
+		var sinus = dy/dr;
+		var cosinus = dx/dr;
+		var x=(d.source.x + dx/2);
+		var y=(d.source.y + dy/2);
+	    return "translate(" + x + "," + y + ") matrix("+cosinus+", "+sinus+", "+-sinus+", "+cosinus+", 0 , 0)";
+	  });
+
 	});
 });
 }

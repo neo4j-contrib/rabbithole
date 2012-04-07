@@ -127,12 +127,7 @@
 		opacity:0.2;
 */		
 	  }
-	  .link { stroke: #ccc; }
 	
-	  .selected {
-	    stroke: red;
-	    stroke-width: 1.5px;
-	  }
 	  #info {
 		font-family: monospace;
 		background-color: 202020;
@@ -159,6 +154,32 @@
 	  }
 	  img.graph {
 		right:5px;
+	  }
+	   /* d3 styles */
+	  .link { stroke: #ccc; }
+	  .path-text {
+	  		font: 6px sans-serif;
+	  		pointer-events: none;
+	  		text-align:center;
+		}
+
+	   .shadow {
+	     stroke: #000;
+	     stroke-width: 1.5px;
+	     stroke-opacity: .8;
+	   }
+	   .marker {
+	      stroke: #ccc;
+		  fill:#ccc;
+	   }
+	   text {
+		 fill: #fff;
+	     font: 8px sans-serif;
+	     pointer-events: none;
+	   }	
+	  .selected {
+	    stroke: red;
+	    stroke-width: 1.5px;
 	  }
    </style>
 </head>

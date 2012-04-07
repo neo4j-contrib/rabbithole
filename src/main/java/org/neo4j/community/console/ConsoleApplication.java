@@ -183,13 +183,16 @@ public class ConsoleApplication implements SparkApplication
         GraphDatabaseService gdb = getGDB( request );
 		Map<Long,Map> nodes=new TreeMap<Long,Map>();
 		for (Node n : GlobalGraphOperations.at(gdb).getAllNodes()) {
-			nodes.put(n.getId(), toMap(n));
+			Map data=toMap(n);
+			data.put("id",n.getId());
+			nodes.put(n.getId(), data);
 		}
 		List nodeIndex = new ArrayList(nodes.keySet());
 
 		Map<Long,Map> rels=new TreeMap<Long,Map>();
 		for (Relationship rel : GlobalGraphOperations.at(gdb).getAllRelationships()) {
 			Map data=toMap(rel);
+			data.put("id",rel.getId());
 			data.put("source",nodeIndex.indexOf(rel.getStartNode().getId()));
 			data.put("target",nodeIndex.indexOf(rel.getEndNode().getId()));
 			data.put("type", rel.getType().name());
