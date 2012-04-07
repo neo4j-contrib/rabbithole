@@ -1,0 +1,39 @@
+<%@ page session="false" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
+<head>
+    <title>Neo4j Console</title>
+    <script type="text/javascript" src="/javascripts/jquery-1.6.4.min.js"></script>
+	<script type="text/javascript" src="/javascripts/d3.min.js"></script>
+	<script type="text/javascript" src="/javascripts/visualization.js"></script>
+    <script type="text/javascript" src="/javascripts/console.js"></script>
+   <style type="text/css">
+     @import url("stylesheets/main.css");
+     @import url("stylesheets/d3.css");
+   </style>
+</head>
+<body>
+<div id="main">
+	<img title="Info" onclick="$('#info').toggle();" class="info" src="/img/info.png"/>
+	<img title="Graph" onclick="toggleGraph();" class="graph" src="/img/graph.png"/>
+    <pre id="output" class="console">
+    </pre>
+	<form id="form" action="#">
+	    <input class="console" type="text" name="text" size="180" value="start n=node(*) return n"/>
+	</form>
+	<div id="graph">
+	</div>
+	<div id="info">
+		This is an interactive console (REPL) for graphs with integrated visualization.
+		It is hosted on Heroku at <a href="http://console.neo4j.org">http://console.neo4j.org</a> the source
+		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.<br/><br/>
+		To add to the Graph you can issue
+		<a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
+		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
+		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10 <br/><br/>
+		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
+		<input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share()">Share</button>
+	</div>
+</div>
+</body>
+</html>
