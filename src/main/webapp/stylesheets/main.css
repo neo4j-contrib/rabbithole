@@ -1,66 +1,74 @@
-body,html,div,form,input {
-margin:0px;
- }
-   .console {
-width:100%;color:EEE;
-background-color: black;
-font-family: monospace;
-height:10%;
-margin:0px;
-border:none;
- }
-  a:link, a:visited {
-    color:white;
- }
- #output {
-overflow-y:auto;
-height:90%;
-white-space: pre-wrap;       /* css-3 */
-	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-	white-space: -pre-wrap;      /* Opera 4-6 */
-	white-space: -o-pre-wrap;    /* Opera 7 */
-	word-wrap: break-word;       /* Internet Explorer 5.5+ */
- }
- #graph {
-/*		display:none; */
-width:50%;
-height:90%;
-position:absolute;
-background:none;
-z-index:10;
-top:0px;
-right:0px;
-/*
-filter:alpha(opacity=20);
--moz-opacity:0.2;
-opacity:0.2;
-*/		
- }
+body, html, div, form, input {
+    margin: 0;
+}
 
- #info {
-font-family: monospace;
-background-color: 202020;
-color:EEE;
-border: 2px solid darkgrey;
-position:absolute;
-top:25%;
-left:25%;
-display:none;
-width:50%;
-height:50%;
-z-index:50;
-padding: 20px;
- }
-    img {
-z-index:100;
-position:absolute;
-top:5px;
-width:16px;
-height:16px;
- }
- img.info {
-right:26px;
- }
- img.graph {
-right:5px;
- }
+.console {
+    width: 100%;
+    color: #EEE;
+    background-color: black;
+    font-family: monospace;
+    height: 10%;
+    margin: 0;
+    border: none;
+}
+
+a:link, a:visited {
+    color: white;
+}
+
+#output {
+    overflow-y: auto;
+    height: 90%;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+#graph {
+    /*		display:none; */
+    width: 50%;
+    height: 90%;
+    position: absolute;
+    background: none;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    /*
+    filter:alpha(opacity=20);
+    -moz-opacity:0.2;
+    opacity:0.2;
+    */
+}
+
+#info {
+    font-family: monospace;
+    background-color: 202020;
+    color: #EEE;
+    border: 2px solid darkgrey;
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    display: none;
+    width: 50%;
+    height: 50%;
+    z-index: 50;
+    padding: 20px;
+}
+
+.button {
+    z-index: 100;
+    position: absolute;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+}
+
+.button.info {
+    right: 26px;
+}
+
+.button.graph {
+    right: 5px;
+}

@@ -32,10 +32,16 @@ function getParameters() {
     }
     return result;
 }
-function share() {
-    $.ajax("/console/share", { type:"GET", success:function (data) {
-        $('#share').val("http://console.neo4j.org?init=" + encodeURIComponent(data));
-    }});
+
+function share(fn) {
+    $.ajax("/console/url", { type:"GET", success:fn});
+}
+
+function tweet() {
+    share(function(uri) {
+        var text=encodeURIComponent("A #Neo4j graph database ");
+        window.open("https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Fconsole.neo4j.org%2F&source=tweetbutton&text="+text+"&url="+uri+"&via=neo4j","tweet this db","height=400,width=400");
+    });
 }
 function isCypher(query) {
     return query && query.indexOf("start") != -1;

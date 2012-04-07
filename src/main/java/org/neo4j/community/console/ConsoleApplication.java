@@ -7,7 +7,15 @@ import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map;
+import java.util.Scanner;
 
 import static spark.Spark.*;
 
@@ -37,6 +45,16 @@ public class ConsoleApplication implements SparkApplication {
         get(new Route("/console/share") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.toGeoff();
+            }
+        });
+        get(new Route("/console/url") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
+                final String uri = "http://console.neo4j.org?init=" + URLEncoder.encode(service.toGeoff(), "UTF-8");
+
+                final InputStream stream = (InputStream) new URL("http://tinyurl.com/api-create.php?url=" + URLEncoder.encode(uri, "UTF-8")).getContent();
+                final String shortUrl = new Scanner(stream).useDelimiter("\\z").next();
+                stream.close();
+                return shortUrl;
             }
         });
 
