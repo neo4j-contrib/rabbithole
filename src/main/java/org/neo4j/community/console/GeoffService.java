@@ -31,7 +31,7 @@ class GeoffService {
         return result;
     }
 
-    private String toGeoff() {
+    public String toGeoff() {
         StringBuilder sb = new StringBuilder();
         appendNodes(sb);
         appendRelationships(sb);
@@ -64,7 +64,7 @@ class GeoffService {
         sb.append("(").append(n.getId()).append(")");
     }
 
-    private Map<String,PropertyContainer> mergeGeoff(final String geoff) throws SubgraphError, SyntaxError {
+    public Map<String,PropertyContainer> mergeGeoff(final String geoff) throws SubgraphError, SyntaxError {
         final Subgraph subgraph = new Subgraph(geoff.replaceAll("\\s*;\\s*", "\n"));
         return Geoff.mergeIntoNeo4j(subgraph, gdb, geoffNodeParams());
     }
@@ -73,7 +73,7 @@ class GeoffService {
         sb.append(" ");
         sb.append(new Gson().toJson(toMap(pc)));
     }
-    private Map<String, Object> toMap(PropertyContainer pc) {
+    Map<String, Object> toMap(PropertyContainer pc) {
         Map<String, Object> result = new TreeMap<String, Object>();
         for (String prop : pc.getPropertyKeys()) {
             result.put(prop, pc.getProperty(prop));

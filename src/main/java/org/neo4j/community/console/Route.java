@@ -15,12 +15,12 @@ abstract class Route extends spark.Route {
         super(path);
     }
 
-    private ConsoleApplication.Neo4jService service(Request request) {
+    private Neo4jService service(Request request) {
         HttpSession session = request.raw().getSession(true);
-        ConsoleApplication.Neo4jService service = (ConsoleApplication.Neo4jService) session.getAttribute("service");
+        Neo4jService service = (Neo4jService) session.getAttribute("service");
         if (service != null) return service;
 
-        service = new ConsoleApplication.Neo4jService();
+        service = new Neo4jService();
         session.setAttribute("service", service);
         return service;
     }
@@ -36,5 +36,5 @@ abstract class Route extends spark.Route {
         }
     }
 
-    protected abstract Object doHandle(Request request, Response response, ConsoleApplication.Neo4jService service) throws Exception;
+    protected abstract Object doHandle(Request request, Response response, Neo4jService service) throws Exception;
 }

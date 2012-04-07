@@ -1,8 +1,7 @@
-<%@ page session="false" %>
 <html>
 <head>
     <title>Neo4j Console</title>
-    <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+    <script src="/javascripts/jquery-1.6.4.min.js"></script>
 	<script type="text/javascript">
 //		var base="http://localhost:8080";
 		var base="http://console.neo4j.org";
@@ -21,12 +20,12 @@
 (Neo) {"name" : "Neo"}
 (Trinity) {"name" : "Trinity"}
 (Neo)-[:LOVES]->(Trinity)
-		</textarea><br/>
+</textarea><br/>
 		<textarea rows="10" cols="80" id="cypher">
 start neo=node(1) match neo-[r]-other return neo,type(r), other
-		</textarea><br/>
+</textarea><br/>
 		<button id="load" onclick="start();">Load Database</button>
 	</div>
-	<iframe src="" width="500" height="400" id="window"/>
+	<iframe src="" width="500" height="400" id="window"></iframe>
 </body>
 </html>
