@@ -42,7 +42,7 @@ a:link, a:visited {
     */
 }
 
-#info {
+#info, #shareUrl {
     font-family: monospace;
     background-color: 202020;
     color: #EEE;
@@ -68,7 +68,12 @@ a:link, a:visited {
 .button.info {
     right: 26px;
 }
-
+.button.tweet {
+    right: 50px;
+}
 .button.graph {
     right: 5px;
+}
+.button.shareUrl {
+    right: 70px;
 }

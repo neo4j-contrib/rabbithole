@@ -13,8 +13,10 @@
 </head>
 <body>
 <div id="main">
+    <img style="vertical-align:middle; max-width: 24px; max-height: 24px;" title="Tweet this graph" class="tweet button" src="img/twitter.jpg" onClick="tweet()"/>
 	<img title="Info" onclick="$('#info').toggle();" class="info button" src="img/info.png"/>
-	<img title="Graph" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
+    <img title="Share this graph" onclick="$('#shareUrl').toggle();" class="shareUrl button" src="img/Link-icon.png"/>
+	<img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
     <pre id="output" class="console">
     </pre>
 	<form id="form" action="#">
@@ -31,9 +33,27 @@
 		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
 		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10 <br/><br/>
 		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
-		<input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share(function(uri){$('#share').val(uri);})">Get URL</button>
-        <img style="vertical-align:middle; max-width: 24px; max-height: 24px;" src="img/twitter.jpg" onClick="tweet()"/>
+		<!--input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share(function(uri){$('#share').val(uri);})">Get URL</button-->
+        
 	</div>
+    <div id="shareUrl">
+        Get the URL to the current graph content in order to share it via mail and other means as an URL. Copy the generated URL in the text field.<br/>
+        <input type="url" id="share" style="width:80%" onclick="this.select();"/><button onclick="
+            share(
+              function(uri){
+                $('#share').val(uri);
+                frame = '&lt;iframe width=&quot;600&quot; height=&quot;300&quot;  src=&quot;'+uri+'&quot;/&gt;';
+                $('#share_iFrame').val(frame);
+               // $('#preview').html(frame);
+
+            })">Generate URL</button>
+        <br/>
+        <div ><br/>
+        Paste HTML to embed in website (Adjust width and height):<br/><input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/></div>
+        <!--br/>Preview:<br/>
+        <div id="preview"></div-->
+        
+    </div>
 </div>
 </body>
 </html>
