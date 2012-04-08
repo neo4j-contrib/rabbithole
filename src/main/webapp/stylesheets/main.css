@@ -1,5 +1,6 @@
 body, html, div, form, input {
     margin: 0;
+    font-size: 10px;
 }
 
 .console {
@@ -44,9 +45,9 @@ a:link, a:visited {
 
 #info, #shareUrl {
     font-family: monospace;
-    background-color: 202020;
+    background-color: #202020;
     color: #EEE;
-    border: 2px solid darkgrey;
+    border: 2px solid #a9a9a9;
     position: absolute;
     top: 25%;
     left: 25%;
