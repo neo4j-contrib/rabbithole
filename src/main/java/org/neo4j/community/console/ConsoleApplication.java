@@ -3,6 +3,7 @@ package org.neo4j.community.console;
 import com.google.gson.Gson;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
+import org.neo4j.helpers.collection.MapUtil;
 import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
@@ -17,9 +18,13 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Scanner;
 
+import static org.neo4j.helpers.collection.MapUtil.map;
 import static spark.Spark.*;
 
 public class ConsoleApplication implements SparkApplication {
+
+    private static final String DEFAULT_GRAPH = "(Neo) {\"name\": \"Neo\" }; (Morpheus) {\"name\":\"Morpheus\"}; (Trinity) {\"name\":\"Trinity\"}; (Cypher) {\"name\":\"Cypher\"}; (Smith) {\"name\" : \"Agent Smith\"}; (Architect) {\"name\":\"The Architect\"};(0)-[:ROOT]->(Neo);(Neo)-[:KNOWS]->(Morpheus);(Neo)-[:LOVES]->(Trinity);(Morpheus)-[:KNOWS]->(Trinity);(Morpheus)-[:KNOWS]->(Cypher);(Cypher)-[:KNOWS]->(Smith);(Smith)-[:CODED_BY]->(Architect)";
+    private static final String DEFAULT_QUERY = "start n=node(*) match n-[r?]->m return n,type(r),m";
 
     @Override
     public void init() {
@@ -35,6 +40,25 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson(service.cypherQueryResults(query));
             }
 
+        });
+        get(new Route("/console/init") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                long start = System.currentTimeMillis(), time=start;
+                reset(request);
+                time = trace("reset",time);
+                final Neo4jService newService = service(request);
+                time = trace("service",time);
+                String init = param(request, "init", DEFAULT_GRAPH);
+                final Map geoff = newService.mergeGeoff(init);
+                time = trace("geoff",time);
+                String query = param(request, "query", DEFAULT_QUERY);
+                final String result = newService.cypherQuery(query);
+                time = trace("cypher",time);
+                final Map visualization = newService.cypherQueryViz(query);
+                trace("viz",time);
+                time = trace("all",start);
+                return new Gson().toJson(map("init", init, "geoff", geoff, "query", query, "result", result, "visualization", visualization,"time",time));
+            }
         });
         get(new Route("/console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
@@ -60,7 +84,7 @@ public class ConsoleApplication implements SparkApplication {
 
         delete(new Route("/console") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                request.raw().getSession().invalidate();
+                reset(request);
                 return "deleted";
             }
         });
@@ -71,5 +95,9 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson(res);
             }
         });
+    }
+
+    private void reset(Request request) {
+        request.raw().getSession().invalidate();
     }
 }

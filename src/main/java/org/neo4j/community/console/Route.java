@@ -15,7 +15,7 @@ abstract class Route extends spark.Route {
         super(path);
     }
 
-    private Neo4jService service(Request request) {
+    protected Neo4jService service(Request request) {
         HttpSession session = request.raw().getSession(true);
         Neo4jService service = (Neo4jService) session.getAttribute("service");
         if (service != null) return service;
@@ -37,4 +37,18 @@ abstract class Route extends spark.Route {
     }
 
     protected abstract Object doHandle(Request request, Response response, Neo4jService service) throws Exception;
+
+    protected String param(Request request, String param, String defaultValue) {
+        String geoff = request.queryParams(param);
+        if (geoff==null || geoff.isEmpty()) {
+            geoff= defaultValue;
+        }
+        return geoff;
+    }
+
+    protected long trace(String msg, long time) {
+        long now=System.currentTimeMillis();
+        System.err.println("## "+msg+" took: "+(now-time)+" ms.");
+        return now;
+    }
 }

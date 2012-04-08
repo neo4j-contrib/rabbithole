@@ -68,9 +68,19 @@ function toggleGraph() {
 }
 
 $(document).ready(function () {
-    console.log(getParameters());
+        console.log("parameters"+window.location.search);
+        $.ajax("/console/init"+window.location.search, {type:"GET", success: function(json) {
+            var data=$.parseJSON(json);
+            append($("#output"), data.init);
+            append($("#output"), data.geoff);
+            append($("#output"), data.result);
+            $("#form input").val(data.query);
+            viz(data.vizualization);
+        }});
+/*
     reset(function () {
         var params = getParameters();
+        console.log(params);
         post("/console/geoff", params.init || "(Neo) {\"name\": \"Neo\" }; (Morpheus) {\"name\":\"Morpheus\"}; (Trinity) {\"name\":\"Trinity\"}; (Cypher) {\"name\":\"Cypher\"}; (Smith) {\"name\" : \"Agent Smith\"}; (Architect) {\"name\":\"The Architect\"};(0)-[:ROOT]->(Neo);(Neo)-[:KNOWS]->(Morpheus);(Neo)-[:LOVES]->(Trinity);(Morpheus)-[:KNOWS]->(Trinity);(Morpheus)-[:KNOWS]->(Cypher);(Cypher)-[:KNOWS]->(Smith);(Smith)-[:CODED_BY]->(Architect)",
             function () {
                 var query = params.query || "start n=node(*) match n-[r]->m return n,type(r),m";
@@ -80,6 +90,7 @@ $(document).ready(function () {
             }
         );
     });
+*/
     $("#form").submit(function () {
         var query = $("#form input").val();
         var url = isCypher(query) ? "/console/cypher" : "/console/geoff";

@@ -13,7 +13,6 @@ var ignore = { source: 1, target:1, type:1, selected:1, index:1, x:1, y:1, weigh
 function propertyHash(ob) {
 	var ret=0;
 	for (var prop in ob) {
-		console.log(prop)
 		if (ignore.hasOwnProperty(prop)) continue;
 		if (ob.hasOwnProperty(prop)) {
 			ret += hash(prop);
