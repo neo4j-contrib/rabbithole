@@ -4,7 +4,14 @@
     <title>Neo4j Console</title>
     <script type="text/javascript" src="javascripts/jquery-1.6.4.min.js"></script>
 	<script type="text/javascript" src="javascripts/d3.min.js"></script>
-	<script type="text/javascript" src="javascripts/visualization.js"></script>
+
+  <!--ace editor-->
+  <script src="http://akollegger.github.com/ace/build/src/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="http://akollegger.github.com/ace/build/src/theme-twilight.js" type="text/javascript" charset="utf-8"></script>
+  <script src="http://akollegger.github.com/ace/build/src/mode-cypher.js" type="text/javascript" charset="utf-8"></script>
+  
+
+  <script type="text/javascript" src="javascripts/visualization.js"></script>
     <script type="text/javascript" src="javascripts/console.js"></script>
    <style type="text/css">
      @import url("stylesheets/main.css");
@@ -19,10 +26,12 @@
 	<img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
     <pre id="output" class="console">
     </pre>
-	<form id="form" action="#">
+	<button id="submitQuery">Execute Cypher (Ctrl-E)</button>
+  <!--form id="form" action="#">
 	    <input class="console" type="text" name="text" size="180" value="start n=node(*) return n"/>
-	</form>
-	<div id="graph">
+	</form-->
+  <div id="editor"></div>
+  <div id="graph">
 	</div>
 	<div id="info">
 		This is an interactive console (REPL) for graphs with integrated visualization.

@@ -58,6 +58,13 @@ a:link, a:visited {
     padding: 20px;
 }
 
+#editor {
+    width: 100%;
+    height: 10%;
+    margin: 0;
+    border: none;
+}
+
 .button {
     z-index: 100;
     position: absolute;
