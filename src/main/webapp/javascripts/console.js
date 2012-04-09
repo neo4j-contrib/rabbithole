@@ -20,7 +20,6 @@ function post(uri, data, done) {
         }
     });
 }
-
 function getParameters() {
     var pairs = window.location.search.substr(1).split('&');
     if (!pairs) return {};
@@ -70,31 +69,12 @@ function toggleGraph() {
 
 $(document).ready(function () {
         console.log("parameters"+window.location.search);
-
-        //initialize the editor
-        var editor = ace.edit("editor");
-        //editor.setTheme("ace/theme/twilight");
-        var CypherMode = require("ace/mode/cypher").Mode;
-        editor.getSession().setMode(new CypherMode());
-
         $.ajax("/console/init"+window.location.search, {type:"GET", success: function(json) {
             var data=$.parseJSON(json);
             append($("#output"), data.init);
             append($("#output"), data.geoff);
             append($("#output"), data.result);
-            console.log(data.query);
-            editor.getSession().setValue(data.query);
-            editor.commands.addCommand({
-            name: 'execute',
-            bindKey: {
-            win: 'Ctrl-E',
-            mac: 'Ctrl-E'
-            },
-                exec: function(editor) {
-                   $("#submitQuery").click();
-            }
-        });
-            editor.focus();
+            $("#form input").val(data.query);
             viz(data.vizualization);
         }});
 /*
@@ -111,10 +91,13 @@ $(document).ready(function () {
         );
     });
 */
-    $("#submitQuery").click(function (){
-        post(isCypher(editor.getSession().getValue()) ? "/console/cypher" : "/console/geoff", editor.getSession().getValue(), function () {
+    $("#form").submit(function () {
+        var query = $("#form input").val();
+        var url = isCypher(query) ? "/console/cypher" : "/console/geoff";
+        post(url, query, function () {
             viz();
         });
         return false;
     });
+    $("#form input").focus();
 });
