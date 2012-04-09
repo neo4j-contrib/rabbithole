@@ -19,9 +19,9 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 * @since 08.04.12
 */
 class Neo4jService {
-    private final GraphDatabaseService gdb = new ImpermanentGraphDatabase();
-    private final ExecutionEngine executionEngine = new ExecutionEngine(gdb);
-    private final GeoffService geoffService = new GeoffService(gdb);
+    private GraphDatabaseService gdb = new ImpermanentGraphDatabase();
+    private ExecutionEngine executionEngine = new ExecutionEngine(gdb);
+    private GeoffService geoffService = new GeoffService(gdb);
 
     public String cypherQuery(String query) {
         ExecutionResult result = executionEngine.execute(query);
@@ -102,5 +102,15 @@ class Neo4jService {
             result.add(row);
         }
         return result;
+    }
+
+    public void stop() {
+        if (gdb!=null) {
+            System.err.println("Shutting down service "+this);
+            gdb.shutdown();
+            executionEngine=null;
+            geoffService=null;
+            gdb=null;
+        }
     }
 }
