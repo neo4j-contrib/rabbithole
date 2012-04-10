@@ -16,7 +16,7 @@ function post(uri, data, done) {
             }
         },
         error:function (data, error) {
-            append($("#output"), "Error: "+error+"\n" + data+"");
+            append($("#output"), "Error: "+error+"\n" + data.responseText+"");
         }
     });
 }
