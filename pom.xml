@@ -51,7 +51,7 @@
 	<dependency>
 	    <groupId>org.neo4j</groupId>
 	    <artifactId>neo4j-cypher</artifactId>
-	    <version>${neo4j-version}</version>
+	    <version>${neo4j.version}</version>
 	    <scope>system</scope>
 	    <systemPath>${project.basedir}/lib/neo4j-cypher-1.7-SNAPSHOT.jar</systemPath>
 	</dependency>
