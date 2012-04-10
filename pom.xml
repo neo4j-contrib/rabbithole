@@ -41,11 +41,29 @@
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j</artifactId>
       <version>${neo4j.version}</version>
+      <exclusions>
+	    <exclusion>
+		   <groupId>org.neo4j</groupId>
+		   <artifactId>neo4j-cypher</artifactId>
+		</exclusion>
+	  </exclusions>
     </dependency>
+	<dependency>
+	    <groupId>org.neo4j</groupId>
+	    <artifactId>neo4j-cypher</artifactId>
+	    <version>${neo4j-version}</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/lib/neo4j-cypher-1.7-SNAPSHOT.jar</systemPath>
+	</dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-geoff-core</artifactId>
       <version>${neo4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.9.0-1</version>
     </dependency>
 
     <dependency>
@@ -146,6 +164,8 @@
           <arguments>
             <argument>argument1</argument>
           </arguments>
+          <includeProjectDependencies>true</includeProjectDependencies>
+          <classpathScope>system</classpathScope>
           <systemProperties>
             <systemProperty>
               <key>myproperty</key>

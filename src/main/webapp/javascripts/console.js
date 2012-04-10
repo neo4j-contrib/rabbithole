@@ -44,7 +44,7 @@ function tweet() {
     });
 }
 function isCypher(query) {
-    return query && query.indexOf("start") != -1;
+    return query && (query.indexOf("start") != -1 || query.indexOf("create") != -1);
 }
 function viz() {
     if ($('#graph').is(":hidden")) return;
