@@ -39,8 +39,9 @@ function share(fn) {
 
 function tweet() {
     share(function(uri) {
+        var host=encodeURIComponent(window.location.protocol+"//"+window.location.host);
         var text=encodeURIComponent("A #Neo4j graph database ");
-        window.open("https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Fconsole.neo4j.org%2F&source=tweetbutton&text="+text+"&url="+uri+"&via=neo4j","tweet this db","height=400,width=400");
+        window.open("https://twitter.com/intent/tweet?original_referer="+host+"%2F&source=tweetbutton&text="+text+"&url="+uri+"&via=neo4j","tweet this db","height=400,width=400");
     });
 }
 function isCypher(query) {

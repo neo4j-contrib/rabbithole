@@ -32,10 +32,14 @@ class Neo4jService {
         Map<Long, Map<String, Object>> nodes = nodeMap();
         Map<Long, Map<String, Object>> relationships = relationshipMap(nodes);
 
-        if (query != null && !query.trim().isEmpty()) {
+        if (isValidQuery(query)) {
             markCypherResults(query, nodes, relationships);
         }
         return map("nodes", nodes.values(), "links", relationships.values());
+    }
+
+    private boolean isValidQuery(String query) {
+        return query != null && !query.trim().isEmpty() && !query.matches("\\b(create|relate|set|delete)\\b");
     }
 
     private void markCypherResults(String query, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {

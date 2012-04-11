@@ -81,7 +81,9 @@ public class ConsoleApplication implements SparkApplication {
         });
         get(new Route("/console/url") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
-                final String uri = "http://console.neo4j.org?init=" + URLEncoder.encode(service.toGeoff(), "UTF-8");
+                final URL requestUrl = new URL(request.raw().getRequestURL().toString());
+                final String content = URLEncoder.encode(service.toGeoff(), "UTF-8");
+                final String uri = String.format("%s://%s:%d?init=%s",requestUrl.getProtocol(), requestUrl.getHost(), requestUrl.getPort(), content);
 				return shortenUrl(uri);
             	}
         });

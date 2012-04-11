@@ -4,8 +4,7 @@
     <title>Neo4j Console</title>
     <script src="/javascripts/jquery-1.6.4.min.js"></script>
 	<script type="text/javascript">
-//		var base="http://localhost:8080";
-		var base="http://console.neo4j.org";
+		var base=window.location.protocol+"//"+window.location.host;
 		function start() {
 			var geoff=encodeURIComponent($("#geoff").val().replace(/\s*\n\s*/g,";"));
 			var cypher=encodeURIComponent($("#cypher").val());
