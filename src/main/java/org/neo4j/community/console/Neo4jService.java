@@ -39,7 +39,7 @@ class Neo4jService {
     }
 
     private boolean isValidQuery(String query) {
-        return query != null && !query.trim().isEmpty() && !query.matches("\\b(create|relate|set|delete)\\b");
+        return query != null && !query.trim().isEmpty() && !query.matches(".*\\b(create|relate|set|delete)\\b.*");
     }
 
     private void markCypherResults(String query, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
