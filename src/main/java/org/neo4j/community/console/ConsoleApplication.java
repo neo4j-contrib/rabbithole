@@ -82,11 +82,12 @@ public class ConsoleApplication implements SparkApplication {
         get(new Route("/console/url") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
                 final String uri = "http://console.neo4j.org?init=" + URLEncoder.encode(service.toGeoff(), "UTF-8");
-
-                final InputStream stream = (InputStream) new URL("http://tinyurl.com/api-create.php?url=" + URLEncoder.encode(uri, "UTF-8")).getContent();
-                final String shortUrl = new Scanner(stream).useDelimiter("\\z").next();
-                stream.close();
-                return shortUrl;
+				return shortenUrl(uri);
+            	}
+        });
+        get(new Route("/console/shorten") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
+                return shortenUrl(request.queryParams("url"));
             }
         });
 
@@ -105,5 +106,10 @@ public class ConsoleApplication implements SparkApplication {
         });
     }
 
-
+    private String shortenUrl(String uri) throws IOException {
+        final InputStream stream = (InputStream) new URL("http://tinyurl.com/api-create.php?url=" + URLEncoder.encode(uri, "UTF-8")).getContent();
+        final String shortUrl = new Scanner(stream).useDelimiter("\\z").next();
+        stream.close();
+        return shortUrl;
+	}
 }
