@@ -10,23 +10,36 @@
 			var geoff=encodeURIComponent($("#geoff").val().replace(/\s*\n\s*/g,";"));
 			var cypher=encodeURIComponent($("#cypher").val());
 			console.log(base+"?init="+geoff+"&query="+cypher);
-			$("#window").attr("src",base+"?init="+geoff+"&query="+cypher);
+			var url=base+"?init="+geoff+"&query="+cypher;
+			$("#window").attr("src",url);
+			$("#link").val(url);
+			$.ajax("/console/shorten?url="+encodeURIComponent(url), { type: "GET", success: function(data) { $('#short').val(data);}});
 			return false;
 		}
 	</script>
 </head>
 <body>
 	<div>
-		<textarea rows="10" cols="80" id="geoff">
-(Neo) {"name" : "Neo"}
-(Trinity) {"name" : "Trinity"}
+		<textarea rows="10" cols="80" id="geoff">(Neo) {"name": "Neo" }
+(Morpheus) {"name":"Morpheus"}
+(Trinity) {"name":"Trinity"}
+(Cypher) {"name":"Cypher"}
+(Smith) {"name" : "Agent Smith"}
+(Architect) {"name":"The Architect"}
+(0)-[:ROOT]->(Neo)
+(Neo)-[:KNOWS]->(Morpheus)
 (Neo)-[:LOVES]->(Trinity)
-</textarea><br/>
+(Morpheus)-[:KNOWS]->(Trinity)
+(Morpheus)-[:KNOWS]->(Cypher)
+(Cypher)-[:KNOWS]->(Smith)
+(Smith)-[:CODED_BY]->(Architect)</textarea><br/>
 		<textarea rows="10" cols="80" id="cypher">
-start neo=node(1) match neo-[r]-other return neo,type(r), other
+start neo=node(1) match neo-[r?]-other return neo,type(r), other
 </textarea><br/>
 		<button id="load" onclick="start();">Load Database</button>
 	</div>
+	<input type="text" size="100" id="link"/><br/>
+	<input type="text" size="50" id="short"/><br/>
 	<iframe src="" width="500" height="400" id="window"></iframe>
 </body>
 </html>
