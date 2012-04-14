@@ -23,12 +23,12 @@
   })();
 
 </script>
+
 </head>
 <body>
 <div id="main">
-    <img style="vertical-align:middle; max-width: 24px; max-height: 24px;" title="Tweet this graph" class="tweet button" src="img/twitter.jpg" onClick="tweet()"/>
-	<img title="Info" onclick="$('#info').toggle();" class="info button" src="img/info.png"/>
-    <img title="Share this graph" onclick="$('#shareUrl').toggle();" class="shareUrl button" src="img/Link-icon.png"/>
+    <img title="Info" onclick="$('#info').toggle();" class="info button" src="img/info.png"/>
+    <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="img/Link-icon.png"/>
 	<img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
     <pre id="output" class="console">
     </pre>
@@ -46,23 +46,40 @@
 		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
 		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10 <br/><br/>
 		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
-		<!--input type="url" id="share" style="width:80%" onclick="this.select();"><button onclick="share(function(uri){$('#share').val(uri);})">Get URL</button-->
         
 	</div>
     <div id="shareUrl">
-        Get the URL to the current graph content in order to share it via mail and other means as an URL. Copy the generated URL in the text field.<br/>
-        <input type="url" id="share" style="width:80%" onclick="this.select();"/><button onclick="
-            share(
-              function(uri){
-                $('#share').val(uri);
+        Initial graph setup:<textarea id="share_init" rows=10  style="width:80%"></textarea></br>
+        Initial Query:<input type="text" id="share_query" style="width:80%"/></br>
+        Adjust the above parameters to fit your intention, then press the Button below to generate the final URLs to share.<br/>
+        <button onclick="
+                init = $('#share_init').val();
+                uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&amp;query='+encodeURIComponent($('#share_query').val());
+                console.log(uri);
+                $('#share_url').val(uri);
                 frame = '&lt;iframe width=&quot;600&quot; height=&quot;300&quot;  src=&quot;'+uri+'&quot;/&gt;';
                 $('#share_iFrame').val(frame);
-               // $('#preview').html(frame);
-
-            })">Generate URL</button>
+                addthis.update('share', 'url', uri);
+                addthis.update('share', 'title', 'Look at this Neo4j graph: ');
+                //addthis.update('config', 'ui_cobrand', 'New Cobrand!');
+               ">Generate URL</button>
         <br/>
-        <div ><br/>
-        Paste HTML to embed in website (Adjust width and height):<br/><input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/></div>
+        Share as a link (email, web etc)
+        <input type="url" id="share_url" style="width:80%" onclick="this.select();"/>
+        <!-- AddThis Button BEGIN -->
+        <div class="addthis_toolbox addthis_default_style ">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_compact"></a>
+        <a class="addthis_counter addthis_bubble_style"></a>
+        </div>
+        <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f895f9309279e1e"></script>
+        <!-- AddThis Button END -->
+        <br/>
+        Paste HTML to embed in website (Adjust width and height):<br/>
+        <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/></div>
         <!--br/>Preview:<br/>
         <div id="preview"></div-->
         

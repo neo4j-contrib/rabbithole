@@ -74,7 +74,7 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson(service.cypherQueryViz(query));
             }
         });
-        get(new Route("/console/share") {
+        get(new Route("/console/to_geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.toGeoff();
             }

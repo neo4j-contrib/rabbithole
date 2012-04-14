@@ -37,12 +37,6 @@ function share(fn) {
     $.ajax("/console/url", { type:"GET", success:fn});
 }
 
-function tweet() {
-    share(function(uri) {
-        var text=encodeURIComponent("A #Neo4j graph database ");
-        window.open("https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Fconsole.neo4j.org%2F&source=tweetbutton&text="+text+"&url="+uri+"&via=neo4j","tweet this db","height=400,width=400");
-    });
-}
 function isCypher(query) {
     return query && query.indexOf("start") != -1;
 }
@@ -67,6 +61,20 @@ function toggleGraph() {
     }
 }
 
+function toggleShare() {
+    $('#shareUrl').toggle();
+    $('#share_query').val($("#form input").val());
+    $.ajax("console/to_geoff", {
+        type:"GET",
+        success:function (data) {
+            $('#share_init').val(data);
+        },
+        error:function (data, error) {
+            append($("#output"), "Error: "+error+"\n" + data.responseText+"");
+        }
+    });
+}
+
 $(document).ready(function () {
         console.log("parameters"+window.location.search);
         $.ajax("/console/init"+window.location.search, {type:"GET", success: function(json) {
@@ -76,7 +84,8 @@ $(document).ready(function () {
             append($("#output"), data.result);
             $("#form input").val(data.query);
             viz(data.vizualization);
-        }});
+        }
+    });
 /*
     reset(function () {
         var params = getParameters();
