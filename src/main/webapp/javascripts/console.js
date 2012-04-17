@@ -59,10 +59,10 @@ function reset(done) {
 function generate_url() {
     var init = $('#share_init').val();
     var query = $('#share_query').val();
-    var uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&amp;query='+encodeURIComponent(query);
+    var uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query);
     console.log(uri);
     $('#share_url').val(uri);
-    var frame = '&lt;iframe width=&quot;600&quot; height=&quot;300&quot; src=&quot;'+uri+'&quot;/&gt;';
+    var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
     $('#share_iFrame').val(frame);
     addthis.update('share', 'url', uri);
     addthis.update('share', 'title', 'Look at this Neo4j graph: ');
