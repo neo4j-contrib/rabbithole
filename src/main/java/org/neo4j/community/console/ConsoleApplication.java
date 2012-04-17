@@ -53,18 +53,24 @@ public class ConsoleApplication implements SparkApplication {
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                long start = System.currentTimeMillis(), time=start;
-                time = trace("service",time);
                 String init = param(request, "init", DEFAULT_GRAPH);
-                final Map geoff = service.mergeGeoff(init);
-                time = trace("geoff",time);
                 String query = param(request, "query", DEFAULT_QUERY);
-                final String result = service.cypherQuery(query);
-                time = trace("cypher",time);
-                final Map visualization = service.cypherQueryViz(query);
-                trace("viz",time);
-                time = trace("all",start);
-                return new Gson().toJson(map("init", init, "geoff", geoff, "query", query, "result", result, "visualization", visualization,"time",time));
+                final Map<String, Object> data = map("init", init, "query", query);
+                long start = System.currentTimeMillis(), time = start;
+                try {
+                    time = trace("service", time);
+                    data.put("geoff", service.mergeGeoff(init));
+                    time = trace("geoff", time);
+                    data.put("result", service.cypherQuery(query));
+                    time = trace("cypher", time);
+                    data.put("visualization", service.cypherQueryViz(query));
+                    trace("viz", time);
+                } catch (Exception e) {
+                    data.put("error", e.getMessage());
+                }
+                time = trace("all", start);
+                data.put("time", time);
+                return new Gson().toJson(data);
             }
 
         });

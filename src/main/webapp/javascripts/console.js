@@ -1,4 +1,6 @@
 function append(element, text) {
+    if (!text) return;
+    if (typeof(text) == 'object') text = JSON.stringify(text);
     element.html(element.html() + "\n" + text);
     element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
@@ -54,6 +56,19 @@ function reset(done) {
     return false;
 }
 
+function generate_url() {
+    var init = $('#share_init').val();
+    var query = $('#share_query').val();
+    var uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&amp;query='+encodeURIComponent(query);
+    console.log(uri);
+    $('#share_url').val(uri);
+    var frame = '&lt;iframe width=&quot;600&quot; height=&quot;300&quot; src=&quot;'+uri+'&quot;/&gt;';
+    $('#share_iFrame').val(frame);
+    addthis.update('share', 'url', uri);
+    addthis.update('share', 'title', 'Look at this Neo4j graph: ');
+    //addthis.update('config', 'ui_cobrand', 'New Cobrand!');
+}
+
 function toggleGraph() {
     $('#graph').toggle();
     if ($('#graph').is(":visible")) {
@@ -62,12 +77,12 @@ function toggleGraph() {
 }
 
 function toggleShare() {
-    $('#shareUrl').toggle();
-    $('#share_query').val($("#form input").val());
     $.ajax("console/to_geoff", {
         type:"GET",
         success:function (data) {
             $('#share_init').val(data);
+            $('#share_query').val($("#form input").val());
+            $('#shareUrl').toggle();
         },
         error:function (data, error) {
             append($("#output"), "Error: "+error+"\n" + data.responseText+"");
@@ -77,15 +92,20 @@ function toggleShare() {
 
 $(document).ready(function () {
         console.log("parameters"+window.location.search);
-        $.ajax("/console/init"+window.location.search, {type:"GET", success: function(json) {
-            var data=$.parseJSON(json);
-            append($("#output"), data.init);
-            append($("#output"), data.geoff);
-            append($("#output"), data.result);
-            $("#form input").val(data.query);
-            viz(data.vizualization);
-        }
-    });
+        $.ajax("/console/init"+window.location.search, {type:"GET",
+            success:function (json) {
+                var data = $.parseJSON(json);
+                if (data["init"]) append($("#output"), "Graph Setup:\n"+data["init"]);
+                // append($("#output"), data["geoff"]);
+                append($("#output"), data["result"]);
+                if (data["query"]) $("#form input").val(data["query"]);
+                if (data["error"]) append($("#output"), "Error: "+data["error"]);
+                if (data["visualization"]) viz(data.visualization);
+            },
+            error:function (data, error) {
+                append($("#output"), "Error: "+error+"\n" + data.responseText+"");
+            }
+        });
 /*
     reset(function () {
         var params = getParameters();

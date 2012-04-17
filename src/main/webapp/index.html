@@ -52,17 +52,7 @@
         Initial graph setup:<textarea id="share_init" rows=10  style="width:80%"></textarea></br>
         Initial Query:<input type="text" id="share_query" style="width:80%"/></br>
         Adjust the above parameters to fit your intention, then press the Button below to generate the final URLs to share.<br/>
-        <button onclick="
-                init = $('#share_init').val();
-                uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&amp;query='+encodeURIComponent($('#share_query').val());
-                console.log(uri);
-                $('#share_url').val(uri);
-                frame = '&lt;iframe width=&quot;600&quot; height=&quot;300&quot;  src=&quot;'+uri+'&quot;/&gt;';
-                $('#share_iFrame').val(frame);
-                addthis.update('share', 'url', uri);
-                addthis.update('share', 'title', 'Look at this Neo4j graph: ');
-                //addthis.update('config', 'ui_cobrand', 'New Cobrand!');
-               ">Generate URL</button>
+        <button onclick="generate_url();">Generate URL</button>
         <br/>
         Share as a link (email, web etc)
         <input type="url" id="share_url" style="width:80%" onclick="this.select();"/>
