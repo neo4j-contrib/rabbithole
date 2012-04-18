@@ -95,8 +95,9 @@ $(document).ready(function () {
         //console.log(getParameters());
         $.ajax("/console/init", {type:"POST", // +window.location.search
             data : JSON.stringify(getParameters()),
-            success:function (json) {
-                var data = $.parseJSON(json);
+            dataType : "json",
+            success:function (data) {
+                // var data = $.parseJSON(json);
                 if (data["init"]) append($("#output"), "Graph Setup:\n"+data["init"]);
                 // append($("#output"), data["geoff"]);
                 append($("#output"), data["result"]);
