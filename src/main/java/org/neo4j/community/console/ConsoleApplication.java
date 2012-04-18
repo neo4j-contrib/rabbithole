@@ -46,16 +46,18 @@ public class ConsoleApplication implements SparkApplication {
             }
 
         });
-        get(new Route("/console/init") {
+        post(new Route("/console/init") {
             @Override
             protected void doBefore(Request request, Response response) {
                 reset(request);
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String init = param(request, "init", DEFAULT_GRAPH);
-                String query = param(request, "query", DEFAULT_QUERY);
+                final Map input = new Gson().fromJson(request.body(),Map.class);
+                String init = param(input, "init", DEFAULT_GRAPH);
+                String query = param(input, "query", DEFAULT_QUERY);
                 final Map<String, Object> data = map("init", init, "query", query);
+
                 long start = System.currentTimeMillis(), time = start;
                 try {
                     time = trace("service", time);

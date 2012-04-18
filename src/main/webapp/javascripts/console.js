@@ -28,7 +28,7 @@ function getParameters() {
     var result = {};
     for (var i = 0; i < pairs.length; ++i) {
         var pair = pairs[i].split('=');
-        console.log(pair);
+        // console.log(pair);
         if (pair.length != 2) continue;
         result[pair[0]] = decodeURIComponent(pair[1].replace(/\+/g, " "));
     }
@@ -40,7 +40,7 @@ function share(fn) {
 }
 
 function isCypher(query) {
-    return query && query.indexOf("start") != -1;
+    return query && query.toLowerCase().indexOf("start") != -1;
 }
 function viz() {
     if ($('#graph').is(":hidden")) return;
@@ -91,8 +91,10 @@ function toggleShare() {
 }
 
 $(document).ready(function () {
-        console.log("parameters"+window.location.search);
-        $.ajax("/console/init"+window.location.search, {type:"GET",
+        // console.log("parameters"+window.location.search);
+        //console.log(getParameters());
+        $.ajax("/console/init", {type:"POST", // +window.location.search
+            data : JSON.stringify(getParameters()),
             success:function (json) {
                 var data = $.parseJSON(json);
                 if (data["init"]) append($("#output"), "Graph Setup:\n"+data["init"]);

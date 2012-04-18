@@ -4,6 +4,8 @@ import org.neo4j.kernel.lifecycle.LifecycleException;
 import spark.Request;
 import spark.Response;
 
+import java.util.Map;
+
 /**
  * @author mh
  * @since 08.04.12
@@ -43,11 +45,19 @@ abstract class Route extends spark.Route {
     }
 
     protected String param(Request request, String param, String defaultValue) {
-        String geoff = request.queryParams(param);
-        if (geoff == null || geoff.isEmpty()) {
-            geoff = defaultValue;
+        String data = request.queryParams(param);
+        if (data == null || data.isEmpty()) {
+            data = defaultValue;
         }
-        return geoff;
+        return data;
+    }
+    protected String param(Map input, String param, String defaultValue) {
+        if (input==null) return defaultValue;
+        String data = (String) input.get(param);
+        if (data == null || data.isEmpty()) {
+            data = defaultValue;
+        }
+        return data;
     }
 
     protected long trace(String msg, long time) {
