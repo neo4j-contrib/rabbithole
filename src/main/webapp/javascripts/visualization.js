@@ -1,5 +1,4 @@
-var color = d3.scale.category20();
-var color2 = d3.scale.category10();
+var color = d3.scale.category20b();
 
 function hash(s) {
 	if (!s) return 0;
@@ -81,6 +80,7 @@ d3.json(url, function(data) {
         .attr("class", "link")
 	  	.attr("marker-end", function(d) { return "url(#" + "end-marker" + ")"; }) // was d.type
 	  	.style("stroke", function(d) { var sel = d["selected"]; return sel ? "red" : null; })
+        .style("stroke-width", function(d) { return d["selected"] ? 2 : null; })
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
@@ -92,7 +92,8 @@ d3.json(url, function(data) {
         .attr("class", "node")
 	    .attr("r", 5)
 	    .style("fill", function(d) { return color(propertyHash(d) % 20); })
-	  	.style("stroke", function(d) { var sel = d["selected"]; return sel ? "red" /* was d3.rgb(color2(hash(sel) % 20)).brighter() */ : null; })
+	  	.style("stroke-width", function(d) { return d["selected"] ? 2 : 0; })
+        .style("stroke", function(d) { var sel = d["selected"]; return sel ? "red" /* was d3.rgb(color2(hash(sel) % 20)).brighter() */ : null; })
         .call(force.drag);
 
 	  node.append("title")

@@ -42,17 +42,31 @@ class Neo4jService {
         ExecutionResult result = executionEngine.execute(query);
         for (Map<String, Object> row : result) {
             for (Map.Entry<String, Object> entry : row.entrySet()) {
-                String column = entry.getKey();
-                Object value = entry.getValue();
-                if (value instanceof Node) {
-                    final long id = ((Node) value).getId();
-                    nodes.get(id).put("selected", column);
-                }
-                if (value instanceof Relationship) {
-                    final long id = ((Relationship) value).getId();
-                    rels.get(id).put("selected", column);
-                }
+                markEntry(nodes, rels, entry);
             }
+        }
+    }
+
+    private void markEntry(Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels, Map.Entry<String, Object> entry) {
+        String column = entry.getKey();
+        Object value = entry.getValue();
+        if (value instanceof Iterable) {
+            for (Object inner : (Iterable)value) {
+                markNodeOrRel(nodes,rels,column,inner);
+            }
+        } else {
+            markNodeOrRel(nodes, rels, column, value);
+        }
+    }
+
+    private void markNodeOrRel(Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels, String column, Object value) {
+        if (value instanceof Node) {
+            final long id = ((Node) value).getId();
+            nodes.get(id).put("selected", column);
+        }
+        if (value instanceof Relationship) {
+            final long id = ((Relationship) value).getId();
+            rels.get(id).put("selected", column);
         }
     }
 
