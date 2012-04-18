@@ -9,7 +9,7 @@ function hash(s) {
 	return ret;
 }
 
-var ignore = { source: 1, target:1, type:1, selected:1, index:1, x:1, y:1, weight:1, px:1,py:1}
+var ignore = { source: 1, target:1, type:1, selected:1, index:1, x:1, y:1, weight:1, px:1,py:1, id: 1}
 function propertyHash(ob) {
 	var ret=0;
 	for (var prop in ob) {
