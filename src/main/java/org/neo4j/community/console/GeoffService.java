@@ -18,9 +18,11 @@ import java.util.TreeMap;
 */
 class GeoffService {
     private final GraphDatabaseService gdb;
+    private final Index index;
 
-    GeoffService(GraphDatabaseService gdb) {
+    GeoffService(GraphDatabaseService gdb, Index index) {
         this.gdb = gdb;
+        this.index = index;
     }
 
     private Map<String, Node> geoffNodeParams() {
@@ -66,7 +68,15 @@ class GeoffService {
 
     public Map<String,PropertyContainer> mergeGeoff(final String geoff) throws SubgraphError, SyntaxError {
         final Subgraph subgraph = new Subgraph(geoff.replaceAll("\\s*;\\s*", "\n"));
+        registerProperties(subgraph);
         return Geoff.mergeIntoNeo4j(subgraph, gdb, geoffNodeParams());
+    }
+
+    private void registerProperties(Subgraph subgraph) {
+        for (Subgraph.Rule rule : subgraph) {
+            if (rule==null) continue;
+            index.registerProperty(rule.getData());
+        }
     }
 
     private void formatProperties(StringBuilder sb, PropertyContainer pc) {

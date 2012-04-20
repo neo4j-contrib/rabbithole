@@ -20,8 +20,9 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 */
 class Neo4jService {
     private GraphDatabaseService gdb = new ImpermanentGraphDatabase();
+
     private ExecutionEngine executionEngine = new ExecutionEngine(gdb);
-    private GeoffService geoffService = new GeoffService(gdb);
+    private GeoffService geoffService = new GeoffService(gdb,new Index(gdb));
 
     public String cypherQuery(String query) {
         ExecutionResult result = executionEngine.execute(query);
