@@ -54,7 +54,7 @@ d3.json(url, function(data) {
         .links(data.links)
         .gravity(.2)
         .distance(40)
-        .charge(-2000)
+        .charge(-1000)
         .size([w, h])
         .start();
 

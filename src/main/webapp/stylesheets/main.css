@@ -50,10 +50,14 @@ a:link, a:visited {
     border: 2px solid #a9a9a9;
     position: absolute;
     top: 10%;
+    bottom: 10%;
+    right: 10%;
     left: 10%;
     display: none;
+    /*
     width: 80%;
     height: 80%;
+    */
     z-index: 50;
     padding: 20px;
 }
