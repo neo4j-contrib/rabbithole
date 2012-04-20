@@ -150,5 +150,6 @@ $(document).ready(function () {
         }
         return false;
     });
-    $("#form input").focus();
+    var isInIFrame = window.location != window.parent.location;
+    if (!isInIFrame) $("#form input").focus();
 });
