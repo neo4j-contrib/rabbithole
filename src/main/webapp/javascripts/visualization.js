@@ -52,9 +52,9 @@ d3.json(url, function(data) {
     var force = self.force = d3.layout.force()
         .nodes(data.nodes)
         .links(data.links)
-        .gravity(.05)
-        .distance(120)
-        .charge(-200)
+        .gravity(.2)
+        .distance(40)
+        .charge(-2000)
         .size([w, h])
         .start();
 
