@@ -49,11 +49,11 @@ a:link, a:visited {
     color: #EEE;
     border: 2px solid #a9a9a9;
     position: absolute;
-    top: 25%;
-    left: 25%;
+    top: 10%;
+    left: 10%;
     display: none;
-    width: 50%;
-    height: 50%;
+    width: 80%;
+    height: 80%;
     z-index: 50;
     padding: 20px;
 }
