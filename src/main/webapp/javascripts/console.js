@@ -1,9 +1,32 @@
 function append(element, text) {
     if (!text) return;
     if (typeof(text) == 'object') text = JSON.stringify(text);
-    element.html(element.html() + "\n" + text);
+    text = highlight(text);
+    element.html(element.html() + "\n" + "<div class='data'>" + text + "</div>");
     element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
+
+function highlight(text) {
+    if (!text) return text;
+    var prompt = ""
+    if (text.substr(0, 2) == "> ") {
+        prompt = "> ";
+        text = text.substr(2);
+    }
+    if (text[0] == "(" || text[0] == "[") {
+        // Geoff
+        // colour nodes
+        text = text.replace(/(\([0-9A-Za-z_]*?\))/g, '<span style="color:#fa8072;">$1</span>');
+        // colour rels
+        text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/g, '<span style="color:#87cefa;">$1</span>');
+    } else if (text.substr(0, 5) == "start") {
+        // Cypher
+        text = text.replace(/\b(start|match|where|return)\b/g, '<span style="color:#70E0BC;">$1</span>');
+        text = text.replace(/\b(node|type)\b/g, '<span style="color:#C370E0;">$1</span>');
+    }
+    return prompt + text;
+}
+
 function post(uri, data, done) {
     console.log("Post data: " + data);
     append($("#output"), "> " + data);
@@ -98,7 +121,10 @@ $(document).ready(function () {
             dataType : "json",
             success:function (data) {
                 // var data = $.parseJSON(json);
-                if (data["init"]) append($("#output"), "Graph Setup:\n"+data["init"]);
+                if (data["init"]) {
+                    append($("#output"), "Graph Setup:");
+                    append($("#output"), data["init"]);
+                }
                 // append($("#output"), data["geoff"]);
                 append($("#output"), data["result"]);
                 if (data["query"]) $("#form input").val(data["query"]);
