@@ -64,7 +64,7 @@ function share(fn) {
 }
 
 function isCypher(query) {
-    return query && query.toLowerCase().indexOf("start") != -1;
+    return query && query.match(/\b(start|create|delete|relate)\b/i);
 }
 function viz(data) {
     if ($('#graph').is(":hidden")) return;
