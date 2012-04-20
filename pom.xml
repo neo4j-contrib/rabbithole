@@ -8,7 +8,7 @@
   <description><![CDATA[]]></description>
   <url></url>
   <properties>
-    <neo4j.version>1.7-SNAPSHOT</neo4j.version>
+    <neo4j.version>1.8-SNAPSHOT</neo4j.version>
   </properties>
 
   <repositories>
@@ -45,7 +45,7 @@
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-geoff-core</artifactId>
-      <version>${neo4j.version}</version>
+      <version>1.7-SNAPSHOT</version>
     </dependency>
 
     <dependency>

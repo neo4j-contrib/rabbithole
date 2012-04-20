@@ -24,23 +24,27 @@ class Neo4jService {
     private ExecutionEngine executionEngine = new ExecutionEngine(gdb);
     private GeoffService geoffService = new GeoffService(gdb,new Index(gdb));
 
-    public String cypherQuery(String query) {
-        ExecutionResult result = executionEngine.execute(query);
-        return result.toString();
+    public ExecutionResult cypherQuery(String query) {
+        return executionEngine.execute(query);
     }
 
     public Map cypherQueryViz(String query) {
+        final boolean invalidQuery = query == null || query.trim().isEmpty() || isMutatingQuery(query);
+        return invalidQuery ? cypherQueryViz((ExecutionResult) null) : cypherQueryViz(cypherQuery(query));
+    }
+    public Map cypherQueryViz(ExecutionResult result) {
         Map<Long, Map<String, Object>> nodes = nodeMap();
         Map<Long, Map<String, Object>> relationships = relationshipMap(nodes);
-
-        if (query != null && !query.trim().isEmpty()) {
-            markCypherResults(query, nodes, relationships);
-        }
+        markCypherResults(result, nodes, relationships);
         return map("nodes", nodes.values(), "links", relationships.values());
     }
 
-    private void markCypherResults(String query, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
-        ExecutionResult result = executionEngine.execute(query);
+    private boolean isMutatingQuery(String query) {
+        return query.matches("(?i).*\\b(create|relate|delete|set)\\b.*");
+    }
+
+    private void markCypherResults(ExecutionResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
+        if (result==null) return;
         for (Map<String, Object> row : result) {
             for (Map.Entry<String, Object> entry : row.entrySet()) {
                 markEntry(nodes, rels, entry);
@@ -63,10 +67,12 @@ class Neo4jService {
     private void markNodeOrRel(Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels, String column, Object value) {
         if (value instanceof Node) {
             final long id = ((Node) value).getId();
+            if (!nodes.containsKey(id)) return;
             nodes.get(id).put("selected", column);
         }
         if (value instanceof Relationship) {
             final long id = ((Relationship) value).getId();
+            if (!rels.containsKey(id)) return;
             rels.get(id).put("selected", column);
         }
     }

@@ -80,9 +80,12 @@ class GeoffService {
     }
 
     private void formatProperties(StringBuilder sb, PropertyContainer pc) {
+        final Map<String, Object> properties = toMap(pc);
+        if (properties.isEmpty()) return;
         sb.append(" ");
-        sb.append(new Gson().toJson(toMap(pc)));
+        sb.append(new Gson().toJson(properties));
     }
+
     Map<String, Object> toMap(PropertyContainer pc) {
         Map<String, Object> result = new TreeMap<String, Object>();
         for (String prop : pc.getPropertyKeys()) {

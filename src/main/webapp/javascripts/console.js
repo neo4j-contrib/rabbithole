@@ -16,28 +16,29 @@ function highlight(text) {
     if (text[0] == "(" || text[0] == "[") {
         // Geoff
         // colour nodes
-        text = text.replace(/(\([0-9A-Za-z_]*?\))/g, '<span style="color:#fa8072;">$1</span>');
+        text = text.replace(/(\([0-9A-Za-z_]*?\))/gi, '<span class="node">$1</span>');
         // colour rels
-        text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/g, '<span style="color:#87cefa;">$1</span>');
-    } else if (text.substr(0, 5) == "start") {
+        text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/gi, '<span class="relationship">$1</span>');
+    } else if (isCypher(text)) {
         // Cypher
-        text = text.replace(/\b(start|match|where|return)\b/g, '<span style="color:#70E0BC;">$1</span>');
-        text = text.replace(/\b(node|type)\b/g, '<span style="color:#C370E0;">$1</span>');
+        text = text.replace(/\b(start|with|create|delete|rel|relate|skip|limit|distinct|oder by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
+        text = text.replace(/\b(and|or|not|has|node)\b/gi, '<span class="keyword">$1</span>');
+        text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>');
     }
     return prompt + text;
 }
 
-function post(uri, data, done) {
+function post(uri, data, done, dataType) {
     console.log("Post data: " + data);
     append($("#output"), "> " + data);
     $.ajax(uri, {
         type:"POST",
         data:data,
-        dataType:"text",
+        dataType: dataType || "text",
         success:function (data) {
-            append($("#output"), data);
+            if (dataType=="text") append($("#output"), data);
             if (done) {
-                done();
+                done(data);
             }
         },
         error:function (data, error) {
@@ -65,13 +66,17 @@ function share(fn) {
 function isCypher(query) {
     return query && query.toLowerCase().indexOf("start") != -1;
 }
-function viz() {
+function viz(data) {
     if ($('#graph').is(":hidden")) return;
-    var query = $("#form input").val();
-    if (!isCypher(query)) query = "";
     var graph = $("#graph");
     graph.empty();
-    render("graph", graph.width(), graph.height(), "/console/visualization?query=" + encodeURIComponent(query));
+    if (data) {
+        visualize("graph", graph.width(), graph.height(),data)
+    } else {
+        var query = $("#form input").val();
+        if (!isCypher(query)) query = "";
+        render("graph", graph.width(), graph.height(), "/console/visualization?query=" + encodeURIComponent(query));
+    }
     graph.show();
 }
 function reset(done) {
@@ -113,48 +118,36 @@ function toggleShare() {
     });
 }
 
+function showResults(data) {
+    if (data["init"]) {
+        append($("#output"), "Graph Setup:");
+        append($("#output"), data["init"]);
+    }
+    if (data["query"]) {
+        append($("#output"), data["query"]);
+        $("#form input").val(data["query"]);
+    }
+    if (data["result"]) {
+        append($("#output"), data["result"]);
+    }
+    if (data["error"]) append($("#output"), "Error: " + data["error"]);
+    if (data["visualization"]) {
+        viz(data.visualization);
+    }
+}
 $(document).ready(function () {
         // console.log("parameters"+window.location.search);
         //console.log(getParameters());
-        $.ajax("/console/init", {type:"POST", // +window.location.search
-            data : JSON.stringify(getParameters()),
-            dataType : "json",
-            success:function (data) {
-                // var data = $.parseJSON(json);
-                if (data["init"]) {
-                    append($("#output"), "Graph Setup:");
-                    append($("#output"), data["init"]);
-                }
-                // append($("#output"), data["geoff"]);
-                append($("#output"), data["result"]);
-                if (data["query"]) $("#form input").val(data["query"]);
-                if (data["error"]) append($("#output"), "Error: "+data["error"]);
-                if (data["visualization"]) viz(data.visualization);
-            },
-            error:function (data, error) {
-                append($("#output"), "Error: "+error+"\n" + data.responseText+"");
-            }
-        });
-/*
-    reset(function () {
-        var params = getParameters();
-        console.log(params);
-        post("/console/geoff", params.init || "(Neo) {\"name\": \"Neo\" }; (Morpheus) {\"name\":\"Morpheus\"}; (Trinity) {\"name\":\"Trinity\"}; (Cypher) {\"name\":\"Cypher\"}; (Smith) {\"name\" : \"Agent Smith\"}; (Architect) {\"name\":\"The Architect\"};(0)-[:ROOT]->(Neo);(Neo)-[:KNOWS]->(Morpheus);(Neo)-[:LOVES]->(Trinity);(Morpheus)-[:KNOWS]->(Trinity);(Morpheus)-[:KNOWS]->(Cypher);(Cypher)-[:KNOWS]->(Smith);(Smith)-[:CODED_BY]->(Architect)",
-            function () {
-                var query = params.query || "start n=node(*) match n-[r]->m return n,type(r),m";
-                post("/console/cypher", query);
-                $("#form input").val(query);
-                viz();
-            }
-        );
-    });
-*/
+        post("/console/init", JSON.stringify(getParameters()), showResults,"json");
     $("#form").submit(function () {
         var query = $("#form input").val();
-        var url = isCypher(query) ? "/console/cypher" : "/console/geoff";
-        post(url, query, function () {
-            viz();
-        });
+        if (isCypher(query)) {
+            post("/console/cypher", query, showResults,"json");
+        } else {
+            post("/console/geoff", query, function () {
+                viz();
+            });
+        }
         return false;
     });
     $("#form input").focus();

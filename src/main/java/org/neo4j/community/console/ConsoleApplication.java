@@ -1,6 +1,7 @@
 package org.neo4j.community.console;
 
 import com.google.gson.Gson;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import spark.Request;
@@ -40,15 +41,14 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String query = request.body();
-                return service.cypherQuery(query);
+                return new Gson().toJson(execute(service, null, query));
             }
         });
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
-                return new Gson().toJson(service.cypherQueryResults(query));
+                return service.cypherQueryResults(query).toString();
             }
-
         });
         post(new Route("/console/init") {
             @Override
@@ -60,23 +60,7 @@ public class ConsoleApplication implements SparkApplication {
                 final Map input = new Gson().fromJson(request.body(),Map.class);
                 String init = param(input, "init", DEFAULT_GRAPH);
                 String query = param(input, "query", DEFAULT_QUERY);
-                final Map<String, Object> data = map("init", init, "query", query);
-
-                long start = System.currentTimeMillis(), time = start;
-                try {
-                    time = trace("service", time);
-                    data.put("geoff", service.mergeGeoff(init));
-                    time = trace("geoff", time);
-                    data.put("result", service.cypherQuery(query));
-                    time = trace("cypher", time);
-                    data.put("visualization", service.cypherQueryViz(query));
-                    trace("viz", time);
-                } catch (Exception e) {
-                    data.put("error", e.getMessage());
-                }
-                time = trace("all", start);
-                data.put("time", time);
-                return new Gson().toJson(data);
+                return new Gson().toJson(execute(service, init, query));
             }
 
         });
@@ -117,6 +101,37 @@ public class ConsoleApplication implements SparkApplication {
             }
         });
     }
+
+    private Map<String, Object> execute(Neo4jService service, String init, String query) {
+        final Map<String, Object> data = map("init", init, "query", query);
+        long start = System.currentTimeMillis(), time = start;
+        try {
+            time = trace("service", time);
+            if (init!=null) data.put("geoff", service.mergeGeoff(init));
+            time = trace("geoff", time);
+            ExecutionResult result = null;
+            if (query!=null) {
+                result = service.cypherQuery(query);
+                data.put("result", result.toString());
+            }
+            time = trace("cypher", time);
+            data.put("visualization", service.cypherQueryViz(query)); // was `result` but not possible right now due to multiple execution of mutating cypher
+            trace("viz", time);
+        } catch (Exception e) {
+            e.printStackTrace();
+            data.put("error", e.getMessage());
+        }
+        time = trace("all", start);
+        data.put("time", time);
+        return data;
+    }
+
+    protected long trace(String msg, long time) {
+        long now = System.currentTimeMillis();
+        System.err.println("## " + msg + " took: " + (now - time) + " ms.");
+        return now;
+    }
+
 
     private String shortenUrl(String uri) throws IOException {
         final InputStream stream = (InputStream) new URL("http://tinyurl.com/api-create.php?url=" + URLEncoder.encode(uri, "UTF-8")).getContent();

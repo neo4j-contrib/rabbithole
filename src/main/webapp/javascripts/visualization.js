@@ -43,8 +43,7 @@ function title(ob) {
 	return ob.id;
 }
 
-function render(id,w,h,url) {
-d3.json(url, function(data) {
+function visualize(id,w,h,data) {
   var vis = d3.select("#"+id).append("svg")
     .attr("width", w)
     .attr("height", h);
@@ -154,5 +153,9 @@ d3.json(url, function(data) {
 	  });
 
 	});
-});
+}
+function render(id,w,h,url) {
+    d3.json(url, function(data) {
+        visualize(id,w,h,data);
+    });
 }
