@@ -34,22 +34,27 @@
     <pre id="output" class="console">
     </pre>
 	<form id="form" action="#">
-	    <input class="console" type="text" name="text" size="180" value="start n=node(*) return n"/>
+	    <textarea id="input" class="console">start n=node(*) return n</textarea>
 	</form>
 	<div id="graph">
 	</div>
-	<div id="info">
+	<div id="info" class="popup">
 		This is an interactive console (REPL) for graphs with integrated visualization.
 		It is hosted on Heroku at <a href="http://console.neo4j.org">http://console.neo4j.org</a> the source
 		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.<br/><br/>
 		To add to the Graph you can issue
 		<a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
 		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
-		For querying the graph, <a href="http://docs.neo4j.org/chunked/milestone/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10 <br/><br/>
+		For querying and mutating the graph, <a href="http://docs.neo4j.org/chunked/snapshot/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. 
+		<ul>
+			<li><code>start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10</code></li>
+			<li><code>start n=node(*) where has(n.name) with n create node m { name : "actor of " n.name }, rel m-[:ACTS_AS]->n return m</code></li>
+		</ul>
+		 <br/><br/>
 		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
         
 	</div>
-    <div id="shareUrl">
+    <div id="shareUrl" class="popup">
         Initial graph setup:<textarea id="share_init" rows=10  style="width:80%"></textarea></br>
         Initial Query:<input type="text" id="share_query" style="width:80%"/></br>
         Adjust the above parameters to fit your intention, then press the Button below to generate the final URLs to share.<br/>

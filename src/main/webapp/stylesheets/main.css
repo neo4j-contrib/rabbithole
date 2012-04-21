@@ -11,6 +11,7 @@ body, html, div, form, input {
     height: 10%;
     margin: 0;
     border: none;
+	padding:5px;
 }
 
 a:link, a:visited {
@@ -25,6 +26,10 @@ a:link, a:visited {
     white-space: -pre-wrap; /* Opera 4-6 */
     white-space: -o-pre-wrap; /* Opera 7 */
     word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
+#input {
+	overflow:hidden;
 }
 
 #graph {
@@ -44,6 +49,9 @@ a:link, a:visited {
 }
 
 #info, #shareUrl {
+
+}
+.popup {
     font-family: monospace;
     background-color: #202020;
     color: #EEE;

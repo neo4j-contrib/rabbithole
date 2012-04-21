@@ -21,16 +21,16 @@ function highlight(text) {
         text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/gi, '<span class="relationship">$1</span>');
     } else if (isCypher(text)) {
         // Cypher
-        text = text.replace(/\b(start|with|create|delete|rel|relate|skip|limit|distinct|oder by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
+        text = text.replace(/\b(start|with|create|delete|rel|relate|skip|limit|distinct|desc|asc|as|order by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
         text = text.replace(/\b(and|or|not|has|node)\b/gi, '<span class="keyword">$1</span>');
-        text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>');
+        text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>(');
     }
     return prompt + text;
 }
 
 function post(uri, data, done, dataType) {
     console.log("Post data: " + data);
-    append($("#output"), "> " + data);
+    // append($("#output"), "> " + data.trim());
     $.ajax(uri, {
         type:"POST",
         data:data,
@@ -73,7 +73,7 @@ function viz(data) {
     if (data) {
         visualize("graph", graph.width(), graph.height(),data)
     } else {
-        var query = $("#form input").val();
+        var query = $("#input").val();
         if (!isCypher(query)) query = "";
         render("graph", graph.width(), graph.height(), "/console/visualization?query=" + encodeURIComponent(query));
     }
@@ -109,7 +109,7 @@ function toggleShare() {
         type:"GET",
         success:function (data) {
             $('#share_init').val(data);
-            $('#share_query').val($("#form input").val());
+            $('#share_query').val($("#input").val());
             $('#shareUrl').toggle();
         },
         error:function (data, error) {
@@ -124,8 +124,8 @@ function showResults(data) {
         append($("#output"), data["init"]);
     }
     if (data["query"]) {
-        append($("#output"), data["query"]);
-        $("#form input").val(data["query"]);
+	    append($("#output"), "> " + data["query"].trim());
+        $("#input").val(data["query"]+"\n\n\n");
     }
     if (data["result"]) {
         append($("#output"), data["result"]);
@@ -135,21 +135,37 @@ function showResults(data) {
         viz(data.visualization);
     }
 }
+
+function send(query) {
+    if (isCypher(query)) {
+        post("/console/cypher", query, showResults,"json");
+    } else {
+        post("/console/geoff", query, function () {
+            viz();
+        });
+    }
+}
+
 $(document).ready(function () {
-        // console.log("parameters"+window.location.search);
-        //console.log(getParameters());
-        post("/console/init", JSON.stringify(getParameters()), showResults,"json");
-    $("#form").submit(function () {
-        var query = $("#form input").val();
-        if (isCypher(query)) {
-            post("/console/cypher", query, showResults,"json");
-        } else {
-            post("/console/geoff", query, function () {
-                viz();
-            });
-        }
-        return false;
-    });
+    post("/console/init", JSON.stringify(getParameters()), showResults,"json");
+    var input=$("#input");
+//    $("#form").submit(function () {
+//        send(input.val());
+//        return false;
+//    });
     var isInIFrame = window.location != window.parent.location;
-    if (!isInIFrame) $("#form input").focus();
+    if (!isInIFrame) $("#input").focus();
+
+    $("body").keyup(function(e) {
+        if (e.keyCode == 27) $(".popup").hide();
+		return true;
+    });
+    input.keyup(function(e) {
+		 if (e.keyCode == 40) { // arrow down, add line
+		 }
+         if (e.keyCode == 13) { // return, send
+             send(input.val());
+			return true;
+         }
+     });
 });
