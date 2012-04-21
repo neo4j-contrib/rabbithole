@@ -109,13 +109,13 @@ public class ConsoleApplication implements SparkApplication {
             time = trace("service", time);
             if (init!=null) data.put("geoff", service.mergeGeoff(init));
             time = trace("geoff", time);
-            ExecutionResult result = null;
+            CypherQueryExecutor.CypherResult result = null;
             if (query!=null) {
                 result = service.cypherQuery(query);
-                data.put("result", result.toString());
+                data.put("result", result.getText());
             }
             time = trace("cypher", time);
-            data.put("visualization", service.cypherQueryViz(query)); // was `result` but not possible right now due to multiple execution of mutating cypher
+            data.put("visualization", service.cypherQueryViz(result)); // was `result` but not possible right now due to multiple execution of mutating cypher
             trace("viz", time);
         } catch (Exception e) {
             e.printStackTrace();

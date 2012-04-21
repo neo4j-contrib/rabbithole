@@ -1,7 +1,6 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
+import org.neo4j.cypher.PipeExecutionResult;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -9,7 +8,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
+import scala.Tuple2;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
@@ -21,18 +22,14 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 class Neo4jService {
     private GraphDatabaseService gdb = new ImpermanentGraphDatabase();
 
-    private ExecutionEngine executionEngine = new ExecutionEngine(gdb);
+    private CypherQueryExecutor cypherQueryExecutor = new CypherQueryExecutor(gdb);
     private GeoffService geoffService = new GeoffService(gdb,new Index(gdb));
-
-    public ExecutionResult cypherQuery(String query) {
-        return executionEngine.execute(query);
-    }
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || isMutatingQuery(query);
-        return invalidQuery ? cypherQueryViz((ExecutionResult) null) : cypherQueryViz(cypherQuery(query));
+        return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
     }
-    public Map cypherQueryViz(ExecutionResult result) {
+    public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
         Map<Long, Map<String, Object>> nodes = nodeMap();
         Map<Long, Map<String, Object>> relationships = relationshipMap(nodes);
         markCypherResults(result, nodes, relationships);
@@ -43,7 +40,7 @@ class Neo4jService {
         return query.matches("(?i).*\\b(create|relate|delete|set)\\b.*");
     }
 
-    private void markCypherResults(ExecutionResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
+    private void markCypherResults(CypherQueryExecutor.CypherResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
         if (result==null) return;
         for (Map<String, Object> row : result) {
             for (Map.Entry<String, Object> entry : row.entrySet()) {
@@ -119,17 +116,21 @@ class Neo4jService {
 
     public Collection<Map<String,Object>> cypherQueryResults(String query) {
         Collection<Map<String,Object>> result=new ArrayList<Map<String, Object>>();
-        for (Map<String, Object> row : executionEngine.execute(query)) {
+        for (Map<String, Object> row : cypherQuery(query)) {
             result.add(row);
         }
         return result;
+    }
+
+    public CypherQueryExecutor.CypherResult cypherQuery(String query) {
+        return cypherQueryExecutor.cypherQuery(query);
     }
 
     public void stop() {
         if (gdb!=null) {
             System.err.println("Shutting down service "+this);
             gdb.shutdown();
-            executionEngine=null;
+            cypherQueryExecutor=null;
             geoffService=null;
             gdb=null;
         }
