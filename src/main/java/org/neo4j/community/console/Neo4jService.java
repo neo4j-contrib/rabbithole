@@ -3,9 +3,7 @@ package org.neo4j.community.console;
 import org.neo4j.cypher.PipeExecutionResult;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 import scala.Tuple2;
@@ -36,8 +34,8 @@ class Neo4jService {
         return map("nodes", nodes.values(), "links", relationships.values());
     }
 
-    private boolean isMutatingQuery(String query) {
-        return query.matches("(?i).*\\b(create|relate|delete|set)\\b.*");
+    public boolean isMutatingQuery(String query) {
+        return query.matches("(?is).*\\b(create|relate|delete|set)\\b.*");
     }
 
     private void markCypherResults(CypherQueryExecutor.CypherResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
@@ -133,6 +131,27 @@ class Neo4jService {
             cypherQueryExecutor=null;
             geoffService=null;
             gdb=null;
+        }
+    }
+
+    public void deleteReferenceNode() {
+        final Node root = gdb.getReferenceNode();
+        if (root!=null) {
+            final Transaction tx = gdb.beginTx();
+            try {
+                root.delete();
+                tx.success();
+            } finally {
+                tx.finish();
+            }
+        }
+    }
+
+    public boolean hasReferenceNode() {
+        try {
+            return gdb.getReferenceNode() != null;
+        } catch (NotFoundException nfe) {
+            return false;
         }
     }
 }

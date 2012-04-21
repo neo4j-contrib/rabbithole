@@ -53,13 +53,16 @@ class GeoffService {
     }
 
     private void appendNodes(StringBuilder sb) {
-        final Node refNode = gdb.getReferenceNode();
         for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            if (node.equals(refNode)) continue;
+            if (isReferenceNode(node)) continue;
             formatNode(sb, node);
             formatProperties(sb, node);
             sb.append("\n");
         }
+    }
+
+    private boolean isReferenceNode(Node node) {
+        return node.getId()==0;
     }
 
     private void formatNode(StringBuilder sb, Node n) {

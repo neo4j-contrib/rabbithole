@@ -4,11 +4,11 @@ body, html, div, form, input {
 }
 
 .console {
-    width: 100%;
+    left: 0;
+    right: 0;
     color: #EEE;
     background-color: black;
     font-family: monospace;
-    height: 10%;
     margin: 0;
     border: none;
 	padding:5px;
@@ -20,6 +20,7 @@ a:link, a:visited {
 
 #output {
     overflow-y: auto;
+    top: 0;
     height: 90%;
     white-space: pre-wrap; /* css-3 */
     white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
@@ -29,6 +30,11 @@ a:link, a:visited {
 }
 
 #input {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 8%;
 	overflow:hidden;
 }
 
@@ -89,4 +95,8 @@ a:link, a:visited {
 }
 .button.shareUrl {
     right: 70px;
+}
+
+h3 {
+    margin: 1px;
 }

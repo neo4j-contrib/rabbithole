@@ -87,11 +87,14 @@ function reset(done) {
 function generate_url() {
     var init = $('#share_init').val();
     var query = $('#share_query').val();
-    var uri = 'http://console.neo4j.org?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query);
+    var base=document.location.protocol+"//"+document.location.host;
+    var uri = base+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query);
+    if ($("#share_no_root").is(":checked")) uri+="&no_root=true";
     console.log(uri);
     $('#share_url').val(uri);
     var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
     $('#share_iFrame').val(frame);
+    $.ajax("/console/shorten?url="+encodeURIComponent(uri), { type: "GET", success: function(data) { $('#share_short').val(data);}});
     addthis.update('share', 'url', uri);
     addthis.update('share', 'title', 'Look at this Neo4j graph: ');
     //addthis.update('config', 'ui_cobrand', 'New Cobrand!');
@@ -164,8 +167,8 @@ $(document).ready(function () {
 		 if (e.keyCode == 40) { // arrow down, add line
 		 }
          if (e.keyCode == 13) { // return, send
-             send(input.val());
-			return true;
+            send(input.val());
+            e.stopImmediatePropagation();
          }
      });
 });

@@ -55,15 +55,15 @@
         
 	</div>
     <div id="shareUrl" class="popup">
-        Initial graph setup:<textarea id="share_init" rows=10  style="width:80%"></textarea></br>
-        Initial Query:<input type="text" id="share_query" style="width:80%"/></br>
-        Adjust the above parameters to fit your intention, then press the Button below to generate the final URLs to share.<br/>
-        <button onclick="generate_url();">Generate URL</button>
-        <br/>
+        <h3>Initial graph setup (Cypher or Geoff):</h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>
+        <h3>Initial Query (Cypher):</h3><input type="text" id="share_query" style="width:80%"/><br/>
+        <h3 style="display: inline-block;">Remove Root Node: </h3><input type="checkbox" id="share_no_root" style="vertical-align: bottom;"/><br/>
+        Adjust the above parameters to fit your intention, then <a href="#" onclick="generate_url();">click to generate</a> the final URLs to share.<br/>
         Share as a link (email, web etc)
-        <input type="url" id="share_url" style="width:80%" onclick="this.select();"/>
+        <input type="url" id="share_url" style="width:80%" onclick="this.select();"/><br/>
         <!-- AddThis Button BEGIN -->
-        <div class="addthis_toolbox addthis_default_style ">
+        <input type="url" id="share_short" style="width:20%" onclick="this.select();"/>
+        <div class="addthis_toolbox addthis_default_style" style="display: inline-block;vertical-align: bottom;">
         <a class="addthis_button_preferred_1"></a>
         <a class="addthis_button_preferred_2"></a>
         <a class="addthis_button_preferred_3"></a>

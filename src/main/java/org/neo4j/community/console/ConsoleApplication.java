@@ -8,9 +8,12 @@ import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -58,6 +61,10 @@ public class ConsoleApplication implements SparkApplication {
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final Map input = new Gson().fromJson(request.body(),Map.class);
+                String noRoot = param(input, "no_root","");
+                if (noRoot.equals("true")) {
+                    service.deleteReferenceNode();
+                }
                 String init = param(input, "init", DEFAULT_GRAPH);
                 String query = param(input, "query", DEFAULT_QUERY);
                 return new Gson().toJson(execute(service, init, query));
@@ -77,7 +84,7 @@ public class ConsoleApplication implements SparkApplication {
         });
         get(new Route("/console/url") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
-                final String uri = "http://console.neo4j.org?init=" + URLEncoder.encode(service.toGeoff(), "UTF-8");
+                final String uri = baseUri(request.raw(),"init=" + URLEncoder.encode(service.toGeoff(), "UTF-8")+hasRootNodeParam(service));
 				return shortenUrl(uri);
             	}
         });
@@ -102,20 +109,41 @@ public class ConsoleApplication implements SparkApplication {
         });
     }
 
+    private String hasRootNodeParam(Neo4jService service) {
+        return service.hasReferenceNode() ? "" : "&no_root=true";
+    }
+
+    private String baseUri(HttpServletRequest request, String query) {
+        final String requestURI = request.getRequestURI();
+        try {
+            final URI uri = new URI(requestURI);
+            return new URI(uri.getScheme(),null,uri.getHost(),uri.getPort(),null,query,null).toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error parsing URI from "+requestURI+" query "+query);
+        }
+    }
+
     private Map<String, Object> execute(Neo4jService service, String init, String query) {
         final Map<String, Object> data = map("init", init, "query", query);
         long start = System.currentTimeMillis(), time = start;
         try {
             time = trace("service", time);
-            if (init!=null) data.put("geoff", service.mergeGeoff(init));
-            time = trace("geoff", time);
+            if (init!=null) {
+                if (service.isMutatingQuery(init)) {
+                    service.cypherQuery(init);
+                    data.put("graph",service.toGeoff());
+                } else {
+                    data.put("graph", service.mergeGeoff(init));
+                }
+            }
+            time = trace("graph", time);
             CypherQueryExecutor.CypherResult result = null;
             if (query!=null) {
                 result = service.cypherQuery(query);
                 data.put("result", result.getText());
             }
             time = trace("cypher", time);
-            data.put("visualization", service.cypherQueryViz(result)); // was `result` but not possible right now due to multiple execution of mutating cypher
+            data.put("visualization", service.cypherQueryViz(result));
             trace("viz", time);
         } catch (Exception e) {
             e.printStackTrace();
