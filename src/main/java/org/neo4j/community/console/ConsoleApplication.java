@@ -1,15 +1,10 @@
 package org.neo4j.community.console;
 
-import com.google.gson.Gson;
-import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.geoff.except.SubgraphError;
-import org.neo4j.geoff.except.SyntaxError;
-import spark.Request;
-import spark.Response;
-import spark.servlet.SparkApplication;
+import static org.neo4j.helpers.collection.MapUtil.map;
+import static spark.Spark.delete;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -19,16 +14,30 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Scanner;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
-import static spark.Spark.*;
+import javax.servlet.http.HttpServletRequest;
+
+import org.neo4j.geoff.except.SubgraphError;
+import org.neo4j.geoff.except.SyntaxError;
+
+import spark.Request;
+import spark.Response;
+import spark.servlet.SparkApplication;
+
+import com.google.gson.Gson;
 
 public class ConsoleApplication implements SparkApplication {
 
-    private static final String DEFAULT_GRAPH = "(Neo) {\"name\": \"Neo\"} (Morpheus) {\"name\": \"Morpheus\"} " +
+    private static final String DEFAULT_GRAPH_GEOFF = "(Neo) {\"name\": \"Neo\"} (Morpheus) {\"name\": \"Morpheus\"} " +
             "(Trinity) {\"name\": \"Trinity\"} (Cypher) {\"name\": \"Cypher\"} (Smith) {\"name\": \"Agent Smith\"} " +
             "(Architect) {\"name\":\"The Architect\"} (0)-[:ROOT]->(Neo) (Neo)-[:KNOWS]->(Morpheus) " +
             "(Neo)-[:LOVES]->(Trinity) (Morpheus)-[:KNOWS]->(Trinity) (Morpheus)-[:KNOWS]->(Cypher) " +
             "(Cypher)-[:KNOWS]->(Smith) (Smith)-[:CODED_BY]->(Architect)";
+    private static final String DEFAULT_GRAPH_CYPHER = "start root=node(0) with root create node Neo = {name:'Neo'}, "+
+            "node Morpheus = {name: 'Morpheus'}, " +
+            "node Trinity = {name: 'Trinity'}, node Cypher = {name: 'Cypher'}, node Smith = {name: 'Agent Smith'}, " +
+            "node Architect = {name:'The Architect'}, rel root-[:ROOT]->Neo, rel Neo-[:KNOWS]->Morpheus, " +
+            "rel Neo-[:LOVES]->Trinity, rel Morpheus-[:KNOWS]->Trinity, rel Morpheus-[:KNOWS]->Cypher, " +
+            "rel Cypher-[:KNOWS]->Smith, rel Smith-[:CODED_BY]->Architect";
     private static final String DEFAULT_QUERY = "start n=node(*) match n-[r?]->m return n,type(r),m";
 
     @Override
@@ -65,7 +74,7 @@ public class ConsoleApplication implements SparkApplication {
                 if (noRoot.equals("true")) {
                     service.deleteReferenceNode();
                 }
-                String init = param(input, "init", DEFAULT_GRAPH);
+                String init = param(input, "init", DEFAULT_GRAPH_CYPHER);
                 String query = param(input, "query", DEFAULT_QUERY);
                 return new Gson().toJson(execute(service, init, query));
             }
