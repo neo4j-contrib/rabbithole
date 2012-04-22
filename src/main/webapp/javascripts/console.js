@@ -29,6 +29,7 @@ function highlight(text) {
 }
 
 function post(uri, data, done, dataType) {
+    data = data.trim();
     console.log("Post data: " + data);
     // append($("#output"), "> " + data.trim());
     $.ajax(uri, {
@@ -163,12 +164,23 @@ $(document).ready(function () {
         if (e.keyCode == 27) $(".popup").hide();
 		return true;
     });
+    input.keypress(function(e) {
+        if (e.keyCode == 13) { // return, send
+           e.preventDefault();
+           e.stopPropagation();
+           e.stopImmediatePropagation();
+           e.cancelBubble = true;
+        }
+    })
     input.keyup(function(e) {
 		 if (e.keyCode == 40) { // arrow down, add line
 		 }
          if (e.keyCode == 13) { // return, send
             send(input.val());
+            e.preventDefault();
+            e.stopPropagation();
             e.stopImmediatePropagation();
+            e.cancelBubble = true;
          }
      });
 });
