@@ -109,7 +109,7 @@ function toggleGraph() {
 }
 
 function toggleShare() {
-    $.ajax("console/to_geoff", {
+    $.ajax("console/to_cypher", {
         type:"GET",
         success:function (data) {
             $('#share_init').val(data);
@@ -118,6 +118,18 @@ function toggleShare() {
         },
         error:function (data, error) {
             append($("#output"), "Error: "+error+"\n" + data.responseText+"");
+        }
+    });
+}
+
+function export_graph(format) {
+    $.ajax("console/to_"+format, {
+        type:"GET",
+        success:function (data) {
+            $('#share_init').val(data);
+        },
+        error:function (data, error) {
+            $('#share_init').val("Error: "+error+"\n" + data.responseText+"");
         }
     });
 }

@@ -21,8 +21,8 @@ class CypherExportService {
     public String export() {
         StringBuilder sb = new StringBuilder();
         init(sb);
-        appendNodes(sb);
-        appendRelationships(sb);
+        int nodes = appendNodes(sb);
+        appendRelationships(sb, nodes);
         return sb.toString();
     }
 
@@ -42,16 +42,15 @@ class CypherExportService {
         }
     }
 
-    private void appendRelationships(StringBuilder sb) {
-        sb.append("create \n");
-        boolean first=true;
+    private int appendRelationships(StringBuilder sb, int count) {
         for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
             for (Relationship rel : node.getRelationships(Direction.OUTGOING)) {
-                if (!first) { sb.append(",\n"); } else { first=false; }
+                if (count > 0) { sb.append(",\n"); }
+                count++;
                 appendRelationship(sb, rel);
             }
         }
-        sb.append("\n");
+        return count;
     }
 
     private void appendRelationship(StringBuilder sb, Relationship rel) {
@@ -63,14 +62,15 @@ class CypherExportService {
         formatNode(sb, rel.getEndNode());
     }
 
-    private void appendNodes(StringBuilder sb) {
-        boolean first = true;
+    private int appendNodes(StringBuilder sb) {
+        int count = 0;
         for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
             if (isReferenceNode(node)) continue;
-            if (!first) { sb.append(",\n"); } else { first=false; }
+            if (count > 0) { sb.append(",\n"); }
+            count++;
             appendNode(sb, node);
         }
-        sb.append("\n");
+        return count;
     }
 
     private void appendNode(StringBuilder sb, Node node) {
