@@ -76,6 +76,25 @@ a:link, a:visited {
     padding: 20px;
 }
 
+.btn_pretty{
+ 	-moz-border-radius: 4px;-webkit-border-radius: 4px;border-radius: 4px;
+	-moz-box-shadow: 0 0 4px #000;-webkit-box-shadow: 0 0 4px #000;box-shadow: 0 0 4px #000;
+	border:none;
+	background-color:#606060;
+	padding:5px;
+	display:inline-block;
+	text-decoration:none;
+	color:#Fff;
+	text-shadow: 1px 1px 1px #2e2e2e;
+	filter: dropshadow(color=#2e2e2e, offx=1, offy=1);
+	font-size:100%;
+	vertical-align:middle;
+}
+.btn_pretty:hover{
+	-webkit-box-shadow: 0 0 0;
+	-moz-box-shadow: 0 0 0;
+	box-shadow: 0 0 0;
+}
 .button {
     z-index: 100;
     position: absolute;

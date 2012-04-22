@@ -21,9 +21,10 @@ class CypherExportService {
     public String export() {
         StringBuilder sb = new StringBuilder();
         init(sb);
-        int nodes = appendNodes(sb);
-        appendRelationships(sb, nodes);
-        return sb.toString();
+        int count = appendNodes(sb);
+        count = appendRelationships(sb, count);
+        if (count > 0) return sb.toString();
+        return "";
     }
 
     private void init(StringBuilder sb) {

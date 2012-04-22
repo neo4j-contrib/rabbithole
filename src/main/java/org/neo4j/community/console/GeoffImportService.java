@@ -1,6 +1,5 @@
 package org.neo4j.community.console;
 
-import com.google.gson.Gson;
 import org.neo4j.geoff.Geoff;
 import org.neo4j.geoff.Subgraph;
 import org.neo4j.geoff.except.SubgraphError;
@@ -10,17 +9,16 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
 * @author mh
 * @since 08.04.12
 */
-class GeoffService {
+class GeoffImportService {
     private final GraphDatabaseService gdb;
     private final Index index;
 
-    GeoffService(GraphDatabaseService gdb, Index index) {
+    GeoffImportService(GraphDatabaseService gdb, Index index) {
         this.gdb = gdb;
         this.index = index;
     }
@@ -41,8 +39,8 @@ class GeoffService {
 
     private void registerProperties(Subgraph subgraph) {
         for (Subgraph.Rule rule : subgraph) {
-            if (rule==null) continue;
-            index.registerProperty(rule.getData());
+            if (rule==null || rule.getData()==null) continue;
+            index.registerProperty(rule.getData().keySet());
         }
     }
 }

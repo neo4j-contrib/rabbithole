@@ -109,7 +109,7 @@ function toggleGraph() {
 }
 
 function toggleShare() {
-    $.ajax("console/to_cypher", {
+    $.ajax("console/to_geoff", {
         type:"GET",
         success:function (data) {
             $('#share_init').val(data);

@@ -8,6 +8,9 @@ import org.neo4j.graphdb.index.RelationshipAutoIndexer;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -49,21 +52,21 @@ public class IndexTest {
     }
     @Test
     public void testRegisterEmptyProperty() throws Exception {
-        index.registerProperty(MapUtil.map());
+        index.registerProperty(Collections.<String>emptySet());
         assertEquals(true, index.getAutoIndexedProperties().isEmpty());
         assertEquals(true,nodeAutoIndexer.getAutoIndexedProperties().isEmpty());
         assertEquals(true,relationshipAutoIndexer.getAutoIndexedProperties().isEmpty());
     }
     @Test
     public void testRegisterTwoProperties() throws Exception {
-        index.registerProperty(MapUtil.map("foo",null,"bar",null));
+        index.registerProperty(Arrays.asList("foo", "bar"));
         assertThat(index.getAutoIndexedProperties(),hasItems("foo","bar"));
         assertThat(nodeAutoIndexer.getAutoIndexedProperties(),hasItems("foo","bar"));
         assertThat(relationshipAutoIndexer.getAutoIndexedProperties(),hasItems("foo","bar"));
     }
     @Test
     public void testRegisterOneProperty() throws Exception {
-        index.registerProperty(MapUtil.map("foo",null));
+        index.registerProperty(Arrays.asList("foo"));
         assertThat(index.getAutoIndexedProperties(), hasItems("foo"));
         assertThat(nodeAutoIndexer.getAutoIndexedProperties(),hasItems("foo"));
         assertThat(relationshipAutoIndexer.getAutoIndexedProperties(),hasItems("foo"));

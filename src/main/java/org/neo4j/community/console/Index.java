@@ -6,6 +6,7 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.RelationshipAutoIndexer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +31,9 @@ public class Index {
         autoIndexer.getAutoIndex();
     }
 
-    public void registerProperty(Map<String, Object> data) {
-        if (data == null) return;
-        for (String prop : data.keySet()) {
+    public void registerProperty(final Collection<String> properties) {
+        if (properties == null) return;
+        for (String prop : properties) {
             if (autoIndexedProperties.contains(prop)) continue;
             System.out.println("Auto-Indexing "+prop);
             autoIndexedProperties.add(prop);

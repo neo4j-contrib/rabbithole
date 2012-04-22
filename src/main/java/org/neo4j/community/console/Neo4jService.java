@@ -17,13 +17,14 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 class Neo4jService {
     private GraphDatabaseService gdb = new ImpermanentGraphDatabase();
 
-    private CypherQueryExecutor cypherQueryExecutor = new CypherQueryExecutor(gdb);
-    private GeoffService geoffService = new GeoffService(gdb,new Index(gdb));
+    private Index index = new Index(gdb);
+    private CypherQueryExecutor cypherQueryExecutor = new CypherQueryExecutor(gdb,index);
+    private GeoffImportService geoffService = new GeoffImportService(gdb, index);
     private GeoffExportService geoffExportService = new GeoffExportService(gdb);
     private CypherExportService cypherExportService = new CypherExportService(gdb);
 
     public Map cypherQueryViz(String query) {
-        final boolean invalidQuery = query == null || query.trim().isEmpty() || isMutatingQuery(query);
+        final boolean invalidQuery = query == null || query.trim().isEmpty() || cypherQueryExecutor.isMutatingQuery(query);
         return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
     }
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
@@ -31,10 +32,6 @@ class Neo4jService {
         Map<Long, Map<String, Object>> relationships = relationshipMap(nodes);
         markCypherResults(result, nodes, relationships);
         return map("nodes", nodes.values(), "links", relationships.values());
-    }
-
-    public boolean isMutatingQuery(String query) {
-        return query.matches("(?is).*\\b(create|relate|delete|set)\\b.*");
     }
 
     private void markCypherResults(CypherQueryExecutor.CypherResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
@@ -131,6 +128,7 @@ class Neo4jService {
         if (gdb!=null) {
             System.err.println("Shutting down service "+this);
             gdb.shutdown();
+            index = null;
             cypherQueryExecutor=null;
             geoffExportService =null;
             cypherExportService =null;
@@ -158,5 +156,9 @@ class Neo4jService {
         } catch (NotFoundException nfe) {
             return false;
         }
+    }
+
+    public boolean isMutatingQuery(String query) {
+        return cypherQueryExecutor.isMutatingQuery(query);
     }
 }
