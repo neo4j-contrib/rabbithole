@@ -1,14 +1,11 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.PipeExecutionResult;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
-import scala.Tuple2;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
@@ -22,6 +19,8 @@ class Neo4jService {
 
     private CypherQueryExecutor cypherQueryExecutor = new CypherQueryExecutor(gdb);
     private GeoffService geoffService = new GeoffService(gdb,new Index(gdb));
+    private GeoffExportService geoffExportService = new GeoffExportService(gdb);
+    private CypherExportService cypherExportService = new CypherExportService(gdb);
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || isMutatingQuery(query);
@@ -77,7 +76,7 @@ class Neo4jService {
 
         Map<Long, Map<String, Object>> relationships = new TreeMap<Long, Map<String, Object>>();
         for (Relationship rel : GlobalGraphOperations.at(gdb).getAllRelationships()) {
-            Map<String, Object> data = geoffService.toMap(rel);
+            Map<String, Object> data = geoffExportService.toMap(rel);
             data.put("id", rel.getId());
             data.put("source", nodeIndex.indexOf(rel.getStartNode().getId()));
             data.put("target", nodeIndex.indexOf(rel.getEndNode().getId()));
@@ -91,15 +90,19 @@ class Neo4jService {
     private Map<Long, Map<String, Object>> nodeMap() {
         Map<Long, Map<String, Object>> nodes = new TreeMap<Long, Map<String, Object>>();
         for (Node n : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            Map<String, Object> data = geoffService.toMap(n);
+            Map<String, Object> data = geoffExportService.toMap(n);
             data.put("id", n.getId());
             nodes.put(n.getId(), data);
         }
         return nodes;
     }
 
-    public String toGeoff() {
-        return geoffService.toGeoff();
+    public String exportToGeoff() {
+        return geoffExportService.export();
+    }
+    
+    public String exportToCypher() {
+        return cypherExportService.export();
     }
 
     public Map mergeGeoff(String geoff) {
@@ -129,7 +132,9 @@ class Neo4jService {
             System.err.println("Shutting down service "+this);
             gdb.shutdown();
             cypherQueryExecutor=null;
-            geoffService=null;
+            geoffExportService =null;
+            cypherExportService =null;
+            geoffService =null;
             gdb=null;
         }
     }

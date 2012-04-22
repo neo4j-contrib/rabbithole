@@ -88,12 +88,17 @@ public class ConsoleApplication implements SparkApplication {
         });
         get(new Route("/console/to_geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                return service.toGeoff();
+                return service.exportToGeoff();
+            }
+        });
+        get(new Route("/console/to_cypher") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                return service.exportToCypher();
             }
         });
         get(new Route("/console/url") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
-                final String uri = baseUri(request.raw(),"init=" + URLEncoder.encode(service.toGeoff(), "UTF-8")+hasRootNodeParam(service));
+                final String uri = baseUri(request.raw(),"init=" + URLEncoder.encode(service.exportToGeoff(), "UTF-8")+hasRootNodeParam(service));
 				return shortenUrl(uri);
             	}
         });
@@ -140,7 +145,7 @@ public class ConsoleApplication implements SparkApplication {
             if (init!=null) {
                 if (service.isMutatingQuery(init)) {
                     service.cypherQuery(init);
-                    data.put("graph",service.toGeoff());
+                    data.put("graph",service.exportToGeoff());
                 } else {
                     data.put("graph", service.mergeGeoff(init));
                 }

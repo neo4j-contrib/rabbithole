@@ -170,8 +170,10 @@ $(document).ready(function () {
            e.stopPropagation();
            e.stopImmediatePropagation();
            e.cancelBubble = true;
+           return false;
         }
-    })
+        return true;
+    });
     input.keyup(function(e) {
 		 if (e.keyCode == 40) { // arrow down, add line
 		 }
@@ -181,6 +183,8 @@ $(document).ready(function () {
             e.stopPropagation();
             e.stopImmediatePropagation();
             e.cancelBubble = true;
+            return false;
          }
+         return true;
      });
 });

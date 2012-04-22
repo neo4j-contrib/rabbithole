@@ -33,42 +33,6 @@ class GeoffService {
         return result;
     }
 
-    public String toGeoff() {
-        StringBuilder sb = new StringBuilder();
-        appendNodes(sb);
-        appendRelationships(sb);
-        return sb.toString();
-    }
-
-    private void appendRelationships(StringBuilder sb) {
-        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            for (Relationship rel : node.getRelationships(Direction.OUTGOING)) {
-                formatNode(sb, rel.getStartNode());
-                sb.append("-[:").append(rel.getType().name()).append("]->");
-                formatNode(sb, rel.getEndNode());
-                formatProperties(sb, rel);
-                sb.append("\n");
-            }
-        }
-    }
-
-    private void appendNodes(StringBuilder sb) {
-        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            if (isReferenceNode(node)) continue;
-            formatNode(sb, node);
-            formatProperties(sb, node);
-            sb.append("\n");
-        }
-    }
-
-    private boolean isReferenceNode(Node node) {
-        return node.getId()==0;
-    }
-
-    private void formatNode(StringBuilder sb, Node n) {
-        sb.append("(").append(n.getId()).append(")");
-    }
-
     public Map<String,PropertyContainer> mergeGeoff(final String geoff) throws SubgraphError, SyntaxError {
         final Subgraph subgraph = new Subgraph(geoff.replaceAll("\\s*;\\s*", "\n"));
         registerProperties(subgraph);
@@ -80,20 +44,5 @@ class GeoffService {
             if (rule==null) continue;
             index.registerProperty(rule.getData());
         }
-    }
-
-    private void formatProperties(StringBuilder sb, PropertyContainer pc) {
-        final Map<String, Object> properties = toMap(pc);
-        if (properties.isEmpty()) return;
-        sb.append(" ");
-        sb.append(new Gson().toJson(properties));
-    }
-
-    Map<String, Object> toMap(PropertyContainer pc) {
-        Map<String, Object> result = new TreeMap<String, Object>();
-        for (String prop : pc.getPropertyKeys()) {
-            result.put(prop, pc.getProperty(prop));
-        }
-        return result;
     }
 }

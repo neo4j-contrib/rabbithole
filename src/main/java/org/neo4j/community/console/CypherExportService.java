@@ -1,0 +1,111 @@
+package org.neo4j.community.console;
+
+import com.google.gson.Gson;
+import org.neo4j.graphdb.*;
+import org.neo4j.tooling.GlobalGraphOperations;
+
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * @author mh
+ * @since 22.04.12
+ */
+class CypherExportService {
+    private final GraphDatabaseService gdb;
+
+    CypherExportService(GraphDatabaseService gdb) {
+        this.gdb = gdb;
+    }
+
+    public String export() {
+        StringBuilder sb = new StringBuilder();
+        init(sb);
+        appendNodes(sb);
+        appendRelationships(sb);
+        return sb.toString();
+    }
+
+    private void init(StringBuilder sb) {
+        final Node refNode = getReferenceNode();
+        if (refNode !=null && refNode.hasRelationship()) {
+            sb.append("start _0 = node(0) with _0 \n");
+        }
+        sb.append("create \n");
+    }
+
+    private Node getReferenceNode() {
+        try {
+            return gdb.getReferenceNode();
+        } catch(NotFoundException nfe) {
+            return null;
+        }
+    }
+
+    private void appendRelationships(StringBuilder sb) {
+        sb.append("create \n");
+        boolean first=true;
+        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
+            for (Relationship rel : node.getRelationships(Direction.OUTGOING)) {
+                if (!first) { sb.append(",\n"); } else { first=false; }
+                appendRelationship(sb, rel);
+            }
+        }
+        sb.append("\n");
+    }
+
+    private void appendRelationship(StringBuilder sb, Relationship rel) {
+        sb.append("    rel ");
+        formatNode(sb, rel.getStartNode());
+        sb.append("-[:").append(rel.getType().name());
+        formatProperties(sb, rel);
+        sb.append("]->");
+        formatNode(sb, rel.getEndNode());
+    }
+
+    private void appendNodes(StringBuilder sb) {
+        boolean first = true;
+        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
+            if (isReferenceNode(node)) continue;
+            if (!first) { sb.append(",\n"); } else { first=false; }
+            appendNode(sb, node);
+        }
+        sb.append("\n");
+    }
+
+    private void appendNode(StringBuilder sb, Node node) {
+        sb.append("    node ");
+        formatNode(sb, node);
+        sb.append("=");
+        formatProperties(sb, node);
+    }
+
+    private boolean isReferenceNode(Node node) {
+        return node.getId() == 0;
+    }
+
+    private void formatNode(StringBuilder sb, Node n) {
+        sb.append("_").append(n.getId());
+    }
+
+    private void formatProperties(StringBuilder sb, PropertyContainer pc) {
+        final Map<String, Object> properties = toMap(pc);
+        if (properties.isEmpty()) return;
+        sb.append(" ");
+        final String jsonString = new Gson().toJson(properties);
+        sb.append(removeNameQuotes(jsonString));
+    }
+
+    private String removeNameQuotes(String json) {
+        return json.replaceAll("\"([^\"]+)\":","$1:");
+    }
+
+    Map<String, Object> toMap(PropertyContainer pc) {
+        Map<String, Object> result = new TreeMap<String, Object>();
+        for (String prop : pc.getPropertyKeys()) {
+            result.put(prop, pc.getProperty(prop));
+        }
+        return result;
+    }
+
+}
