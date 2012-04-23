@@ -48,7 +48,7 @@
 		For querying and mutating the graph, <a href="http://docs.neo4j.org/chunked/snapshot/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. 
 		<ul>
 			<li><code>start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10</code></li>
-			<li><code>start n=node(*) where has(n.name) with n create node m { name : "actor of " n.name }, rel m-[:ACTS_AS]->n return m</code></li>
+			<li><code>start n=node(*) where has(n.name) with n create node m { name : "actor of " n.name }, rel m-[r:ACTS_AS]->n return m,r</code></li>
 		</ul>
 		 <br/><br/>
 		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
