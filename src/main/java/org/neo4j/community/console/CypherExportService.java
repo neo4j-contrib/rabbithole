@@ -55,7 +55,6 @@ class CypherExportService {
     }
 
     private void appendRelationship(StringBuilder sb, Relationship rel) {
-        sb.append("    rel ");
         formatNode(sb, rel.getStartNode());
         sb.append("-[:").append(rel.getType().name());
         formatProperties(sb, rel);
@@ -75,7 +74,6 @@ class CypherExportService {
     }
 
     private void appendNode(StringBuilder sb, Node node) {
-        sb.append("    node ");
         formatNode(sb, node);
         sb.append("=");
         formatProperties(sb, node);

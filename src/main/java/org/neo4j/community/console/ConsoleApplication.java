@@ -32,12 +32,12 @@ public class ConsoleApplication implements SparkApplication {
             "(Architect) {\"name\":\"The Architect\"} (0)-[:ROOT]->(Neo) (Neo)-[:KNOWS]->(Morpheus) " +
             "(Neo)-[:LOVES]->(Trinity) (Morpheus)-[:KNOWS]->(Trinity) (Morpheus)-[:KNOWS]->(Cypher) " +
             "(Cypher)-[:KNOWS]->(Smith) (Smith)-[:CODED_BY]->(Architect)";
-    private static final String DEFAULT_GRAPH_CYPHER = "start root=node(0) with root create node Neo = {name:'Neo'}, "+
-            "node Morpheus = {name: 'Morpheus'}, " +
-            "node Trinity = {name: 'Trinity'}, node Cypher = {name: 'Cypher'}, node Smith = {name: 'Agent Smith'}, " +
-            "node Architect = {name:'The Architect'}, rel root-[:ROOT]->Neo, rel Neo-[:KNOWS]->Morpheus, " +
-            "rel Neo-[:LOVES]->Trinity, rel Morpheus-[:KNOWS]->Trinity, rel Morpheus-[:KNOWS]->Cypher, " +
-            "rel Cypher-[:KNOWS]->Smith, rel Smith-[:CODED_BY]->Architect";
+    private static final String DEFAULT_GRAPH_CYPHER = "start root=node(0) create Neo = {name:'Neo'}, "+
+            "Morpheus = {name: 'Morpheus'}, " +
+            "Trinity = {name: 'Trinity'}, Cypher = {name: 'Cypher'}, Smith = {name: 'Agent Smith'}, " +
+            "Architect = {name:'The Architect'}, root-[:ROOT]->Neo, Neo-[:KNOWS]->Morpheus, " +
+            "Neo-[:LOVES]->Trinity, Morpheus-[:KNOWS]->Trinity, Morpheus-[:KNOWS]->Cypher, " +
+            "Cypher-[:KNOWS]->Smith, Smith-[:CODED_BY]->Architect";
     private static final String DEFAULT_QUERY = "start n=node(*) match n-[r?]->m return n,type(r),m";
 
     @Override

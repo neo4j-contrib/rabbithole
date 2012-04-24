@@ -30,19 +30,19 @@ public class CypherQueryExecutorTest {
     public void testIsMutatingQuery() throws Exception {
         assertFalse(cypherQueryExecutor.isMutatingQuery(""));
         assertFalse(cypherQueryExecutor.isMutatingQuery("start n = node(1) return n"));
-        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) with n create node m={ name: 'Andres'}"));
-        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) with n create rel n-[:KNOWS]->n"));
-        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) with n delete n"));
-        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) with n set n.name = 'Andres'"));
+        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) create m={ name: 'Andres'}"));
+        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) create n-[:KNOWS]->n"));
+        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) delete n"));
+        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) set n.name = 'Andres'"));
     }
 
     @Test
     public void testExtractProperties() throws Exception {
         assertTrue(cypherQueryExecutor.extractProperties("").isEmpty());
         assertTrue(cypherQueryExecutor.extractProperties("start n = node(1) return n").isEmpty());
-        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) with n create node m={ name: 'Andres'}"), hasItem("name"));
-        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) with n create rel n-[:KNOWS {name:'Friends', since : 2000}]->n"), hasItems("name", "since"));
-        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) with n create node m={ name: 'Andres'} set n.age = 19"), hasItems("name", "age"));
+        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'}"), hasItem("name"));
+        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create n-[:KNOWS {name:'Friends', since : 2000}]->n"), hasItems("name", "since"));
+        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'} set n.age = 19"), hasItems("name", "age"));
     }
 
     @Test
