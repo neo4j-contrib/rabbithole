@@ -56,6 +56,13 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson(execute(service, null, query));
             }
         });
+        post(new Route("/console/version") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                final String version = request.body();
+                service.setVersion(version);
+                return new Gson().toJson(map("version",service.getVersion()));
+            }
+        });
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
@@ -76,7 +83,11 @@ public class ConsoleApplication implements SparkApplication {
                 }
                 String init = param(input, "init", DEFAULT_GRAPH_CYPHER);
                 String query = param(input, "query", DEFAULT_QUERY);
-                return new Gson().toJson(execute(service, init, query));
+                String version= param(input, "version",null);
+                service.setVersion(version);
+                final Map<String, Object> result = execute(service, init, query);
+                result.put("version",service.getVersion());
+                return new Gson().toJson(result);
             }
 
         });
@@ -144,7 +155,7 @@ public class ConsoleApplication implements SparkApplication {
             time = trace("service", time);
             if (init!=null) {
                 if (service.isMutatingQuery(init)) {
-                    service.cypherQuery(init);
+                    service.initCypherQuery(init);
                     data.put("graph",service.exportToGeoff());
                 } else {
                     data.put("graph", service.mergeGeoff(init));

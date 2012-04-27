@@ -65,7 +65,12 @@ public class CypherQueryExecutor {
         }
     }
 
-    public CypherResult cypherQuery(String query) {
+    public CypherResult cypherQuery(String query, String version) {
+        if (version==null || version.isEmpty()) return cypherQuery(query);
+        return cypherQuery("CYPHER "+version+" "+query);
+    }
+
+    private CypherResult cypherQuery(String query) {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }

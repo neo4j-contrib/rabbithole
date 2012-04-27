@@ -22,6 +22,7 @@ class Neo4jService {
     private GeoffImportService geoffService = new GeoffImportService(gdb, index);
     private GeoffExportService geoffExportService = new GeoffExportService(gdb);
     private CypherExportService cypherExportService = new CypherExportService(gdb);
+    private String version;
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || cypherQueryExecutor.isMutatingQuery(query);
@@ -120,8 +121,11 @@ class Neo4jService {
         return result;
     }
 
+    public CypherQueryExecutor.CypherResult initCypherQuery(String query) {
+        return cypherQueryExecutor.cypherQuery(query,null);
+    }
     public CypherQueryExecutor.CypherResult cypherQuery(String query) {
-        return cypherQueryExecutor.cypherQuery(query);
+        return cypherQueryExecutor.cypherQuery(query,version);
     }
 
     public void stop() {
@@ -147,6 +151,18 @@ class Neo4jService {
             } finally {
                 tx.finish();
             }
+        }
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        if (version==null || version.trim().isEmpty()) this.version=null;
+        else {
+            if (!version.matches("\\d+\\.\\d+")) throw new IllegalArgumentException("Incorrect version string "+version);
+            this.version = version;
         }
     }
 

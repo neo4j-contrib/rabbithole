@@ -8,7 +8,8 @@
 		function start() {
 			var geoff=encodeURIComponent($("#graph").val());
 			var cypher=encodeURIComponent($("#cypher").val());
-            var url=base+"?init="+geoff+"&query="+cypher;
+			var version=encodeURIComponent($("#version").val());
+            var url=base+"?init="+geoff+"&query="+cypher+"&version="+version;
             if ($("#no_root").is(":checked")) url+="&no_root=true";
             console.log(url);
 			$("#window").attr("src",url);
@@ -39,6 +40,12 @@
 start neo=node(1) match neo-[r?]-other return neo,type(r), other
 </textarea><br/>
         <input type="checkbox" id="no_root"/> remove root node<br/>
+        Version: <select id="version">
+            <option selected="selected" value="">current</option>
+            <option value="1.8">1.8</option>
+            <option value="1.7">1.7</option>
+            <option value="1.6">1.6</option>
+        </select><br/>
 		<button id="load" onclick="start();">Load Database</button>
 	</div>
 	<input type="text" size="100" id="link"/><br/>

@@ -88,8 +88,9 @@ function reset(done) {
 function generate_url() {
     var init = $('#share_init').val();
     var query = $('#share_query').val();
+    var version = $('#share_version').val();
     var base=document.location.protocol+"//"+document.location.host;
-    var uri = base+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query);
+    var uri = base+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query)+'&version='+encodeURIComponent(version);
     if ($("#share_no_root").is(":checked")) uri+="&no_root=true";
     console.log(uri);
     $('#share_url').val(uri);
@@ -141,7 +142,7 @@ function showResults(data) {
     }
     if (data["query"]) {
 	    append($("#output"), "> " + data["query"].trim());
-        $("#input").val(data["query"]+"\n\n\n");
+        $("#input").val(data["query"]);
     }
     if (data["result"]) {
         append($("#output"), data["result"]);
@@ -162,13 +163,19 @@ function send(query) {
     }
 }
 
+function showVersion(json) {
+    $('#version').val(json['version']);
+    $('#share_version').val(json['version']);
+}
+
 $(document).ready(function () {
-    post("/console/init", JSON.stringify(getParameters()), showResults,"json");
+    post("/console/init", JSON.stringify(getParameters()), function(json) {showResults(json);showVersion(json);},"json");
+    $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
     var input=$("#input");
-//    $("#form").submit(function () {
-//        send(input.val());
-//        return false;
-//    });
+    $("#form").submit(function () {
+        send(input.val());
+        return false;
+    });
     var isInIFrame = window.location != window.parent.location;
     if (!isInIFrame) $("#input").focus();
 
@@ -176,6 +183,7 @@ $(document).ready(function () {
         if (e.keyCode == 27) $(".popup").hide();
 		return true;
     });
+/*
     input.keypress(function(e) {
         if (e.keyCode == 13) { // return, send
            e.preventDefault();
@@ -199,4 +207,5 @@ $(document).ready(function () {
          }
          return true;
      });
+*/
 });

@@ -106,14 +106,15 @@ a:link, a:visited {
 .button.info {
     right: 26px;
 }
-.button.tweet {
-    right: 50px;
+#version {
+    right: 70px;
+    width:auto;
 }
 .button.graph {
     right: 5px;
 }
 .button.shareUrl {
-    right: 70px;
+    right: 50px;
 }
 
 h3 {

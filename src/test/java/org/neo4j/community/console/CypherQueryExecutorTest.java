@@ -2,6 +2,7 @@ package org.neo4j.community.console;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.cypher.SyntaxException;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.util.Map;
@@ -45,9 +46,27 @@ public class CypherQueryExecutorTest {
         assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'} set n.age = 19"), hasItems("name", "age"));
     }
 
+
+    @Test(expected = SyntaxException.class)
+    public void testAdhereToCypherVersion16() throws Exception {
+        cypherQueryExecutor.cypherQuery("start n=node(1) match n-[:A|B]-() return n","1.6");
+    }
+    @Test(expected = SyntaxException.class)
+    public void testAdhereToCypherVersion17() throws Exception {
+        cypherQueryExecutor.cypherQuery("create n={}","1.7");
+    }
+    @Test
+    public void testAdhereToCypherVersion18() throws Exception {
+        cypherQueryExecutor.cypherQuery("create n={}","1.8");
+    }
+    @Test
+    public void testAdhereToNoCypherVersion() throws Exception {
+        cypherQueryExecutor.cypherQuery("create n={}",null);
+    }
+
     @Test
     public void testCypherQuery() throws Exception {
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node(0) return n");
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node(0) return n",null);
         assertEquals(asList("n"), result.getColumns());
         assertTrue(result.getText().contains("Node[0]"));
         for (Map<String, Object> row : result) {
