@@ -46,7 +46,7 @@ a:link, a:visited {
     background: none;
     z-index: 10;
     top: 0;
-    right: 0;
+    right: 15px;
     /*
     filter:alpha(opacity=20);
     -moz-opacity:0.2;
@@ -106,10 +106,12 @@ a:link, a:visited {
 .button.info {
     right: 26px;
 }
+
 #version {
     right: 70px;
     width:auto;
 }
+
 .button.graph {
     right: 5px;
 }
