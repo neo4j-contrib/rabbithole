@@ -3,6 +3,9 @@ body, html, div, form, input {
     font-size: 10px;
 }
 
+body {
+	height:99%;
+}
 .console {
     left: 0;
     right: 0;
