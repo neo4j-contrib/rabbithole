@@ -48,6 +48,8 @@ abstract class Route extends spark.Route {
         String data = request.queryParams(param);
         if (data == null || data.isEmpty()) {
             data = defaultValue;
+        } else {
+            System.err.println(param+": "+data);
         }
         return data;
     }
@@ -56,6 +58,8 @@ abstract class Route extends spark.Route {
         String data = (String) input.get(param);
         if (data == null || data.isEmpty()) {
             data = defaultValue;
+        } else {
+            System.err.println(param+": "+data);
         }
         return data;
     }

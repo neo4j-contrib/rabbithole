@@ -27,9 +27,14 @@
 
 </head>
 <body>
+<span id="welcome_msg" style="display:none;">
+You can modify and query this graph by entering statements in the input field.
+For some syntax help hit the <img title="Info" onclick="$('#info').toggle();" class="button" src="img/info.png"/> button.
+If you want to share your graph, just do it with <img title="Share this graph" onclick="toggleShare();" class="button" src="img/link.png"/>
+</span>
 <div id="main">
     <img title="Info" onclick="$('#info').toggle();" class="info button" src="img/info.png"/>
-    <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="img/Link-icon.png"/>
+    <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="img/link.png"/>
 	<img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
     <select id="version" class="button">
         <option selected="selected" value="">current</option>
@@ -46,23 +51,32 @@
 	<div id="graph">
 	</div>
 	<div id="info" class="popup">
-		This is an interactive console (REPL) for graphs with integrated visualization.
+        <h3>Welcome to the Neo4j Console</h3>
+		<p>This is an interactive console (REPL) for graphs with integrated visualization.
 		It is hosted on Heroku at <a href="http://console.neo4j.org">http://console.neo4j.org</a> the source
-		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.<br/><br/>
-		To add to the Graph you can issue
+		code is available on <a href="http://github.com/neo4j-contrib/rabbithole">GitHub</a>.</p>
+
+        <h4>Updating</h4>
+
+        <p>To interactively build the Graph you can either issue
 		<a target="_blank" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a> statements, like
-		(Neo) {"name":"Neo"} to create nodes and (Neo)-[:LOVES]->(Trinity) to create relationships. Connect or update existing nodes by referring to (nodeId)<br/><br/>
-		For querying and mutating the graph, <a href="http://docs.neo4j.org/chunked/snapshot/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g. 
+		<code>(Neo) {"name":"Neo"}</code> to create nodes and <code>(Neo)-[:LOVES]->(Trinity)</code> to create relationships. Connect to or update existing nodes by referring to (nodeId).<br/>
+        You can also use <a href="http://docs.neo4j.org/chunked/snapshot/query-create.html">mutating Cypher</a> to create nodes <code>create neo={ name : "Neo" }</code> and to create relationships
+        <code>create neo-[:KNOWS {since:"2 days"}]->morpheus</code>.</p>
+
+        <h4>Querying</h4>
+		<p>
+        For querying and mutating the graph, <a href="http://docs.neo4j.org/chunked/snapshot/cypher-query-lang.html" target="_blank">Cypher</a> is your friend. E.g.
 		<ul>
 			<li><code>start user=node(1) match user-[:KNOWS]->friend where friend.age > 20 return user,friend order by friend.age limit 10</code></li>
 			<li><code>start n=node(*) where has(n.name) create m { name : "actor of " n.name }, m-[r:ACTS_AS]->n return m,r</code></li>
 		</ul>
-		 <br/><br/>
-		You can <a href="#" onclick="reset()">reset</a> or share the database.<br/>
+        </p>
+		<p>You can <a href="#" onclick="reset();return false;">reset</a> or <a href="#" onclick="toggleShare();return false;">share</a> the database.</p>
         
 	</div>
     <div id="shareUrl" class="popup">
-        <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');">Cypher</a> or <a href="#" onclick="export_graph('geoff');">Geoff</a>):</h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>
+        <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a> or <a href="#" onclick="export_graph('geoff');return false;">Geoff</a>):</h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>
         <h3>Initial Query (Cypher):</h3><input type="text" id="share_query" style="width:80%"/><br/>
         <h3 style="display: inline-block;">Remove Root Node: </h3><input type="checkbox" id="share_no_root" style="vertical-align: bottom;"/><br/>
         <h3 style="display: inline-block;">Version: </h3>
@@ -72,7 +86,7 @@
             <option value="1.7">1.7</option>
             <option value="1.6">1.6</option>
         </select><br/>
-        Adjust the above parameters to fit your intention, then <button class="btn_pretty" href="#" onclick="generate_url();">click to generate</button> the final URLs to share.<br/>
+        Adjust the above parameters to fit your intention, then <button class="btn_pretty" href="#" onclick="generate_url();return false;">click to generate</button> the final URLs to share.<br/>
 
         Share as a link (email, web etc)
         <input type="url" id="share_url" style="width:80%" onclick="this.select();"/><br/>

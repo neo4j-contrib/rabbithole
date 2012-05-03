@@ -53,48 +53,57 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String query = request.body();
+                if (query!=null && !query.isEmpty()) {
+                    System.err.println( "cypher: "+query );
+                }
                 return new Gson().toJson(execute(service, null, query));
             }
         });
-        post(new Route("/console/version") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) {
+        post( new Route( "/console/version" )
+        {
+            protected Object doHandle( Request request, Response response, Neo4jService service )
+            {
                 final String version = request.body();
-                service.setVersion(version);
-                return new Gson().toJson(map("version",service.getVersion()));
+                service.setVersion( version );
+                return new Gson().toJson( map( "version", service.getVersion() ) );
             }
-        });
+        } );
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String query = request.queryParams("query");
+                String query = param( request,"query", "");
                 return service.cypherQueryResults(query).toString();
             }
         });
-        post(new Route("/console/init") {
+        post( new Route( "/console/init" )
+        {
             @Override
-            protected void doBefore(Request request, Response response) {
-                reset(request);
+            protected void doBefore( Request request, Response response )
+            {
+                reset( request );
             }
 
-            protected Object doHandle(Request request, Response response, Neo4jService service) {
-                final Map input = new Gson().fromJson(request.body(),Map.class);
-                String noRoot = param(input, "no_root","");
-                if (noRoot.equals("true")) {
+            protected Object doHandle( Request request, Response response, Neo4jService service )
+            {
+                final Map input = new Gson().fromJson( request.body(), Map.class );
+                String noRoot = param( input, "no_root", "" );
+                if ( noRoot.equals( "true" ) )
+                {
                     service.deleteReferenceNode();
                 }
-                String init = param(input, "init", DEFAULT_GRAPH_CYPHER);
-                String query = param(input, "query", DEFAULT_QUERY);
-                String version= param(input, "version",null);
-                service.setVersion(version);
-                final Map<String, Object> result = execute(service, init, query);
-                result.put("version",service.getVersion());
-                return new Gson().toJson(result);
+                String init = param( input, "init", DEFAULT_GRAPH_CYPHER );
+                String query = param( input, "query", DEFAULT_QUERY );
+                String version = param( input, "version", null );
+                service.setVersion( version );
+                final Map<String, Object> result = execute( service, init, query );
+                result.put( "version", service.getVersion() );
+                return new Gson().toJson( result );
             }
 
-        });
+        } );
         get(new Route("/console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String query = request.queryParams("query");
-                return new Gson().toJson(service.cypherQueryViz(query));
+                String query = request.queryParams( "query" );
+                return new Gson().toJson( service.cypherQueryViz( query ) );
             }
         });
         get(new Route("/console/to_geoff") {
@@ -102,17 +111,21 @@ public class ConsoleApplication implements SparkApplication {
                 return service.exportToGeoff();
             }
         });
-        get(new Route("/console/to_cypher") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) {
+        get( new Route( "/console/to_cypher" )
+        {
+            protected Object doHandle( Request request, Response response, Neo4jService service )
+            {
                 return service.exportToCypher();
             }
-        });
-        get(new Route("/console/url") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
-                final String uri = baseUri(request.raw(),"init=" + URLEncoder.encode(service.exportToGeoff(), "UTF-8")+hasRootNodeParam(service));
-				return shortenUrl(uri);
-            	}
-        });
+        } );
+        get( new Route( "/console/url" )
+        {
+            protected Object doHandle( Request request, Response response, Neo4jService service ) throws IOException
+            {
+                final String uri = baseUri( request.raw(), "init=" + URLEncoder.encode( service.exportToGeoff(), "UTF-8" ) + hasRootNodeParam( service ) );
+                return shortenUrl( uri );
+            }
+        } );
         get(new Route("/console/shorten") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
                 return shortenUrl(request.queryParams("url"));
@@ -128,7 +141,11 @@ public class ConsoleApplication implements SparkApplication {
 
         post(new Route("/console/geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws SyntaxError, SubgraphError {
-                Map res = service.mergeGeoff(request.body());
+                String geoff = request.body();
+                if (geoff!=null && !geoff.isEmpty()) {
+                    System.err.println( "geoff: "+geoff );
+                }
+                Map res = service.mergeGeoff( geoff );
                 return new Gson().toJson(res);
             }
         });

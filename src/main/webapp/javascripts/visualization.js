@@ -28,7 +28,7 @@ function toString(ob) {
 			ret += prop +": "+ob[prop]+" ";
 		}
 	}
-	return ret;
+	return ret+"id: "+ob.id;
 }
 
 function title(ob) {

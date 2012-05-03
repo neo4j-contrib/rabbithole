@@ -167,9 +167,17 @@ function showVersion(json) {
     $('#version').val(json['version']);
     $('#share_version').val(json['version']);
 }
+function welcome_msg() {
+    return $("#welcome_msg").html();
+}
 
 $(document).ready(function () {
-    post("/console/init", JSON.stringify(getParameters()), function(json) {showResults(json);showVersion(json);},"json");
+    post( "/console/init", JSON.stringify( getParameters() ), function ( json )
+    {
+        showResults( json );
+        showVersion( json );
+        append( $( "#output" ), welcome_msg() );
+    }, "json" );
     $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
     var input=$("#input");
     $("#form").submit(function () {
