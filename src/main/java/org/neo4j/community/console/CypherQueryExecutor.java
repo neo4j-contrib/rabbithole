@@ -74,9 +74,16 @@ public class CypherQueryExecutor {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }
+        query = removeSemicolon( query );
         org.neo4j.cypher.PipeExecutionResult result = (org.neo4j.cypher.PipeExecutionResult) executionEngine.execute(query);
         Tuple2<scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>>, String> timedResults = createTimedResults(result);
         return new CypherResult(result.columns(), result.dumpToString(), timedResults._1());
+    }
+
+    private String removeSemicolon( String query )
+    {
+        if (query.trim().endsWith( ";" )) return query.substring( 0,query.lastIndexOf( ";" ) );
+        return query;
     }
 
     private void registerProperties(String query) {

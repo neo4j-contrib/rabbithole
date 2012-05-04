@@ -46,6 +46,11 @@ public class CypherQueryExecutorTest {
         assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'} set n.age = 19"), hasItems("name", "age"));
     }
 
+    @Test
+    public void testIgnoreTrailingSemicolon() throws Exception
+    {
+        cypherQueryExecutor.cypherQuery( "create n = {};\n " ,null);
+    }
 
     @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion16() throws Exception {
