@@ -8,11 +8,7 @@ function append(element, text) {
 
 function highlight(text) {
     if (!text) return text;
-    var prompt = ""
-    if (text.substr(0, 2) == "> ") {
-        prompt = "> ";
-        text = text.substr(2);
-    }
+	text = text.replace(/<null>/gi, '&lt;null&gt;');
     if (text[0] == "(" || text[0] == "[") {
         // Geoff
         // colour nodes
@@ -21,17 +17,17 @@ function highlight(text) {
         text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/gi, '<span class="relationship">$1</span>');
     } else if (isCypher(text)) {
         // Cypher
+        text = text.replace(/\b(start|with|create|delete|relate|skip|limit|order by|set|match|where|return)\b/gi, '\n$1');
         text = text.replace(/\b(start|with|create|delete|relate|skip|limit|distinct|desc|asc|as|order by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
         text = text.replace(/\b(and|or|not|has|node)\b/gi, '<span class="keyword">$1</span>');
         text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>(');
     }
-    return prompt + text;
+    return text;
 }
 
 function post(uri, data, done, dataType) {
     data = data.trim();
     console.log("Post data: " + data);
-    // append($("#output"), "> " + data.trim());
     $.ajax(uri, {
         type:"POST",
         data:data,
@@ -141,7 +137,7 @@ function showResults(data) {
         append($("#output"), data["init"]);
     }
     if (data["query"]) {
-	    append($("#output"), "> " + data["query"].trim());
+	    append($("#output"), data["query"].trim());
         $("#input").val(data["query"]);
     }
     if (data["result"]) {

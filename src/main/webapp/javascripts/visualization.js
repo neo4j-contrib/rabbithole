@@ -52,7 +52,7 @@ function visualize(id,w,h,data) {
         .nodes(data.nodes)
         .links(data.links)
         .gravity(.2)
-        .distance(40)
+        .distance(80)
         .charge(-1000)
         .size([w, h])
         .start();
@@ -105,13 +105,13 @@ function visualize(id,w,h,data) {
 		// A copy of the text with a thick white stroke for legibility.
 		text.append("svg:text")
 		    .attr("x", 8)
-		    .attr("y", ".31em")
+		    .attr("y", "-.31em")
 		    .attr("class", "text shadow")
 		    .text(function(d) { return title(d); });
 
 		text.append("svg:text")
 		    .attr("x", 8)
-		    .attr("y", ".31em")
+		    .attr("y", "-.31em")
 			.attr("class","text")
 		    .text(function(d) { return title(d); });
 
@@ -136,7 +136,7 @@ function visualize(id,w,h,data) {
           .attr("y2", function(d) { return d.target.y; });
 
 	  text.attr("transform", function(d) {
-		    return "translate(" + d.x + "," + d.y + ")";
+		    return "translate(" + d.x + "," + d.y  + ")";
 	  });
 
       node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });

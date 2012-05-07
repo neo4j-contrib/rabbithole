@@ -3,7 +3,7 @@
 }
 
 .path-text {
-    font: 6px sans-serif;
+    font: 8px sans-serif;
     pointer-events: none;
     text-align: center;
 }
@@ -21,7 +21,7 @@
 
 text {
     fill: #fff;
-    font: 8px sans-serif;
+    font: 10px sans-serif;
     pointer-events: none;
 }
 
