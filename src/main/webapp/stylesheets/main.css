@@ -121,6 +121,9 @@ code {
     background-color: #3d3d3d;
 }
 
+.welcome {
+	font-family: sans-serif;
+}
 #version {
     position: absolute;
     top: 5px;

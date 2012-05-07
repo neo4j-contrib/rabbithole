@@ -23,6 +23,7 @@ text {
     fill: #fff;
     font: 10px sans-serif;
     pointer-events: none;
+    z-index:10;
 }
 
 .selected {

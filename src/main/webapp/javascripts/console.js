@@ -2,7 +2,7 @@ function append(element, text) {
     if (!text) return;
     if (typeof(text) == 'object') text = JSON.stringify(text);
     text = highlight(text);
-    element.html(element.html() + "\n" + "<div class='data'>" + text + "</div>");
+    element.html(element.html() + "\n" + text);
     element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
 
@@ -135,6 +135,7 @@ function showResults(data) {
     if (data["init"]) {
         append($("#output"), "Graph Setup:");
         append($("#output"), data["init"]);
+	    append($("#output"), "--------------------------------------------------------------------------------");
     }
     if (data["query"]) {
 	    append($("#output"), data["query"].trim());
@@ -142,6 +143,7 @@ function showResults(data) {
     }
     if (data["result"]) {
         append($("#output"), data["result"]);
+//	    append($("#output"), "--------------------------------------------------------------------------------");
     }
     if (data["error"]) append($("#output"), "Error: " + data["error"]);
     if (data["visualization"]) {
