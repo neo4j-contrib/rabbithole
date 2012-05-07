@@ -12,7 +12,7 @@ Features:
 * visualize graph and returned results with d3
 * export graph
 * share, tweet link to current graph and query
-
+ 
 Endpoints:
 
 * post /console/cypher
