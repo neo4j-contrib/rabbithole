@@ -147,8 +147,10 @@ function visualize(id,w,h,data) {
 		var dr = Math.sqrt(dx * dx + dy * dy);
 		var sinus = dy/dr;
 		var cosinus = dx/dr;
-		var x=(d.source.x + dx/2);
-		var y=(d.source.y + dy/2);
+		var l = d.type.length*6;
+		var offset = (1 - (l / dr )) / 2;
+		var x=(d.source.x + dx*offset);
+		var y=(d.source.y + dy*offset);
 	    return "translate(" + x + "," + y + ") matrix("+cosinus+", "+sinus+", "+-sinus+", "+cosinus+", 0 , 0)";
 	  });
 
