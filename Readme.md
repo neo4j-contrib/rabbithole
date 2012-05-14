@@ -23,4 +23,4 @@ Endpoints:
 
 Running locally:
 
-    mvn clean install exec:java 
+    mvn clean install exec:java  
