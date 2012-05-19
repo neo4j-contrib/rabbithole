@@ -74,9 +74,11 @@ class CypherExportService {
     }
 
     private void appendNode(StringBuilder sb, Node node) {
+        sb.append("(");
         formatNode(sb, node);
-        sb.append("=");
+        sb.append(" ");
         formatProperties(sb, node);
+        sb.append(")");
     }
 
     private boolean isReferenceNode(Node node) {

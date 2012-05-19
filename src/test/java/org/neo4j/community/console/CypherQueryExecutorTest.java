@@ -31,7 +31,7 @@ public class CypherQueryExecutorTest {
     public void testIsMutatingQuery() throws Exception {
         assertFalse(cypherQueryExecutor.isMutatingQuery(""));
         assertFalse(cypherQueryExecutor.isMutatingQuery("start n = node(1) return n"));
-        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) create m={ name: 'Andres'}"));
+        assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) create (m { name: 'Andres'})"));
         assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) create n-[:KNOWS]->n"));
         assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) delete n"));
         assertTrue(cypherQueryExecutor.isMutatingQuery("start n = node(1) set n.name = 'Andres'"));
@@ -41,15 +41,15 @@ public class CypherQueryExecutorTest {
     public void testExtractProperties() throws Exception {
         assertTrue(cypherQueryExecutor.extractProperties("").isEmpty());
         assertTrue(cypherQueryExecutor.extractProperties("start n = node(1) return n").isEmpty());
-        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'}"), hasItem("name"));
+        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create (m { name: 'Andres'})"), hasItem("name"));
         assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create n-[:KNOWS {name:'Friends', since : 2000}]->n"), hasItems("name", "since"));
-        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create m={ name: 'Andres'} set n.age = 19"), hasItems("name", "age"));
+        assertThat(cypherQueryExecutor.extractProperties("start n = node(1) create (m { name: 'Andres'}) set n.age = 19"), hasItems("name", "age"));
     }
 
     @Test
     public void testIgnoreTrailingSemicolon() throws Exception
     {
-        cypherQueryExecutor.cypherQuery( "create n = {};\n " ,null);
+        cypherQueryExecutor.cypherQuery( "create (n {});\n " ,null);
     }
 
     @Test(expected = SyntaxException.class)
@@ -58,15 +58,15 @@ public class CypherQueryExecutorTest {
     }
     @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion17() throws Exception {
-        cypherQueryExecutor.cypherQuery("create n={}","1.7");
+        cypherQueryExecutor.cypherQuery("create (n {})","1.7");
     }
     @Test
     public void testAdhereToCypherVersion18() throws Exception {
-        cypherQueryExecutor.cypherQuery("create n={}","1.8");
+        cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
     @Test
     public void testAdhereToNoCypherVersion() throws Exception {
-        cypherQueryExecutor.cypherQuery("create n={}",null);
+        cypherQueryExecutor.cypherQuery("create (n {})",null);
     }
 
     @Test

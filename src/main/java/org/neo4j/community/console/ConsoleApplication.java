@@ -32,10 +32,10 @@ public class ConsoleApplication implements SparkApplication {
             "(Architect) {\"name\":\"The Architect\"} (0)-[:ROOT]->(Neo) (Neo)-[:KNOWS]->(Morpheus) " +
             "(Neo)-[:LOVES]->(Trinity) (Morpheus)-[:KNOWS]->(Trinity) (Morpheus)-[:KNOWS]->(Cypher) " +
             "(Cypher)-[:KNOWS]->(Smith) (Smith)-[:CODED_BY]->(Architect)";
-    private static final String DEFAULT_GRAPH_CYPHER = "start root=node(0) create Neo = {name:'Neo'}, "+
-            "Morpheus = {name: 'Morpheus'}, " +
-            "Trinity = {name: 'Trinity'},\n Cypher = {name: 'Cypher'}, Smith = {name: 'Agent Smith'}, " +
-            "Architect = {name:'The Architect'},\n root-[:ROOT]->Neo, Neo-[:KNOWS]->Morpheus, " +
+    private static final String DEFAULT_GRAPH_CYPHER = "start root=node(0) create (Neo {name:'Neo'}), "+
+            "(Morpheus {name: 'Morpheus'}), " +
+            "(Trinity {name: 'Trinity'}),\n (Cypher {name: 'Cypher'}), (Smith {name: 'Agent Smith'}), " +
+            "(Architect {name:'The Architect'}),\n root-[:ROOT]->Neo, Neo-[:KNOWS]->Morpheus, " +
             "Neo-[:LOVES]->Trinity, Morpheus-[:KNOWS]->Trinity,\n Morpheus-[:KNOWS]->Cypher, " +
             "Cypher-[:KNOWS]->Smith, Smith-[:CODED_BY]->Architect";
     private static final String DEFAULT_QUERY = "start n=node(*) match n-[r?]->m return n,type(r),m";
