@@ -92,10 +92,13 @@ function generate_url() {
     $('#share_url').val(uri);
     var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
     $('#share_iFrame').val(frame);
-    $.ajax("/console/shorten?url="+encodeURIComponent(uri), { type: "GET", success: function(data) { $('#share_short').val(data);}});
-    addthis.update('share', 'url', uri);
-    addthis.update('share', 'title', 'Look at this Neo4j graph: ');
-    //addthis.update('config', 'ui_cobrand', 'New Cobrand!');
+    $.ajax("/console/shorten?url="+encodeURIComponent(uri), {
+        type: "GET", dataType: "text",
+        success: function(data) {
+            $('#share_short').val(data);
+            addthis.update('share', 'url', data);
+    }});
+    addthis.update('share', 'title', 'Look at this #Neo4j graph: ');
 }
 
 function toggleGraph() {
@@ -108,6 +111,7 @@ function toggleGraph() {
 function toggleShare() {
     $.ajax("console/to_geoff", {
         type:"GET",
+        dataType: "text",
         success:function (data) {
             $('#share_init').val(data);
             $('#share_query').val($("#input").val());
@@ -122,6 +126,7 @@ function toggleShare() {
 function export_graph(format) {
     $.ajax("console/to_"+format, {
         type:"GET",
+        dataType: "text",
         success:function (data) {
             $('#share_init').val(data);
         },
