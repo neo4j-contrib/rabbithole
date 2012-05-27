@@ -65,50 +65,63 @@ public class ConsoleApplication implements SparkApplication {
             {
                 final String version = request.body();
                 service.setVersion( version );
-                return new Gson().toJson( map( "version", service.getVersion() ) );
+                return new Gson().toJson( map("version", service.getVersion()) );
             }
         } );
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String query = param( request,"query", "");
+                String query = param(request, "query", "");
                 return service.cypherQueryResults(query).toString();
             }
         });
-        post( new Route( "/console/init" )
-        {
+        post(new Route("/console/init") {
             @Override
-            protected void doBefore( Request request, Response response )
-            {
-                reset( request );
+            protected void doBefore(Request request, Response response) {
+                reset(request);
             }
 
-            protected Object doHandle( Request request, Response response, Neo4jService service )
-            {
-                final Map input = new Gson().fromJson( request.body(), Map.class );
-                String noRoot = param( input, "no_root", "" );
-                if ( noRoot.equals( "true" ) )
-                {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                final Map input = new Gson().fromJson(request.body(), Map.class);
+                String noRoot = param(input, "no_root", "");
+                if (noRoot.equals("true")) {
                     service.deleteReferenceNode();
                 }
-                String init = param( input, "init", DEFAULT_GRAPH_CYPHER );
-                String query = param( input, "query", DEFAULT_QUERY );
-                String version = param( input, "version", null );
-                service.setVersion( version );
-                final Map<String, Object> result = execute( service, init, query );
-                result.put( "version", service.getVersion() );
-                return new Gson().toJson( result );
+                String init = param(input, "init", DEFAULT_GRAPH_CYPHER);
+                String query = param(input, "query", DEFAULT_QUERY);
+                String version = param(input, "version", null);
+                service.setVersion(version);
+                final Map<String, Object> result = execute(service, init, query);
+                result.put("version", service.getVersion());
+                return new Gson().toJson(result);
             }
 
-        } );
+        });
         get(new Route("/console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String query = request.queryParams( "query" );
-                return new Gson().toJson( service.cypherQueryViz( query ) );
+                String query = request.queryParams("query");
+                return new Gson().toJson(service.cypherQueryViz(query));
             }
         });
         get(new Route("/console/to_geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.exportToGeoff();
+            }
+        });
+        get(new Route("/console/to_yuml") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                String query = param( request,"query", "");
+                String[] props = param( request,"props", "name").split(",");
+                final String type = param(request, "type", "png");
+                final String scale = param(request, "type", "100");
+                Graph graph;
+                if (query.trim().isEmpty()) {
+                    graph = Graph.from(service.getGraphDatabase());
+                } else {
+                    final CypherQueryExecutor.CypherResult result = service.cypherQuery(query);
+                    graph = Graph.from(result);
+                }
+                final String yuml = new YumlExport().toYuml(graph, props);
+                return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);
             }
         });
         get( new Route( "/console/to_cypher" )

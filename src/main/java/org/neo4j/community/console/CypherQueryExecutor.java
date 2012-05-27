@@ -36,9 +36,13 @@ public class CypherQueryExecutor {
         private final Iterable<scala.collection.immutable.Map<String, Object>> rows;
 
         public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>> rows) {
-            this.columns = JavaConversions.seqAsJavaList(columns);
+            this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows));
+        }
+
+        public CypherResult(java.util.List<String> columns, String text, Iterable<scala.collection.immutable.Map<String, Object>> rows) {
+            this.columns = columns;
             this.text = text;
-            this.rows = JavaConversions.asJavaIterable(rows);
+            this.rows = rows;
         }
 
         public List<String> getColumns() {

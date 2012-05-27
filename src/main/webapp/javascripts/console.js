@@ -81,6 +81,13 @@ function reset(done) {
     return false;
 }
 
+function share_yuml(query) {
+    $.ajax("/console/to_yuml?query="+encodeURIComponent(query), {
+        type: "GET", dataType: "text",
+        success: function(data) {
+            $('#share_yuml').attr("href",data);
+    }});
+}
 function generate_url() {
     var init = $('#share_init').val();
     var query = $('#share_query').val();
@@ -98,6 +105,7 @@ function generate_url() {
             $('#share_short').val(data);
             addthis.update('share', 'url', data);
     }});
+    share_yuml(query);
     addthis.update('share', 'title', 'Look at this #Neo4j graph: ');
 }
 
@@ -114,8 +122,10 @@ function toggleShare() {
         dataType: "text",
         success:function (data) {
             $('#share_init').val(data);
-            $('#share_query').val($("#input").val());
+            var query = $("#input").val();
+            $('#share_query').val(query);
             $('#shareUrl').toggle();
+            share_yuml(query)
         },
         error:function (data, error) {
             append($("#output"), "Error: "+error+"\n" + data.responseText+"");

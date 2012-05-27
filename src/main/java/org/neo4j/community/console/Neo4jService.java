@@ -178,4 +178,8 @@ class Neo4jService {
     public boolean isMutatingQuery(String query) {
         return cypherQueryExecutor.isMutatingQuery(query);
     }
+
+    public GraphDatabaseService getGraphDatabase() {
+        return gdb;
+    }
 }
