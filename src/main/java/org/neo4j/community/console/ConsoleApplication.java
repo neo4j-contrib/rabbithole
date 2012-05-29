@@ -113,12 +113,12 @@ public class ConsoleApplication implements SparkApplication {
                 String[] props = param( request,"props", "name").split(",");
                 final String type = param(request, "type", "png");
                 final String scale = param(request, "type", "100");
-                Graph graph;
+                SubGraph graph;
                 if (query.trim().isEmpty()) {
-                    graph = Graph.from(service.getGraphDatabase());
+                    graph = SubGraph.from(service.getGraphDatabase());
                 } else {
                     final CypherQueryExecutor.CypherResult result = service.cypherQuery(query);
-                    graph = Graph.from(result);
+                    graph = SubGraph.from(result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);
@@ -184,7 +184,11 @@ public class ConsoleApplication implements SparkApplication {
         try {
             time = trace("service", time);
             if (init!=null) {
-                if (service.isMutatingQuery(init)) {
+                final URL url = service.toUrl(init);
+                if (url!=null) {
+                    service.initFromUrl(url, "start n=node(*) match n-[r?]->() return n,r");
+                    data.put("graph",service.exportToGeoff());
+                } else if (service.isMutatingQuery(init)) {
                     service.initCypherQuery(init);
                     data.put("graph",service.exportToGeoff());
                 } else {

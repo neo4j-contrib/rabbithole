@@ -1,11 +1,18 @@
 package org.neo4j.community.console;
 
+import com.google.gson.Gson;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.tooling.GlobalGraphOperations;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
@@ -29,70 +36,8 @@ class Neo4jService {
         return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
     }
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
-        Map<Long, Map<String, Object>> nodes = nodeMap();
-        Map<Long, Map<String, Object>> relationships = relationshipMap(nodes);
-        markCypherResults(result, nodes, relationships);
-        return map("nodes", nodes.values(), "links", relationships.values());
-    }
-
-    private void markCypherResults(CypherQueryExecutor.CypherResult result, Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels) {
-        if (result==null) return;
-        for (Map<String, Object> row : result) {
-            for (Map.Entry<String, Object> entry : row.entrySet()) {
-                markEntry(nodes, rels, entry);
-            }
-        }
-    }
-
-    private void markEntry(Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels, Map.Entry<String, Object> entry) {
-        String column = entry.getKey();
-        Object value = entry.getValue();
-        if (value instanceof Iterable) {
-            for (Object inner : (Iterable)value) {
-                markNodeOrRel(nodes,rels,column,inner);
-            }
-        } else {
-            markNodeOrRel(nodes, rels, column, value);
-        }
-    }
-
-    private void markNodeOrRel(Map<Long, Map<String, Object>> nodes, Map<Long, Map<String, Object>> rels, String column, Object value) {
-        if (value instanceof Node) {
-            final long id = ((Node) value).getId();
-            if (!nodes.containsKey(id)) return;
-            nodes.get(id).put("selected", column);
-        }
-        if (value instanceof Relationship) {
-            final long id = ((Relationship) value).getId();
-            if (!rels.containsKey(id)) return;
-            rels.get(id).put("selected", column);
-        }
-    }
-
-    private Map<Long, Map<String, Object>> relationshipMap(Map<Long, Map<String, Object>> nodes) {
-        List<Long> nodeIndex = new ArrayList<Long>(nodes.keySet());
-
-        Map<Long, Map<String, Object>> relationships = new TreeMap<Long, Map<String, Object>>();
-        for (Relationship rel : GlobalGraphOperations.at(gdb).getAllRelationships()) {
-            Map<String, Object> data = geoffExportService.toMap(rel);
-            data.put("id", rel.getId());
-            data.put("source", nodeIndex.indexOf(rel.getStartNode().getId()));
-            data.put("target", nodeIndex.indexOf(rel.getEndNode().getId()));
-            data.put("type", rel.getType().name());
-            data.put(rel.getType().name(), "type");
-            relationships.put(rel.getId(), data);
-        }
-        return relationships;
-    }
-
-    private Map<Long, Map<String, Object>> nodeMap() {
-        Map<Long, Map<String, Object>> nodes = new TreeMap<Long, Map<String, Object>>();
-        for (Node n : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            Map<String, Object> data = geoffExportService.toMap(n);
-            data.put("id", n.getId());
-            nodes.put(n.getId(), data);
-        }
-        return nodes;
+        final SubGraph subGraph = SubGraph.from(gdb).markSelection(result);
+        return map("nodes", subGraph.getNodes().values(), "links", subGraph.getRelationships().values());
     }
 
     public String exportToGeoff() {
@@ -181,5 +126,53 @@ class Neo4jService {
 
     public GraphDatabaseService getGraphDatabase() {
         return gdb;
+    }
+
+    public void initFromUrl(URL url, final String query) {
+        final Map cypherResult = post(url, map("query", query), Map.class);
+        SubGraph graph=SubGraph.from(cypherResult, false);
+        final Transaction tx = gdb.beginTx();
+        try {
+            graph.importTo(gdb, hasReferenceNode());
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+
+    }
+
+    private <T> T post(URL url, Map<String, Object> data, Class<T> resultType) {
+        try {
+            final HttpClient client = clientFor(url);
+            final PostMethod post = new PostMethod(url.toString());
+            post.setDoAuthentication(true);
+            post.setRequestHeader("Accept", "application/json;stream=true");
+            final Gson gson = new Gson();
+            final String postData = gson.toJson(data);
+            post.setRequestEntity(new StringRequestEntity(postData, "application/json", "UTF-8"));
+            final int status = client.executeMethod(post);
+            if (status != 200) throw new RuntimeException("Return Status Code "+post.getStatusCode()+" "+post.getStatusLine());
+            return gson.fromJson(post.getResponseBodyAsString(), resultType);
+        } catch (Exception e) {
+            throw new RuntimeException("Error executing request to "+url+" with "+data+":" + e.getMessage());
+        }
+    }
+
+    private HttpClient clientFor(URL url) {
+        final HttpClient client = new HttpClient();
+        final String userInfo = url.getUserInfo();
+        if (userInfo != null) {
+            final String[] usernamePassword = userInfo.split(":");
+            client.getState().setCredentials(new AuthScope(url.getHost(), url.getPort()), new UsernamePasswordCredentials(usernamePassword[0], usernamePassword[1]));
+        }
+        return client;
+    }
+
+    public URL toUrl(String url) {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 }

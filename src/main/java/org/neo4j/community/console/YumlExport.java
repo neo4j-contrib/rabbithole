@@ -11,7 +11,7 @@ import static java.util.Arrays.asList;
  * @since 27.05.12
  */
 public class YumlExport {
-    public String toYuml(Graph graph,String...idProps) {
+    public String toYuml(SubGraph graph,String...idProps) {
         StringBuilder sb=new StringBuilder();
         final List<String> idPropsList = asList(idProps);
         final Map<Long, Map<String, Object>> nodes = graph.getNodes();
@@ -19,19 +19,19 @@ public class YumlExport {
             sb.append("[").append(graph.uniqueId(node.getKey(), idPropsList));
             final List<String> props = nodeProps(node, idPropsList);
             if (!props.isEmpty()) {
+                sb.append("|");
                 for (String prop : props) {
-                    sb.append("|");
                     sb.append(prop).append(";");
                 }
             }
-            sb.append("]").append(","); // todo props
+            sb.append("]").append(",");
         }
         for (Map<String, Object> rel : graph.getRelationships().values()) {
-            final Long source = (Long) rel.get("source");
-            final Long target = (Long) rel.get("target");
-            sb.append("[").append(graph.uniqueId(source, idPropsList)).append("]");
+            final Long start = (Long) rel.get("start");
+            final Long end = (Long) rel.get("end");
+            sb.append("[").append(graph.uniqueId(start, idPropsList)).append("]");
             sb.append(rel.get("type")).append("->");
-            sb.append("[").append(graph.uniqueId(target, idPropsList)).append("]");
+            sb.append("[").append(graph.uniqueId(end, idPropsList)).append("]");
             sb.append(",");
         }
         return sb.toString();
