@@ -111,7 +111,7 @@ public class ConsoleApplication implements SparkApplication {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param( request,"query", "");
                 String[] props = param( request,"props", "name").split(",");
-                final String type = param(request, "type", "png");
+                final String type = param(request, "type", "jpg");
                 final String scale = param(request, "type", "100");
                 SubGraph graph;
                 if (query.trim().isEmpty()) {
