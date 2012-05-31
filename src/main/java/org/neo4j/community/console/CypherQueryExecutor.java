@@ -29,6 +29,9 @@ public class CypherQueryExecutor {
     public boolean isMutatingQuery(String query) {
         return query.matches("(?is).*\\b(create|relate|delete|set)\\b.*");
     }
+    public boolean isCypherQuery(String query) {
+        return query.matches("(?is).*\\b(start|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
+    }
 
     public static class CypherResult implements Iterable<Map<String, Object>> {
         private final List<String> columns;

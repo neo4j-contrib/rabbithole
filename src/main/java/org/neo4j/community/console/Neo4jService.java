@@ -9,6 +9,10 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
+import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
+import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
+import org.neo4j.rest.graphdb.util.QueryResult;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.net.MalformedURLException;
@@ -123,14 +127,15 @@ class Neo4jService {
     public boolean isMutatingQuery(String query) {
         return cypherQueryExecutor.isMutatingQuery(query);
     }
+    public boolean isCypherQuery(String query) {
+        return cypherQueryExecutor.isCypherQuery(query);
+    }
 
     public GraphDatabaseService getGraphDatabase() {
         return gdb;
     }
 
-    public void initFromUrl(URL url, final String query) {
-        final Map cypherResult = post(url, map("query", query), Map.class);
-        SubGraph graph=SubGraph.from(cypherResult, false);
+    public void importGraph(SubGraph graph) {
         final Transaction tx = gdb.beginTx();
         try {
             graph.importTo(gdb, hasReferenceNode());
@@ -138,34 +143,6 @@ class Neo4jService {
         } finally {
             tx.finish();
         }
-
-    }
-
-    private <T> T post(URL url, Map<String, Object> data, Class<T> resultType) {
-        try {
-            final HttpClient client = clientFor(url);
-            final PostMethod post = new PostMethod(url.toString());
-            post.setDoAuthentication(true);
-            post.setRequestHeader("Accept", "application/json;stream=true");
-            final Gson gson = new Gson();
-            final String postData = gson.toJson(data);
-            post.setRequestEntity(new StringRequestEntity(postData, "application/json", "UTF-8"));
-            final int status = client.executeMethod(post);
-            if (status != 200) throw new RuntimeException("Return Status Code "+post.getStatusCode()+" "+post.getStatusLine());
-            return gson.fromJson(post.getResponseBodyAsString(), resultType);
-        } catch (Exception e) {
-            throw new RuntimeException("Error executing request to "+url+" with "+data+":" + e.getMessage());
-        }
-    }
-
-    private HttpClient clientFor(URL url) {
-        final HttpClient client = new HttpClient();
-        final String userInfo = url.getUserInfo();
-        if (userInfo != null) {
-            final String[] usernamePassword = userInfo.split(":");
-            client.getState().setCredentials(new AuthScope(url.getHost(), url.getPort()), new UsernamePasswordCredentials(usernamePassword[0], usernamePassword[1]));
-        }
-        return client;
     }
 
     public URL toUrl(String url) {

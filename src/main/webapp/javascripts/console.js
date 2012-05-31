@@ -82,28 +82,48 @@ function reset(done) {
 }
 
 function share_yuml(query) {
+    if (!query) return;
     $.ajax("/console/to_yuml?query="+encodeURIComponent(query), {
         type: "GET", dataType: "text",
         success: function(data) {
             $('#share_yuml').attr("href",data);
     }});
 }
-function generate_url() {
+
+function base_url() {
+    return document.location.protocol + "//" + document.location.host;
+}
+
+function store_graph_info() {
     var init = $('#share_init').val();
     var query = $('#share_query').val();
+    query = isCypher(query) ? query : null;
     var version = $('#share_version').val();
-    var base=document.location.protocol+"//"+document.location.host;
-    var uri = base+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query)+'&version='+encodeURIComponent(version);
-    if ($("#share_no_root").is(":checked")) uri+="&no_root=true";
-    console.log(uri);
-    $('#share_url').val(uri);
-    var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
-    $('#share_iFrame').val(frame);
-    $.ajax("/console/shorten?url="+encodeURIComponent(uri), {
-        type: "GET", dataType: "text",
+    var no_root = $("#share_no_root").is(":checked");
+
+    var message = null;
+    // var uri = base_url()+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query)+'&version='+encodeURIComponent(version);
+    // if (no_root) uri+="&no_root=true";
+
+    $.ajax("/r/share", {
+        type: "POST",
+        dataType: "text",
+        contentType: "application/json",
+        data: JSON.stringify({
+            init : init,
+            query : query,
+            version : version,
+            no_root : no_root,
+            message : message
+        }),
         success: function(data) {
-            $('#share_short').val(data);
-            addthis.update('share', 'url', data);
+            var uri = (data.indexOf("http")!=0) ? base_url() + "/r/" + data : data;
+            console.log(uri);
+            var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
+            $('#share_iFrame').val(frame);
+            $('#share_url').attr("href",uri);
+            $('#share_short').val(uri);
+            addthis.update('share', 'url', uri);
     }});
     share_yuml(query);
     addthis.update('share', 'title', 'Look at this #Neo4j graph: ');
@@ -123,6 +143,7 @@ function toggleShare() {
         success:function (data) {
             $('#share_init').val(data);
             var query = $("#input").val();
+            query = isCypher(query) ? query : null;
             $('#share_query').val(query);
             $('#shareUrl').toggle();
             share_yuml(query)
@@ -184,12 +205,19 @@ function welcome_msg() {
     return $("#welcome_msg").html();
 }
 
+function showWelcome(json) {
+    append( $( "#output" ), welcome_msg() );
+    if (json['message']) {
+        append( $( "#output" ), json['message'] );
+    }
+}
+
 $(document).ready(function () {
     post( "/console/init", JSON.stringify( getParameters() ), function ( json )
     {
         showResults( json );
         showVersion( json );
-        append( $( "#output" ), welcome_msg() );
+        showWelcome( json )
     }, "json" );
     $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
     var input=$("#input");

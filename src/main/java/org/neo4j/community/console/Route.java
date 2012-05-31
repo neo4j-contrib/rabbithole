@@ -1,9 +1,15 @@
 package org.neo4j.community.console;
 
 import org.neo4j.kernel.lifecycle.LifecycleException;
+import spark.HaltException;
 import spark.Request;
 import spark.Response;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -14,6 +20,11 @@ abstract class Route extends spark.Route {
 
     Route(String path) {
         super(path);
+    }
+    
+    public String stop(int status, String message) {
+        halt(status, message);
+        return message;
     }
 
     @Override
@@ -29,6 +40,8 @@ abstract class Route extends spark.Route {
             reset(request);
             SessionHoldingListener.cleanSessions();
             return handleException(oom);
+        } catch (HaltException he) {
+            throw he;
         } catch (Exception e) {
             return handleException(e);
         }
@@ -76,5 +89,20 @@ abstract class Route extends spark.Route {
 
     protected Neo4jService service(Request request) {
         return SessionService.getService(request.raw());
+    }
+
+    protected String baseUri(HttpServletRequest request, String query, final String path) {
+        final String requestURI = request.getRequestURL().toString();
+        try {
+            final URI uri = new URI(requestURI);
+            return new URI(uri.getScheme(),null,uri.getHost(),uri.getPort(), path,query,null).toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error parsing URI from "+requestURI+" query "+query);
+        }
+    }
+
+    protected String encodeParam(String param, String value) throws UnsupportedEncodingException {
+        if (value==null || value.trim().isEmpty()) return "";
+        return param + "=" + URLEncoder.encode(value, "UTF-8");
     }
 }

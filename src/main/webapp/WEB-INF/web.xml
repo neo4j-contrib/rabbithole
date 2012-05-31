@@ -14,15 +14,27 @@
       <param-value>org.neo4j.community.console.ConsoleApplication</param-value>
     </init-param>
   </filter>
+  <filter>
+    <filter-name>ShareGraphApplication</filter-name>
+    <filter-class>spark.servlet.SparkFilter</filter-class>
+    <init-param>
+      <param-name>applicationClass</param-name>
+      <param-value>org.neo4j.community.console.ShareGraphApplication</param-value>
+    </init-param>
+  </filter>
   <filter-mapping>
     <filter-name>ConsoleApplication</filter-name>
     <url-pattern>/console/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>ShareGraphApplication</filter-name>
+    <url-pattern>/r/*</url-pattern>
   </filter-mapping>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
   <session-config>
-      <session-timeout>10</session-timeout>
+      <session-timeout>20</session-timeout>
   </session-config>
   <listener>
       <listener-class>org.neo4j.community.console.SessionHoldingListener</listener-class>
