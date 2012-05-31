@@ -50,7 +50,10 @@ public class ConsoleService {
 
     public ConsoleService() {
         final String restUrl = System.getenv("NEO4J_REST_URL");
-        if (restUrl!=null) storage = new GraphStorage(restUrl);
+        if (restUrl!=null) {
+            final RestAPI api = new RestAPI(restUrl, System.getenv("NEO4J_LOGIN"), System.getenv("NEO4J_PASSWORD"));
+            storage = new GraphStorage(api);
+        }
     }
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {

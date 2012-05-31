@@ -22,7 +22,11 @@ public class GraphStorage {
     private final RestIndex<Node> index;
 
     public GraphStorage(String uri) {
-        restAPI = new RestAPI(uri);
+        this(new RestAPI(uri));
+    }
+
+    public GraphStorage(RestAPI restAPI) {
+        this.restAPI = restAPI;
         cypher = new RestCypherQueryEngine(restAPI);
         index = restAPI.index().forNodes("graphs");
     }
