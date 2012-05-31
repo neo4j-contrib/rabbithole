@@ -1,10 +1,16 @@
 package org.neo4j.community.console;
 
+import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.SyntaxException;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
@@ -81,4 +87,38 @@ public class CypherQueryExecutorTest {
         }
     }
 
+    @Test
+    public void testToJson() throws Exception {
+        gdb.beginTx();
+        final Node n1 = gdb.createNode();
+        n1.setProperty("name","n1");
+        n1.setProperty("age",10);
+        final Relationship rel = gdb.getReferenceNode().createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
+        rel.setProperty("name","rel1");
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(0) match p=n-[r]-m return p,n,r,m", null);
+        System.out.println(result);
+        final List<Map<String,Object>> json = result.getJson();
+        System.out.println(new Gson().toJson(json));
+        assertEquals(1, json.size());
+        final Map<String, Object> row = json.get(0);
+        assertEquals(4, row.size());
+        assertEquals(1, ((Map)row.get("n")).size());
+        assertEquals(0L, ((Map)row.get("n")).get("_id"));
+        assertEquals(3, ((Map)row.get("m")).size());
+        assertEquals(1L, ((Map)row.get("m")).get("_id"));
+        assertEquals("n1", ((Map)row.get("m")).get("name"));
+        assertEquals(10, ((Map)row.get("m")).get("age"));
+
+        assertEquals(5, ((Map)row.get("r")).size());
+        assertEquals(0L, ((Map)row.get("r")).get("_id"));
+        assertEquals("rel1", ((Map)row.get("r")).get("name"));
+        assertEquals("REL", ((Map)row.get("r")).get("_type"));
+        assertEquals(0L, ((Map)row.get("r")).get("_start"));
+        assertEquals(1L, ((Map)row.get("r")).get("_end"));
+
+        assertEquals(3, ((List)row.get("p")).size());
+        assertEquals(0L, ((Map)((List)row.get("p")).get(0)).get("_id"));
+        assertEquals("rel1", ((Map)((List)row.get("p")).get(1)).get("name"));
+        assertEquals(10, ((Map)((List)row.get("p")).get(2)).get("age"));
+    }
 }

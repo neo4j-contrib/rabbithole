@@ -13,7 +13,7 @@ public class UtilTest {
     @Test
     public void testRandomId() throws Exception {
         final String id = Util.randomId();
-        assertTrue(id.matches("[0-9]+"));
+        assertTrue(id.matches("[0-9a-z]+"));
     }
 
     @Test

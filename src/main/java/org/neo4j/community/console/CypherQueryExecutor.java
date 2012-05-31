@@ -2,6 +2,9 @@ package org.neo4j.community.console;
 
 import org.neo4j.cypher.PipeExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.IteratorWrapper;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -36,7 +39,7 @@ public class CypherQueryExecutor {
     public static class CypherResult implements Iterable<Map<String, Object>> {
         private final List<String> columns;
         private final String text;
-        private final Iterable<scala.collection.immutable.Map<String, Object>> rows;
+        private final Collection<Map<String, Object>> rows;
 
         public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>> rows) {
             this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows));
@@ -45,7 +48,7 @@ public class CypherQueryExecutor {
         public CypherResult(java.util.List<String> columns, String text, Iterable<scala.collection.immutable.Map<String, Object>> rows) {
             this.columns = columns;
             this.text = text;
-            this.rows = rows;
+            this.rows = IteratorUtil.addToCollection(iterate(rows), new ArrayList<Map<String, Object>>());
         }
 
         public List<String> getColumns() {
@@ -63,12 +66,55 @@ public class CypherQueryExecutor {
 
         @Override
         public Iterator<Map<String, Object>> iterator() {
-            return new IteratorWrapper<Map<String, Object>, scala.collection.immutable.Map<String, Object>>(this.rows.iterator()) {
+            return rows.iterator();
+        }
+
+        public Iterator<Map<String, Object>> iterate(Iterable<scala.collection.immutable.Map<String, Object>> rows) {
+            return new IteratorWrapper<Map<String, Object>, scala.collection.immutable.Map<String, Object>>(rows.iterator()) {
                 @Override
                 protected Map<String, Object> underlyingObjectToObject(scala.collection.immutable.Map<String, Object> row) {
                     return JavaConversions.mapAsJavaMap(row);
                 }
             };
+        }
+
+        public List<Map<String,Object>> getJson() {
+            final List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+            for (Map<String, Object> row : this) {
+                final LinkedHashMap<String, Object> newRow = new LinkedHashMap<String, Object>();
+                for (String column : columns) {
+                    final Object value = row.get(column);
+                    newRow.put(column, toJsonCompatible(value));
+                }
+                rows.add(newRow);
+            }
+            return rows;
+        }
+
+        private Object toJsonCompatible(Object value) {
+            if (value instanceof Node) {
+                final Node node = (Node) value;
+                final Map<String, Object> result = SubGraph.toMap(node);
+                result.put("_id",node.getId());
+                return result;
+            }
+            if (value instanceof Relationship) {
+                final Relationship relationship = (Relationship) value;
+                final Map<String, Object> result = SubGraph.toMap(relationship);
+                result.put("_id",relationship.getId());
+                result.put("_start",relationship.getStartNode().getId());
+                result.put("_end",relationship.getEndNode().getId());
+                result.put("_type",relationship.getType().name());
+                return result;
+            }
+            if (value instanceof Iterable) {
+                final List<Object> result = new ArrayList<Object>();
+                for (Object inner : (Iterable)value) {
+                    result.add(toJsonCompatible(inner));
+                }
+                return result;
+            }
+            return value;
         }
     }
 

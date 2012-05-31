@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -79,6 +78,7 @@ public class ConsoleService {
             if (query!=null) {
                 result = service.cypherQuery(query);
                 data.put("result", result.getText());
+                data.put("json", result.getJson());
             }
             time = trace("cypher", time);
             data.put("visualization", service.cypherQueryViz(result));

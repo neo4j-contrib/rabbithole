@@ -159,9 +159,11 @@ public class SubGraph {
     @SuppressWarnings("unchecked")
     public static SubGraph from(Map restCypherResult, boolean keepDanglingRels) {
         final SubGraph result = new SubGraph();
-        final List<List<Object>> rows = (List<List<Object>>) restCypherResult.get("data");
-        for (List<Object> row : rows) {
-            for (Object value : row) {
+        final List<String> cols = (List<String>) restCypherResult.get("columns");
+        final List<Map<String,Object>> rows = (List<Map<String,Object>>) restCypherResult.get("data");
+        for (Map<String,Object> row : rows) {
+            for (String col : cols) {
+                final Object value = row.get(col);
                 result.addJsonElementToGraph(value,keepDanglingRels);
             }
         }
