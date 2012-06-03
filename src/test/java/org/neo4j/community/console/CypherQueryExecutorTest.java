@@ -95,30 +95,37 @@ public class CypherQueryExecutorTest {
         n1.setProperty("age",10);
         final Relationship rel = gdb.getReferenceNode().createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         rel.setProperty("name","rel1");
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(0) match p=n-[r]-m return p,n,r,m", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(0) match p=n-[r]->m return p,n,r,m", null);
         System.out.println(result);
         final List<Map<String,Object>> json = result.getJson();
         System.out.println(new Gson().toJson(json));
         assertEquals(1, json.size());
         final Map<String, Object> row = json.get(0);
         assertEquals(4, row.size());
-        assertEquals(1, ((Map)row.get("n")).size());
-        assertEquals(0L, ((Map)row.get("n")).get("_id"));
-        assertEquals(3, ((Map)row.get("m")).size());
-        assertEquals(1L, ((Map)row.get("m")).get("_id"));
-        assertEquals("n1", ((Map)row.get("m")).get("name"));
-        assertEquals(10, ((Map)row.get("m")).get("age"));
+        final Map node1 = (Map) row.get("n");
+        assertEquals(1, node1.size());
+        assertEquals(0L, node1.get("_id"));
+        final Map node2 = (Map) row.get("m");
+        assertEquals(3, node2.size());
+        assertEquals(1L, node2.get("_id"));
+        assertEquals("n1", node2.get("name"));
+        assertEquals(10, node2.get("age"));
 
-        assertEquals(5, ((Map)row.get("r")).size());
-        assertEquals(0L, ((Map)row.get("r")).get("_id"));
-        assertEquals("rel1", ((Map)row.get("r")).get("name"));
-        assertEquals("REL", ((Map)row.get("r")).get("_type"));
-        assertEquals(0L, ((Map)row.get("r")).get("_start"));
-        assertEquals(1L, ((Map)row.get("r")).get("_end"));
+        final Map rel1 = (Map) row.get("r");
+        assertEquals(5, rel1.size());
+        assertEquals(0L, rel1.get("_id"));
+        assertEquals("rel1", rel1.get("name"));
+        assertEquals("REL", rel1.get("_type"));
+        assertEquals(0L, rel1.get("_start"));
+        assertEquals(1L, rel1.get("_end"));
 
-        assertEquals(3, ((List)row.get("p")).size());
-        assertEquals(0L, ((Map)((List)row.get("p")).get(0)).get("_id"));
-        assertEquals("rel1", ((Map)((List)row.get("p")).get(1)).get("name"));
-        assertEquals(10, ((Map)((List)row.get("p")).get(2)).get("age"));
+        final List path = (List) row.get("p");
+        assertEquals(3, path.size());
+        final Map pathNode1 = (Map) path.get(0);
+        assertEquals(0L, pathNode1.get("_id"));
+        final Map pathRel1 = (Map) path.get(1);
+        assertEquals("rel1", pathRel1.get("name"));
+        final Map pathNode2 = (Map) path.get(2);
+        assertEquals(10, pathNode2.get("age"));
     }
 }

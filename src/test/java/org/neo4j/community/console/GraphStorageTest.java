@@ -1,15 +1,17 @@
 package org.neo4j.community.console;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
-import org.neo4j.rest.graphdb.RestGraphDatabase;
-import org.neo4j.rest.graphdb.index.RestIndex;
-import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.index.Index;
+import org.neo4j.server.web.WebServer;
+import org.neo4j.test.ImpermanentGraphDatabase;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.neo4j.community.console.TestWebServer.startWebServer;
 
 /**
  * @author mh
@@ -17,18 +19,28 @@ import static org.junit.Assert.assertNull;
  */
 public class GraphStorageTest {
 
+    private static final int PORT = 7475;
     private GraphStorage storage;
-    private RestGraphDatabase gdb;
-    private RestIndex<Node> index;
-    private RestCypherQueryEngine cypher;
+    private static ImpermanentGraphDatabase gdb;
+    private Index<Node> index;
+    private static WebServer webServer;
 
+    @BeforeClass
+    public static void startup() {
+        gdb = new ImpermanentGraphDatabase();
+        webServer = startWebServer(gdb, PORT);
+    }
     @Before
     public void setUp() throws Exception {
-        storage = new GraphStorage("http://localhost:7474/db/data");
-        gdb = new RestGraphDatabase("http://localhost:7474/db/data");
-        cypher = new RestCypherQueryEngine(gdb.getRestAPI());
-        cypher.query("start n=node(*) match n-[r?]-() where id(n) <> 0 delete n,r",null);
+        gdb.cleanContent(true);
+        storage = new GraphStorage("http://localhost:"+PORT+"/db/data");
         index = gdb.index().forNodes("graphs");
+    }
+
+    @AfterClass
+    public static void stop() throws Exception {
+        webServer.stop();
+        gdb.shutdown();
     }
 
     @Test
@@ -42,8 +54,14 @@ public class GraphStorageTest {
         assertEquals(info.getId(), node.getProperty("id"));
         assertEquals(info.getInit(), node.getProperty("init"));
         assertEquals(info.getMessage(),node.getProperty("message"));
-        node.delete();
+        delete(node);
         assertNull(storage.find(info.getId()));
+    }
+
+    private void delete(Node node) {
+        final Transaction tx = gdb.beginTx();
+        node.delete();
+        tx.success();tx.finish();
     }
 
     @Test
@@ -53,7 +71,7 @@ public class GraphStorageTest {
         final Node node = index.get("id", info.getId()).getSingle();
         assertNotNull(node);
         assertEquals("query", node.getProperty("query"));
-        node.delete();
+        delete(node);
     }
     @Test
     public void testDelete() throws Exception {

@@ -241,7 +241,7 @@ public class ConsoleService {
     }
     public void initFromUrl2(Neo4jService service, URL url, final String query) {
         final Map cypherResult = post(url, map("query", query), Map.class);
-        SubGraph graph=SubGraph.from(cypherResult, false);
+        SubGraph graph=SubGraph.fromRaw(cypherResult, false);
         service.importGraph(graph);
 
     }

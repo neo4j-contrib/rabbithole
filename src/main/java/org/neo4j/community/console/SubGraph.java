@@ -170,6 +170,19 @@ public class SubGraph {
         if (!keepDanglingRels) result.removeDanglingRels();
         return result;
     }
+    @SuppressWarnings("unchecked")
+    public static SubGraph fromRaw(Map restCypherResult, boolean keepDanglingRels) {
+        final SubGraph result = new SubGraph();
+        final List<List<Object>> rows = (List<List<Object>>) restCypherResult.get("data");
+        for (List<Object> row : rows) {
+            for (int i = row.size() - 1; i >= 0; i--) {
+                final Object value = row.get(i);
+                result.addJsonElementToGraph(value,keepDanglingRels);
+            }
+        }
+        if (!keepDanglingRels) result.removeDanglingRels();
+        return result;
+    }
 
     @SuppressWarnings("SuspiciousMethodCalls")
     private void removeDanglingRels() {
