@@ -57,6 +57,7 @@ public class ConsoleService {
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {
         if (version!=null) service.setVersion(version);
+        if (dontInitialize(service)) init=null;
         final Map<String, Object> data = map("init", init, "query", query,"version",service.getVersion());
         long start = System.currentTimeMillis(), time = start;
         try {
@@ -72,6 +73,7 @@ public class ConsoleService {
                 } else {
                     data.put("graph", service.mergeGeoff(init));
                 }
+                service.setInitialized();
             }
             time = trace("graph", time);
             CypherQueryExecutor.CypherResult result = null;
@@ -90,6 +92,10 @@ public class ConsoleService {
         time = trace("all", start);
         data.put("time", time);
         return data;
+    }
+
+    private boolean dontInitialize(Neo4jService service) {
+        return !service.doesOwnDatabase() || service.isInitialized();
     }
 
     protected long trace(String msg, long time) {
@@ -186,7 +192,9 @@ public class ConsoleService {
         final GraphInfo storedInfo = storage.create(info);
         return storedInfo.getId();
     }
+
     public void initFromUrl(Neo4jService service, URL url, final String query) {
+        if (!service.doesOwnDatabase()) return;
         final String urlString = url.toString().replaceAll("/cypher/?$", "");
         final RestAPI restApi = new RestAPI(urlString);
         final QueryResult<Map<String,Object>> cypherResult = new RestCypherQueryEngine(restApi).query(query, null);

@@ -3,6 +3,7 @@ package org.neo4j.community.console;
 import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.server.web.WebServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
@@ -17,13 +18,13 @@ import static org.neo4j.community.console.TestWebServer.startWebServer;
  */
 public class ImportRemoteGraphTest {
 
-    private static final String CYPHER_URL = "http://localhost:7474/db/data/cypher";
     private Node referenceNode;
     private Neo4jService service;
     private ConsoleService consoleService;
     private static ImpermanentGraphDatabase serverGraphDatabase;
     private static WebServer webServer;
     private static final int PORT = 7475;
+    private static final String CYPHER_URL = "http://localhost:"+PORT+"/db/data/cypher";
 
 
     @Test
@@ -53,9 +54,10 @@ public class ImportRemoteGraphTest {
     @Before
     public void setUp() {
         serverGraphDatabase.cleanContent(true);
-        serverGraphDatabase.beginTx();
+        final Transaction tx = serverGraphDatabase.beginTx();
         final Node remoteRefNode = serverGraphDatabase.getReferenceNode();
         remoteRefNode.setProperty("name", "root");
+        tx.success();tx.finish();
 
         consoleService = new ConsoleService();
         service = new Neo4jService();

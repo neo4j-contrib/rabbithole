@@ -5,8 +5,6 @@ import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +19,7 @@ public class ShareGraphApplication implements SparkApplication {
 
     @Override
     public void init() {
+        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
         post(new spark.Route("/r/share") {
             public Object handle(Request request, Response response) {

@@ -21,14 +21,34 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 * @since 08.04.12
 */
 class Neo4jService {
-    private GraphDatabaseService gdb = new ImpermanentGraphDatabase();
+    private GraphDatabaseService gdb;
 
-    private Index index = new Index(gdb);
-    private CypherQueryExecutor cypherQueryExecutor = new CypherQueryExecutor(gdb,index);
-    private GeoffImportService geoffService = new GeoffImportService(gdb, index);
-    private GeoffExportService geoffExportService = new GeoffExportService(gdb);
-    private CypherExportService cypherExportService = new CypherExportService(gdb);
+    private Index index;
+    private CypherQueryExecutor cypherQueryExecutor;
+    private GeoffImportService geoffService;
+    private GeoffExportService geoffExportService;
+    private CypherExportService cypherExportService;
     private String version;
+    private boolean initialized;
+
+    Neo4jService() {
+        this(new ImpermanentGraphDatabase(),true);
+    }
+
+    Neo4jService(GraphDatabaseService gdb) {
+        this(gdb,false);
+    }
+
+    private Neo4jService(GraphDatabaseService gdb, boolean ownsDatabase) {
+        if (gdb == null) throw new IllegalArgumentException("Graph Database must not be null");
+        this.gdb = gdb;
+        this.ownsDatabase = ownsDatabase;
+        index = new Index(this.gdb);
+        cypherQueryExecutor = new CypherQueryExecutor(gdb,index);
+        geoffService = new GeoffImportService(gdb, index);
+        geoffExportService = new GeoffExportService(gdb);
+        cypherExportService = new CypherExportService(gdb);
+    }
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || cypherQueryExecutor.isMutatingQuery(query);
@@ -75,7 +95,7 @@ class Neo4jService {
     public void stop() {
         if (gdb!=null) {
             System.err.println("Shutting down service "+this);
-            gdb.shutdown();
+            if (ownsDatabase) gdb.shutdown();
             index = null;
             cypherQueryExecutor=null;
             geoffExportService =null;
@@ -86,6 +106,7 @@ class Neo4jService {
     }
 
     public void deleteReferenceNode() {
+        if (rootNodeRemovalNotAllowed()) return;
         final Node root = gdb.getReferenceNode();
         if (root!=null) {
             final Transaction tx = gdb.beginTx();
@@ -96,6 +117,10 @@ class Neo4jService {
                 tx.finish();
             }
         }
+    }
+
+    private boolean rootNodeRemovalNotAllowed() {
+        return !ownsDatabase || isInitialized();
     }
 
     public String getVersion() {
@@ -146,5 +171,24 @@ class Neo4jService {
         } catch (MalformedURLException e) {
             return null;
         }
+    }
+
+    private final boolean ownsDatabase;
+    public boolean doesOwnDatabase() {
+        return ownsDatabase;
+    }
+
+    public Neo4jService initializeFrom(SubGraph graph) {
+        importGraph(graph);
+        setInitialized();
+        return this;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized() {
+        this.initialized = true;
     }
 }

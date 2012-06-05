@@ -8,6 +8,14 @@ import javax.servlet.http.HttpSession;
  * @since 09.04.12
  */
 class SessionService {
+    public static final String SERVICE = "service";
+
+    private static DatabaseInfo databaseInfo;
+
+    public static void setDatabaseInfo(DatabaseInfo databaseInfo) {
+        SessionService.databaseInfo = databaseInfo;
+    }
+
     public static void reset(final HttpServletRequest httpRequest) {
         final HttpSession session = httpRequest.getSession(false);
         cleanSession(session, true);
@@ -15,11 +23,11 @@ class SessionService {
 
     public static void cleanSession(HttpSession session, final boolean invalidate) {
         if (session == null) return;
-        Neo4jService service = (Neo4jService) session.getAttribute("service");
+        Neo4jService service = (Neo4jService) session.getAttribute(SERVICE);
         if (service != null) {
             try {
                 service.stop();
-                session.removeAttribute("service");
+                session.removeAttribute(SERVICE);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -31,11 +39,18 @@ class SessionService {
 
     public static Neo4jService getService(final HttpServletRequest request) {
         HttpSession session = request.getSession(true);
-        Neo4jService service = (Neo4jService) session.getAttribute("service");
+        Neo4jService service = (Neo4jService) session.getAttribute(SERVICE);
         if (service != null) return service;
 
-        service = new Neo4jService();
-        session.setAttribute("service", service);
+        service = databaseInfo.shouldCreateNew() ? new Neo4jService() : new Neo4jService(databaseInfo.getDatabase());
+        if (databaseInfo.shouldImport()) {
+            service.initializeFrom(SubGraph.from(databaseInfo.getDatabase()));
+        }
+        session.setAttribute(SERVICE, service);
         return service;
+    }
+
+    public static DatabaseInfo getDatabaseInfo() {
+        return databaseInfo;
     }
 }

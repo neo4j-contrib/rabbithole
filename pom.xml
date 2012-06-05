@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <name>Neo4j Console Backend</name>
   <description><![CDATA[]]></description>
-  <url></url>
+  <url>http://github.com/neo4j-contrib/rabbithole</url>
   <properties>
     <neo4j.version>1.8-SNAPSHOT</neo4j.version>
   </properties>
@@ -87,7 +87,13 @@
           <version>${neo4j.version}</version>
           <scope>test</scope>
       </dependency-->
-    <dependency>
+
+      <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <version>1.8.4</version>
+      </dependency>
+      <dependency>
       <groupId>org.neo4j.app</groupId>
       <artifactId>neo4j-server</artifactId>
       <version>${neo4j.version}</version>
@@ -212,7 +218,7 @@
               <extraJvmArguments>-Xmx512m</extraJvmArguments>
               <programs>
                 <program>
-                  <mainClass>Main</mainClass>
+                  <mainClass>org.neo4j.community.console.Console</mainClass>
                   <name>webapp</name>
                 </program>
               </programs>
@@ -220,7 +226,21 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <finalName>neo4j-console</finalName>
+                <archive>
+                    <manifest>
+                        <mainClass>org.neo4j.community.console.Console</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+        </plugin>
+        <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
@@ -232,8 +252,8 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>Main</mainClass>
-          <arguments>
+          <mainClass>org.neo4j.community.console.Console</mainClass>
+          <!--arguments>
             <argument>argument1</argument>
           </arguments>
           <systemProperties>
@@ -241,7 +261,7 @@
               <key>myproperty</key>
               <value>myvalue</value>
             </systemProperty>
-          </systemProperties>
+          </systemProperties-->
         </configuration>
       </plugin>
     </plugins>

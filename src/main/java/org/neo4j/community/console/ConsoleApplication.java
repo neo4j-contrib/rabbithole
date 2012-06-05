@@ -6,12 +6,8 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -28,6 +24,7 @@ public class ConsoleApplication implements SparkApplication {
 
     @Override
     public void init() {
+        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
