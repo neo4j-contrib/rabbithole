@@ -48,11 +48,18 @@ public class ConsoleService {
     private GraphStorage storage;
 
     public ConsoleService() {
+        createGraphStorage();
+    }
+
+    private void createGraphStorage() {
         final String restUrl = System.getenv("NEO4J_REST_URL");
+        final String login = System.getenv("NEO4J_LOGIN");
+        final String password = System.getenv("NEO4J_PASSWORD");
         if (restUrl!=null) {
-            final RestAPI api = new RestAPI(restUrl, System.getenv("NEO4J_LOGIN"), System.getenv("NEO4J_PASSWORD"));
+            final RestAPI api = new RestAPI(restUrl, login, password);
             storage = new GraphStorage(api);
         }
+        System.err.println("Graph Storage "+restUrl+" login "+login+" "+password+" "+storage);
     }
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {
