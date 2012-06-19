@@ -100,7 +100,10 @@ function store_graph_info() {
     query = isCypher(query) ? query : null;
     var version = $('#share_version').val();
     var no_root = $("#share_no_root").is(":checked");
-
+    var id = $('#share_short').val();
+    if (id && (id.length==0 || id.match("http://.+"))) {
+        id=null;
+    }
     var message = null;
     // var uri = base_url()+'?init='+encodeURIComponent(init)+'&query='+encodeURIComponent(query)+'&version='+encodeURIComponent(version);
     // if (no_root) uri+="&no_root=true";
@@ -110,6 +113,7 @@ function store_graph_info() {
         dataType: "text",
         contentType: "application/json",
         data: JSON.stringify({
+            id : id,
             init : init,
             query : query,
             version : version,
@@ -137,7 +141,7 @@ function toggleGraph() {
 }
 
 function toggleShare() {
-    $.ajax("console/to_geoff", {
+    $.ajax("console/to_cypher", {
         type:"GET",
         dataType: "text",
         success:function (data) {
