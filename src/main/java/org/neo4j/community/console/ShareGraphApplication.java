@@ -14,7 +14,7 @@ import static spark.Spark.*;
 
 public class ShareGraphApplication implements SparkApplication {
 
-    private static final Pattern PATTERN = Pattern.compile("^/r/([0-9a-zA-Z]+)$");
+    private static final Pattern PATTERN = Pattern.compile("^/r/([0-9a-zA-Z_-]+)$");
     private ConsoleService consoleService;
 
     @Override
