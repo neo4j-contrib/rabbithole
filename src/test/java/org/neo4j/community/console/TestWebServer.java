@@ -48,6 +48,11 @@ public class TestWebServer extends Jetty6WebServer {
     protected NeoServer createNeoServer(final GraphDatabaseAPI gdb, final URI baseUri) {
         return new NeoServer() {
             @Override
+            public void init() {
+
+            }
+
+            @Override
             public void start() {
 
             }
