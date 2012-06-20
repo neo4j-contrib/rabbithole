@@ -46,9 +46,13 @@ public class GraphStorage {
     }
 
     public GraphInfo create(GraphInfo info) {
-        if (info.getId()==null) info = info.withId(Util.randomId());
+        if (isEmpty(info)) info = info.withId(Util.randomId());
         final RestNode node = restAPI.getOrCreateNode(index, "id", info.getId(), info.toMap());
         return new GraphInfo(node);
+    }
+
+    private boolean isEmpty(GraphInfo info) {
+        return info.getId()==null || info.getId().trim().isEmpty();
     }
 
     public void delete(String id) {

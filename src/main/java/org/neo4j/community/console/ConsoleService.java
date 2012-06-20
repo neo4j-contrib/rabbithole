@@ -59,7 +59,11 @@ public class ConsoleService {
             final RestAPI api = new RestAPI(restUrl, login, password);
             storage = new GraphStorage(api);
         }
-        System.err.println("Graph Storage "+restUrl+" login "+login+" "+password+" "+storage);
+        log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
+    }
+
+    private void log(String msg) {
+        System.err.println(msg);
     }
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {
@@ -107,7 +111,7 @@ public class ConsoleService {
 
     protected long trace(String msg, long time) {
         long now = System.currentTimeMillis();
-        System.err.println("## " + msg + " took: " + (now - time) + " ms.");
+        log("## " + msg + " took: " + (now - time) + " ms.");
         return now;
     }
 
@@ -138,7 +142,7 @@ public class ConsoleService {
         if (data == null || data.isEmpty()) {
             data = defaultValue;
         } else {
-            System.err.println(param+": "+data);
+            log(param+": "+data);
         }
         return data;
     }
@@ -192,12 +196,14 @@ public class ConsoleService {
 
     public Object share(Request request, Map input) {
         final GraphInfo info = GraphInfo.from(input);
-        if (storage==null) {
-            final String uri = createInitialUri(request, info);
-            return shortenUrl(uri);
+        try {
+            if (storage!=null) return storage.create(info).getId();
+        } catch(Exception e) {
+            log("Error storing shared data "+info);
+            e.printStackTrace();
         }
-        final GraphInfo storedInfo = storage.create(info);
-        return storedInfo.getId();
+        final String uri = createInitialUri(request, info);
+        return shortenUrl(uri);
     }
 
     public void initFromUrl(Neo4jService service, URL url, final String query) {

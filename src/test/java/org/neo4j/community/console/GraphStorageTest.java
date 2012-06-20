@@ -57,6 +57,40 @@ public class GraphStorageTest {
         delete(node);
         assertNull(storage.find(info.getId()));
     }
+    @Test
+    public void testCreateWithNullId() throws Exception {
+        final GraphInfo info = storage.create(new GraphInfo(null, "init", "query", "message"));
+        assertNotNull(info.getId());
+        final Node node = index.get("id", info.getId()).getSingle();
+        assertNotNull(node);
+        assertEquals(info.getId(), node.getProperty("id"));
+    }
+
+    @Test
+    public void testCreateWithEmptyId() throws Exception {
+        final String id = " ";
+        final GraphInfo info = storage.create(new GraphInfo(id, "init", "query", "message"));
+        assertNotNull(info.getId());
+        assertNotSame(id,info.getId());
+        assertFalse(info.getId().trim().isEmpty());
+        final Node node = index.get("id", info.getId()).getSingle();
+        assertNull(index.get("id", id).getSingle());
+        assertNotNull(node);
+        assertEquals(info.getId(), node.getProperty("id"));
+    }
+
+    @Test
+    public void testCreateWithIdWithSpace() throws Exception {
+        final String id = "";
+        final GraphInfo info = storage.create(new GraphInfo(id, "init", "query", "message"));
+        assertNotNull(info.getId());
+        assertNotSame(id,info.getId());
+        assertFalse(info.getId().trim().isEmpty());
+        final Node node = index.get("id", info.getId()).getSingle();
+        assertNull(index.get("id", id).getSingle());
+        assertNotNull(node);
+        assertEquals(info.getId(), node.getProperty("id"));
+    }
 
     private void delete(Node node) {
         final Transaction tx = gdb.beginTx();
