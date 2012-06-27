@@ -1,5 +1,7 @@
 package org.neo4j.community.console;
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -13,6 +15,9 @@ import java.util.Iterator;
  * @since 09.04.12
  */
 public class SessionHoldingListener implements HttpSessionListener {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(SessionHoldingListener.class);
+
     private static final Collection<WeakReference<HttpSession>> sessions = new HashSet<WeakReference<HttpSession>>();
 
     @Override
@@ -21,7 +26,7 @@ public class SessionHoldingListener implements HttpSessionListener {
         synchronized (sessions) {
             sessions.add(new WeakReference<HttpSession>(session));
         }
-        System.err.println("Session created: " + session + " sessions " + sessions.size());
+        LOG.warn("Session created: " + session + " sessions " + sessions.size());
     }
 
     @Override
@@ -37,7 +42,7 @@ public class SessionHoldingListener implements HttpSessionListener {
                 }
             }
         }
-        System.err.println("Session destroyed: " + destroyedSession + " sessions " + sessions.size());
+        LOG.warn("Session destroyed: " + destroyedSession + " sessions " + sessions.size());
     }
 
     static void cleanSessions() {
@@ -45,15 +50,15 @@ public class SessionHoldingListener implements HttpSessionListener {
         synchronized (sessions) {
             clone = sessions.toArray(new WeakReference[sessions.size()]);
         }
-        System.err.println("Cleaning sessions " + sessions.size());
+        LOG.warn("Cleaning sessions " + sessions.size());
         for (WeakReference reference : clone) {
             final HttpSession session = (HttpSession) reference.get();
             if (session != null) {
-                System.err.println("Cleaning session: " + session);
+                LOG.warn("Cleaning session: " + session);
                 SessionService.cleanSession(session, true);
             }
         }
         System.gc();
-        System.err.println("Cleaned sessions " + sessions.size());
+        LOG.warn("Cleaned sessions " + sessions.size());
     }
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 
@@ -19,6 +20,8 @@ import spark.servlet.SparkApplication;
 import com.google.gson.Gson;
 
 public class ConsoleApplication implements SparkApplication {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConsoleApplication.class);
 
     private ConsoleService consoleService;
 
@@ -38,7 +41,7 @@ public class ConsoleApplication implements SparkApplication {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String query = request.body();
                 if (query!=null && !query.isEmpty()) {
-                    System.err.println( "cypher: "+query );
+                    LOG.warn( "cypher: "+query );
                 }
                 return new Gson().toJson(consoleService.execute(service, null, query, null));
             }
@@ -65,7 +68,7 @@ public class ConsoleApplication implements SparkApplication {
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                final Map input = new Gson().fromJson(request.body(), Map.class);
+                final Map input = requestBodyToMap(request);
                 final String id = param(input, "id", null);
                 final Map<String, Object> result;
                 if (id != null) {
@@ -137,12 +140,17 @@ public class ConsoleApplication implements SparkApplication {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws SyntaxError, SubgraphError {
                 String geoff = request.body();
                 if (geoff!=null && !geoff.isEmpty()) {
-                    System.err.println( "geoff: "+geoff );
+                    LOG.warn( "geoff: "+geoff );
                 }
                 Map res = service.mergeGeoff( geoff );
                 return new Gson().toJson(res);
             }
         });
+    }
+
+    private Map requestBodyToMap(Request request) {
+        Map result = new Gson().fromJson(request.body(), Map.class);
+        return result!=null ? result : map();
     }
 
     private String hasRootNodeParam(Neo4jService service) {

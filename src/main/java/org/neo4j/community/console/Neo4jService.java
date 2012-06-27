@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -15,12 +16,16 @@ import java.util.Collection;
 import java.util.Map;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 /**
 * @author mh
 * @since 08.04.12
 */
 class Neo4jService {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Neo4jService.class);
+
     private GraphDatabaseService gdb;
 
     private Index index;
@@ -32,7 +37,7 @@ class Neo4jService {
     private boolean initialized;
 
     Neo4jService() {
-        this(new ImpermanentGraphDatabase(),true);
+        this(new ImpermanentGraphDatabase(stringMap("execution_guard_enabled","true")),true);
     }
 
     Neo4jService(GraphDatabaseService gdb) {
@@ -94,7 +99,7 @@ class Neo4jService {
 
     public void stop() {
         if (gdb!=null) {
-            System.err.println("Shutting down service "+this);
+            LOG.warn("Shutting down service "+this);
             if (ownsDatabase) gdb.shutdown();
             index = null;
             cypherQueryExecutor=null;

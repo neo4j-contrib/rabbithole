@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.slf4j.Logger;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import spark.HaltException;
 import spark.Request;
@@ -17,6 +18,8 @@ import java.util.Map;
  * @since 08.04.12
  */
 abstract class Route extends spark.Route {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Route.class);
 
     Route(String path) {
         super(path);
@@ -62,7 +65,7 @@ abstract class Route extends spark.Route {
         if (data == null || data.isEmpty()) {
             data = defaultValue;
         } else {
-            System.err.println(param+": "+data);
+            LOG.warn(param+": "+data);
         }
         return data;
     }
@@ -72,14 +75,14 @@ abstract class Route extends spark.Route {
         if (data == null || data.isEmpty()) {
             data = defaultValue;
         } else {
-            System.err.println(param+": "+data);
+            LOG.warn(param+": "+data);
         }
         return data;
     }
 
     protected long trace(String msg, long time) {
         long now = System.currentTimeMillis();
-        System.err.println("## " + msg + " took: " + (now - time) + " ms.");
+        LOG.warn("## " + msg + " took: " + (now - time) + " ms.");
         return now;
     }
 

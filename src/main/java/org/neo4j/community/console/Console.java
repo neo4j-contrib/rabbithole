@@ -1,17 +1,23 @@
 package org.neo4j.community.console;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+import org.slf4j.Logger;
 
 public class Console
 {
 
     private static final String WEBAPP_LOCATION = "src/main/webapp/";
+    public static final int REQUEST_TIME_LIMIT = 10 * 1000;
+    public static final int MAX_OPS_LIMIT = 100000;
     private Server server;
     private final DatabaseInfo databaseInfo;
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Console.class);
 
     public Console(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
@@ -41,7 +47,7 @@ public class Console
     }
 
     public void start(int port) throws Exception {
-        System.err.println("Port used: "+ port +" location "+ WEBAPP_LOCATION+" "+databaseInfo.toString());
+        LOG.warn("Port used: " + port + " location " + WEBAPP_LOCATION + " " + databaseInfo.toString());
         server = new Server(port);
         WebAppContext root = new WebAppContext();
         root.setContextPath("/");
@@ -49,8 +55,15 @@ public class Console
         root.setResourceBase(WEBAPP_LOCATION);
         root.setParentLoaderPriority(true);
         root.setAttribute(ConsoleFilter.DATABASE_ATTRIBUTE, databaseInfo);
+        setupRequestLimits(root, REQUEST_TIME_LIMIT, MAX_OPS_LIMIT);
         server.setHandler(root);
         server.start();
+    }
+
+    private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {
+        if (limit == null) return;
+        GuardingRequestFilter requestTimeLimitFilter = new GuardingRequestFilter(limit, maxOps);
+        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/*", FilterMapping.REQUEST);
     }
 
     public void join() throws InterruptedException {

@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.rest.graphdb.RestAPI;
@@ -31,6 +32,8 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 * @since 30.05.12
 */
 public class ConsoleService {
+
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConsoleService.class);
 
     private static final String DEFAULT_GRAPH_GEOFF = "(Neo) {\"name\": \"Neo\"} (Morpheus) {\"name\": \"Morpheus\"} " +
             "(Trinity) {\"name\": \"Trinity\"} (Cypher) {\"name\": \"Cypher\"} (Smith) {\"name\": \"Agent Smith\"} " +
@@ -63,7 +66,7 @@ public class ConsoleService {
     }
 
     private void log(String msg) {
-        System.err.println(msg);
+        LOG.warn(msg);
     }
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {

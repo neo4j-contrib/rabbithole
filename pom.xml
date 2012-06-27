@@ -68,6 +68,14 @@
       <artifactId>neo4j</artifactId>
       <version>${neo4j.version}</version>
       <exclusions>
+        <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-udc</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-jmx</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
       <dependency>
@@ -92,15 +100,21 @@
           <groupId>org.mockito</groupId>
           <artifactId>mockito-core</artifactId>
           <version>1.8.4</version>
+          <scope>test</scope>
       </dependency>
       <dependency>
       <groupId>org.neo4j.app</groupId>
       <artifactId>neo4j-server</artifactId>
       <version>${neo4j.version}</version>
+      <scope>test</scope>
       <exclusions>
           <exclusion>
               <groupId>org.neo4j</groupId>
               <artifactId>neo4j-shell</artifactId>
+          </exclusion>
+          <exclusion>
+              <groupId>org.neo4j</groupId>
+              <artifactId>neo4j-udc</artifactId>
           </exclusion>
           <exclusion>
               <groupId>org.neo4j</groupId>
@@ -139,7 +153,6 @@
               <artifactId>bcprov-jdk16</artifactId>
           </exclusion>
       </exclusions>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
@@ -166,10 +179,17 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
       <version>1.6.1</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.16</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>spark</groupId>
       <artifactId>spark</artifactId>
