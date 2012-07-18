@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -59,7 +60,7 @@ public class ConsoleService {
         final String login = System.getenv("NEO4J_LOGIN");
         final String password = System.getenv("NEO4J_PASSWORD");
         if (restUrl!=null) {
-            final RestAPI api = new RestAPI(restUrl, login, password);
+            final RestAPI api = new RestAPIFacade(restUrl, login, password);
             storage = new GraphStorage(api);
         }
         log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
@@ -212,7 +213,7 @@ public class ConsoleService {
     public void initFromUrl(Neo4jService service, URL url, final String query) {
         if (!service.doesOwnDatabase()) return;
         final String urlString = url.toString().replaceAll("/cypher/?$", "");
-        final RestAPI restApi = new RestAPI(urlString);
+        final RestAPI restApi = new RestAPIFacade(urlString);
         final QueryResult<Map<String,Object>> cypherResult = new RestCypherQueryEngine(restApi).query(query, null);
         final SubGraph graph = new SubGraph();
         for (Map<String, Object> row : cypherResult) {

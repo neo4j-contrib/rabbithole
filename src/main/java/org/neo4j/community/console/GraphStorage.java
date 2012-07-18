@@ -2,6 +2,7 @@ package org.neo4j.community.console;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
@@ -22,7 +23,7 @@ public class GraphStorage {
     private final RestIndex<Node> index;
 
     public GraphStorage(String uri) {
-        this(new RestAPI(uri));
+        this(new RestAPIFacade(uri));
     }
 
     public GraphStorage(RestAPI restAPI) {
