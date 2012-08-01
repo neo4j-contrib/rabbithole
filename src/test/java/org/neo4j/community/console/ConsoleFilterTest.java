@@ -1,15 +1,18 @@
 package org.neo4j.community.console;
 
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import spark.servlet.SparkApplication;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+
+import spark.servlet.SparkApplication;
 
 /**
  * @author mh

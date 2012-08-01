@@ -1,13 +1,7 @@
 package org.neo4j.community.console;
 
-import org.slf4j.Logger;
-import org.neo4j.geoff.except.SubgraphError;
-import org.neo4j.geoff.except.SyntaxError;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import static org.neo4j.helpers.collection.MapUtil.map;
+import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,8 +9,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
+import org.neo4j.community.console.CypherQueryExecutor.CypherResult;
+import org.neo4j.geoff.except.SubgraphError;
+import org.neo4j.geoff.except.SyntaxError;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.test.ImpermanentGraphDatabase;
+import org.slf4j.Logger;
 
 /**
 * @author mh
@@ -36,6 +37,8 @@ class Neo4jService {
     private String version;
     private boolean initialized;
 
+    private FetchContentService fetchContentService;
+
     Neo4jService() {
         this(new ImpermanentGraphDatabase(stringMap("execution_guard_enabled","true")),true);
     }
@@ -53,6 +56,7 @@ class Neo4jService {
         geoffService = new GeoffImportService(gdb, index);
         geoffExportService = new GeoffExportService(gdb);
         cypherExportService = new CypherExportService(gdb);
+        fetchContentService = new FetchContentService( );
     }
 
     public Map cypherQueryViz(String query) {
@@ -66,6 +70,10 @@ class Neo4jService {
 
     public String exportToGeoff() {
         return geoffExportService.export();
+    }
+    
+    public String fetchContent(String url) {
+        return fetchContentService.fetch( url );
     }
     
     public String exportToCypher() {
@@ -91,7 +99,12 @@ class Neo4jService {
     }
 
     public CypherQueryExecutor.CypherResult initCypherQuery(String query) {
-        return cypherQueryExecutor.cypherQuery(query,null);
+
+        CypherResult result = null;
+        for (String each : query.split(";")) {
+            result = cypherQueryExecutor.cypherQuery(each,null);
+        }
+        return result;
     }
     public CypherQueryExecutor.CypherResult cypherQuery(String query) {
         return cypherQueryExecutor.cypherQuery(query,version);

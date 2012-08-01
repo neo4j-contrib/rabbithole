@@ -1,14 +1,16 @@
 package org.neo4j.community.console;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.neo4j.geoff.Geoff;
 import org.neo4j.geoff.Subgraph;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.tooling.GlobalGraphOperations;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
 * @author mh

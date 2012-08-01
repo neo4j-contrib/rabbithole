@@ -1,21 +1,7 @@
 package org.neo4j.community.console;
 
-import com.google.gson.Gson;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.neo4j.rest.graphdb.RestAPIFacade;
-import org.slf4j.Logger;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.rest.graphdb.RestAPI;
-import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
-import org.neo4j.rest.graphdb.util.QueryResult;
-import spark.Request;
+import static org.neo4j.helpers.collection.MapUtil.map;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -26,7 +12,26 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Scanner;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.neo4j.rest.graphdb.RestAPIFacade;
+import org.slf4j.Logger;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.rest.graphdb.RestAPI;
+import org.neo4j.rest.graphdb.RestAPIFacade;
+import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
+import org.neo4j.rest.graphdb.util.QueryResult;
+import org.slf4j.Logger;
+
+import spark.Request;
+
+import com.google.gson.Gson;
 
 /**
 * @author mh

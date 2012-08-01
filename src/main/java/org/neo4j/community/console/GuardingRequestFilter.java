@@ -1,17 +1,23 @@
 package org.neo4j.community.console;
 
-import org.slf4j.Logger;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.guard.Guard;
-import org.neo4j.kernel.guard.GuardException;
+import static javax.servlet.http.HttpServletResponse.SC_REQUEST_TIMEOUT;
 
-import javax.servlet.*;
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transaction;
-import java.io.IOException;
 
-import static javax.servlet.http.HttpServletResponse.SC_REQUEST_TIMEOUT;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.guard.Guard;
+import org.neo4j.kernel.guard.GuardException;
+import org.slf4j.Logger;
 
 public class GuardingRequestFilter implements Filter {
 

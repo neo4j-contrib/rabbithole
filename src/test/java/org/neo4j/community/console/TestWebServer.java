@@ -1,5 +1,15 @@
 package org.neo4j.community.console;
 
+import static java.util.Arrays.asList;
+import static org.neo4j.server.configuration.Configurator.DEFAULT_DATA_API_PATH;
+import static org.neo4j.server.configuration.Configurator.REST_API_PACKAGE;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.junit.Ignore;
@@ -14,16 +24,6 @@ import org.neo4j.server.plugins.PluginManager;
 import org.neo4j.server.web.Jetty6WebServer;
 import org.neo4j.server.web.WebServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.neo4j.server.configuration.Configurator.DEFAULT_DATA_API_PATH;
-import static org.neo4j.server.configuration.Configurator.REST_API_PACKAGE;
 
 /**
 * @author mh

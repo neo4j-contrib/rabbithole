@@ -1,5 +1,9 @@
 package org.neo4j.community.console;
 
+import static org.neo4j.helpers.collection.MapUtil.map;
+
+import java.util.Map;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.rest.graphdb.RestAPI;
 import org.neo4j.rest.graphdb.RestAPIFacade;
@@ -7,10 +11,6 @@ import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.rest.graphdb.index.RestIndex;
 import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
 import org.neo4j.rest.graphdb.util.ResultConverter;
-
-import java.util.Map;
-
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh

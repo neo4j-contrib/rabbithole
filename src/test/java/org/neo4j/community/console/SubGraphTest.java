@@ -1,5 +1,11 @@
 package org.neo4j.community.console;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.neo4j.helpers.collection.MapUtil.map;
+
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphalgo.impl.util.PathImpl;
@@ -8,12 +14,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh

@@ -1,9 +1,9 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.Node;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.neo4j.graphdb.Node;
 
 /**
  * @author mh

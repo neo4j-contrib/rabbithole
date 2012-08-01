@@ -1,12 +1,11 @@
 package org.neo4j.community.console;
 
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.mock;
+
+import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * @author mh

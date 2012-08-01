@@ -1,17 +1,19 @@
 package org.neo4j.community.console;
 
-import org.slf4j.Logger;
-import org.neo4j.kernel.lifecycle.LifecycleException;
-import spark.HaltException;
-import spark.Request;
-import spark.Response;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.neo4j.kernel.lifecycle.LifecycleException;
+import org.slf4j.Logger;
+
+import spark.HaltException;
+import spark.Request;
+import spark.Response;
 
 /**
  * @author mh

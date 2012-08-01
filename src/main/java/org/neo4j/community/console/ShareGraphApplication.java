@@ -1,16 +1,17 @@
 package org.neo4j.community.console;
 
-import com.google.gson.Gson;
-import spark.Request;
-import spark.Response;
-import spark.servlet.SparkApplication;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
-import static spark.Spark.*;
+import spark.Request;
+import spark.Response;
+import spark.servlet.SparkApplication;
+
+import com.google.gson.Gson;
 
 public class ShareGraphApplication implements SparkApplication {
 

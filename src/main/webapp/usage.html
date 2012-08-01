@@ -3,6 +3,8 @@
     <link rel="icon" href="http://neo4j.org/favicon.ico" />
     <title>Neo4j Console</title>
     <script src="/javascripts/jquery-1.6.4.min.js"></script>
+    <link rel="stylesheet/less" type="text/css" href="bootstrap/less/bootstrap.less">
+    <script src="bootstrap/less.js" type="text/javascript"></script>
 	<script type="text/javascript">
         var base=document.location.protocol+"//"+document.location.host;
 		function start() {
@@ -17,12 +19,30 @@
 			$.ajax("/console/shorten?url="+encodeURIComponent(url), { type: "GET", success: function(data) { $('#short').val(data);}});
 			return false;
 		}
+
+        function getScript(url) {
+            console.log(url);
+            $.ajax("/console/fetchContent", {
+                type:"POST",
+                data:url,
+                success:function (data) 
+                { 
+                    $('#graph').val(data);
+                }
+            });
+            return false;
+        }
 	</script>
 </head>
 <body>
-	<div>
-        <h3>Graph Setup (Geoff or Cypher)</h3>
-		<textarea rows="10" cols="80" id="graph">(Neo) {"name": "Neo" }
+  <div class="container-fluid">
+    <div class="row normal-unit">
+        <h2>1. Set up your graph.</h2>
+    </div>
+    <div class="row normal-unit">
+        <div class="span6">
+               <h3>Graph Setup (Geoff or Cypher)</h3>
+		      <textarea rows="10" with="100%" id="graph">(Neo) {"name": "Neo" }
 (Morpheus) {"name":"Morpheus"}
 (Trinity) {"name":"Trinity"}
 (Cypher) {"name":"Cypher"}
@@ -34,22 +54,64 @@
 (Morpheus)-[:KNOWS]->(Trinity)
 (Morpheus)-[:KNOWS]->(Cypher)
 (Cypher)-[:KNOWS]->(Smith)
-(Smith)-[:CODED_BY]->(Architect)</textarea><br/>
-        <h3>Initial Query (Cypher)</h3>
-		<textarea rows="10" cols="80" id="cypher">
+(Smith)-[:CODED_BY]->(Architect)</textarea>
+            </br>
+            <h3>Example datasets:</h3>
+            <a href="https://raw.github.com/gist/3090321/72d1d2b89feb15da76fa0a571a3876fd9c5d9eff/GoT.sql">Game of Thrones</a> <button class="btn" id="load" onClick="getScript('https://raw.github.com/gist/3090321/72d1d2b89feb15da76fa0a571a3876fd9c5d9eff/GoT.sql');">load</button>
+          </div>    
+          <div class="span6">
+            <h3>Initial Query (Cypher)</h3>
+            <textarea rows="10" id="cypher">
 start neo=node(1) match neo-[r?]-other return neo,type(r), other
-</textarea><br/>
-        <input type="checkbox" id="no_root"/> remove root node<br/>
-        Version: <select id="version">
-            <option selected="selected" value="">current</option>
-            <option value="1.8">1.8</option>
-            <option value="1.7">1.7</option>
-            <option value="1.6">1.6</option>
-        </select><br/>
-		<button id="load" onclick="start();">Load Database</button>
-	</div>
-	<input type="text" size="100" id="link"/><br/>
-	<input type="text" size="50" id="short"/><br/>
-	<iframe src="" width="500" height="400" id="window"></iframe>
+            </textarea>
+        </br>
+            <input type="checkbox" id="no_root"/> remove root node<br/>
+            Cypher parser version: <select id="version">
+                <option selected="selected" value="">current</option>
+                <option value="1.8">1.8</option>
+                <option value="1.7">1.7</option>
+                <option value="1.6">1.6</option>
+            </select>
+          </div>
+          
+        </div>
+    </div>
+    <div class="row normal-unit">
+        <div class="span12">            
+            <h2>2. Load the data - <button class="btn" id="load" onclick="start();">load</button></h2>
+            </br>
+            <iframe src="" width="100%" height="400" id="window"></iframe>
+        </div>
+    </div>
+    <div class="row normal-unit">
+        <div class="span12">
+            <h2>3. Share it.</h2>
+            </br>
+            <h3>Full URL:</h3><input type="text" size="50" id="link"/><br/>
+            <h3>TinyURL:</h3><input type="text" size="50" id="short"/><br/>
+        </div>
+    </div>
+  </div>
+
+	<!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <!--script src="bootstrap/js/jquery.js"></script-->
+    <!--script src="bootstrap/js/google-code-prettify/prettify.js"></script-->
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <!--script src="bootstrap/js/bootstrap-alert.js"></script-->
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    <script src="bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="bootstrap/js/bootstrap-tab.js"></script>
+    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="bootstrap/js/bootstrap-popover.js"></script>
+    <script src="bootstrap/js/bootstrap-button.js"></script>
+    <script src="bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="bootstrap/js/bootstrap-typeahead.js"></script>
+    <!--script src="bootstrap/js/application.js"></script-->
+
 </body>
 </html>

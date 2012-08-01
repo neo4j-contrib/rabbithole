@@ -1,11 +1,24 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.*;
-import org.neo4j.tooling.GlobalGraphOperations;
-
-import java.util.*;
-
 import static java.util.Arrays.asList;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * @author mh

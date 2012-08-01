@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
+import org.slf4j.Logger;
 
 import spark.Request;
 import spark.Response;
@@ -144,6 +144,13 @@ public class ConsoleApplication implements SparkApplication {
                 }
                 Map res = service.mergeGeoff( geoff );
                 return new Gson().toJson(res);
+            }
+        });
+        
+        post(new Route("/console/fetchContent") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
+                final String url = request.body();
+                return service.fetchContent( url );
             }
         });
     }

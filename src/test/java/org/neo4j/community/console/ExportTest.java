@@ -1,11 +1,11 @@
 package org.neo4j.community.console;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author mh

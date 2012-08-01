@@ -1,16 +1,15 @@
 package org.neo4j.community.console;
 
-import org.slf4j.Logger;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.RelationshipAutoIndexer;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.slf4j.Logger;
 
 public class Index {
 

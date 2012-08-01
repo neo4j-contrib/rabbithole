@@ -1,5 +1,12 @@
 package org.neo4j.community.console;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.neo4j.community.console.TestWebServer.startWebServer;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -9,9 +16,6 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.server.web.WebServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import static org.junit.Assert.*;
-import static org.neo4j.community.console.TestWebServer.startWebServer;
 
 /**
  * @author mh

@@ -1,11 +1,10 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import spark.servlet.SparkFilter;
-
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+
+import spark.servlet.SparkFilter;
 
 /**
  * @author mh
