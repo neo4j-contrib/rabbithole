@@ -1,6 +1,5 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import spark.servlet.SparkFilter;
 
 import javax.servlet.FilterConfig;

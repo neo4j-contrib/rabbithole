@@ -4,4 +4,5 @@ target
 *.iws
 .idea
 .DS_Store
+.settings
 

@@ -9,7 +9,6 @@ import org.neo4j.graphdb.index.RelationshipAutoIndexer;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Index {

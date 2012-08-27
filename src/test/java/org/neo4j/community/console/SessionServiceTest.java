@@ -4,9 +4,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.mock;
 
 /**

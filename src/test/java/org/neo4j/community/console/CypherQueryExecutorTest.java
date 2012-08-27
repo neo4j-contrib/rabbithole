@@ -9,7 +9,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
