@@ -5,6 +5,7 @@ import org.apache.commons.configuration.Configuration;
 import org.junit.Ignore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.rest.graphdb.ExecutingRestRequest;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.database.Database;
@@ -37,7 +38,7 @@ public class TestWebServer extends Jetty6WebServer {
         init();
     }
 
-    protected URI baseUri(int port) {
+    protected static URI baseUri(int port) {
         final String url = "http://localhost:" + port;
         try {
             return new URI(url);
@@ -107,6 +108,19 @@ public class TestWebServer extends Jetty6WebServer {
     public static WebServer startWebServer(ImpermanentGraphDatabase gdb, int port) {
         final TestWebServer webServer = new TestWebServer(gdb, port);
         webServer.start();
+        waitForServerStartup(baseUri(port));
         return webServer;
+    }
+
+    private static void waitForServerStartup(URI uri) {
+        ExecutingRestRequest request = new ExecutingRestRequest(uri.toString());
+        for (int i=0;i<3;i++) {
+            if (request.get("").getStatus()==200) break;
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
