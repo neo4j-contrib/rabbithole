@@ -102,7 +102,7 @@ public class ConsoleService {
             trace("viz", time);
         } catch (Exception e) {
             e.printStackTrace();
-            data.put("error", e.getMessage());
+            data.put("error", e.toString());
         }
         time = trace("all", start);
         data.put("time", time);
