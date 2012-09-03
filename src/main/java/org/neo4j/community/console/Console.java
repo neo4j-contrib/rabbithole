@@ -5,6 +5,7 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class Console
 
     public static void main(String[] args) throws Exception
     {
-        System.setProperty("neo4j.ext.udc.source","console");
+        System.setProperty(GraphDatabaseSettings.udc_source.name(),"console");
         int port = (args.length>0) ? Integer.parseInt(args[0]): getPort();
         boolean expose = args.length>2 && args[2].equalsIgnoreCase("expose");
         GraphDatabaseService database = (args.length>1) ? embeddedGraphDatabase(args[1],expose) : null;
