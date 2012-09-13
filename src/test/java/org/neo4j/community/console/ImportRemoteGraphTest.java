@@ -4,13 +4,16 @@ import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.server.NeoServer;
+import org.neo4j.server.WrappingNeoServer;
+import org.neo4j.server.configuration.Configurator;
+import org.neo4j.server.configuration.ServerConfigurator;
 import org.neo4j.server.web.WebServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
-import static org.neo4j.community.console.TestWebServer.startWebServer;
 
 /**
  * @author mh
@@ -22,7 +25,7 @@ public class ImportRemoteGraphTest {
     private Neo4jService service;
     private ConsoleService consoleService;
     private static ImpermanentGraphDatabase serverGraphDatabase;
-    private static WebServer webServer;
+    private static NeoServer webServer;
     private static final int PORT = 7475;
     private static final String CYPHER_URL = "http://localhost:"+PORT+"/db/data/cypher";
 
@@ -45,7 +48,15 @@ public class ImportRemoteGraphTest {
         webServer = startWebServer(serverGraphDatabase, PORT);
     }
 
-    @AfterClass
+    public static NeoServer startWebServer(
+			ImpermanentGraphDatabase gdb, int port) {
+    	Configurator configurator = new ServerConfigurator(gdb);
+    	configurator.configuration().setProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY,	port);
+		NeoServer server = new WrappingNeoServer(gdb, configurator );
+		server.start();
+		return server;
+	}
+	@AfterClass
     public static void stop() throws Exception {
         webServer.stop();
         serverGraphDatabase.shutdown();

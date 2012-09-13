@@ -1,5 +1,11 @@
 package org.neo4j.community.console;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -7,11 +13,8 @@ import org.junit.Test;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
-import org.neo4j.server.web.WebServer;
+import org.neo4j.server.NeoServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import static org.junit.Assert.*;
-import static org.neo4j.community.console.TestWebServer.startWebServer;
 
 /**
  * @author mh
@@ -23,12 +26,12 @@ public class GraphStorageTest {
     private GraphStorage storage;
     private static ImpermanentGraphDatabase gdb;
     private Index<Node> index;
-    private static WebServer webServer;
+    private static NeoServer webServer;
 
     @BeforeClass
     public static void startup() {
         gdb = new ImpermanentGraphDatabase();
-        webServer = startWebServer(gdb, PORT);
+        webServer = ImportRemoteGraphTest.startWebServer(gdb, PORT);
     }
     @Before
     public void setUp() throws Exception {
