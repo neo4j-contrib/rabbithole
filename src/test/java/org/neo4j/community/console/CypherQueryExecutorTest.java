@@ -3,6 +3,7 @@ package org.neo4j.community.console;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.neo4j.cypher.SyntaxException;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -58,13 +59,16 @@ public class CypherQueryExecutorTest {
     }
 
     @Test(expected = SyntaxException.class)
+	@Ignore
     public void testAdhereToCypherVersion16() throws Exception {
         cypherQueryExecutor.cypherQuery("start n=node(1) match n-[:A|B]-() return n","1.6");
     }
+
     @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion17() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.7");
     }
+
     @Test
     public void testAdhereToCypherVersion18() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
