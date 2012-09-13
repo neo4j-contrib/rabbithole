@@ -74,6 +74,10 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
     @Test
+    public void testAdhereToCypherVersion19() throws Exception {
+        cypherQueryExecutor.cypherQuery("create (n {})","1.9");
+    }
+    @Test
     public void testAdhereToNoCypherVersion() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})",null);
     }
