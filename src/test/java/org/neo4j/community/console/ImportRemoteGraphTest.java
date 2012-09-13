@@ -1,6 +1,13 @@
 package org.neo4j.community.console;
 
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+
+import java.net.URL;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -8,12 +15,7 @@ import org.neo4j.server.NeoServer;
 import org.neo4j.server.WrappingNeoServer;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
-import org.neo4j.server.web.WebServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
-
-import java.net.URL;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author mh
