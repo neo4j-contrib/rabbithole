@@ -30,7 +30,7 @@ public class Index {
 
     private void enableAutoIndex(AutoIndexer<? extends PropertyContainer> autoIndexer) {
         autoIndexer.setEnabled(true);
-        autoIndexer.getAutoIndex();
+        //autoIndexer.getAutoIndex();
     }
 
     public void registerProperty(final Collection<String> properties) {

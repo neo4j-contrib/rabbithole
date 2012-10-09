@@ -1,5 +1,8 @@
 package org.neo4j.community.console;
 
+import org.neo4j.kernel.lifecycle.LifecycleException;
+import spark.HaltException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -38,16 +41,26 @@ class SessionService {
     }
 
     public static Neo4jService getService(final HttpServletRequest request) {
-        HttpSession session = request.getSession(true);
-        Neo4jService service = (Neo4jService) session.getAttribute(SERVICE);
-        if (service != null) return service;
+        try {
+            HttpSession session = request.getSession(true);
+            Neo4jService service = (Neo4jService) session.getAttribute(SERVICE);
+            if (service != null) return service;
 
-        service = databaseInfo.shouldCreateNew() ? new Neo4jService() : new Neo4jService(databaseInfo.getDatabase());
-        if (databaseInfo.shouldImport()) {
-            service.initializeFrom(SubGraph.from(databaseInfo.getDatabase()));
+            service = databaseInfo.shouldCreateNew() ? new Neo4jService() : new Neo4jService(databaseInfo.getDatabase());
+            if (databaseInfo.shouldImport()) {
+                service.initializeFrom(SubGraph.from(databaseInfo.getDatabase()));
+            }
+            session.setAttribute(SERVICE, service);
+            return service;
+        } catch (LifecycleException lce) {
+            reset(request);
+            SessionHoldingListener.cleanSessions();
+            throw new RuntimeException(lce);
+        } catch (OutOfMemoryError oom) {
+            reset(request);
+            SessionHoldingListener.cleanSessions();
+            throw new RuntimeException(oom);
         }
-        session.setAttribute(SERVICE, service);
-        return service;
     }
 
     public static DatabaseInfo getDatabaseInfo() {
