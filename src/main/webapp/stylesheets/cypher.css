@@ -1,0 +1,43 @@
+/*
+ * Cypher codemirror theme.
+*/
+.cm-s-cypher {
+  line-height: 1.3em;
+}
+.cm-s-cypher {
+  font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+}
+
+.cm-s-cypher { background: #000; color: #EBEFE7; text-shadow: 0 -1px 1px #262626; }
+.cm-s-cypher div.CodeMirror-selected {background: #45443B !important;} /* 33322B*/
+.cm-s-cypher .CodeMirror-cursor { border-left: 1px solid white !important; }
+.cm-s-cypher .CodeMirror-lines { margin-left:3px; margin-right:3px; }/*editable code holder*/
+
+div.CodeMirror span.CodeMirror-matchingbracket { color: #7EFC7E; }/*65FC65*/
+
+.cm-s-cypher .CodeMirror-gutter { background: #262626; border-right:1px solid #aaa; padding-right:3px; min-width:2.5em; }
+.cm-s-cypher .CodeMirror-gutter-text { color: #777; }
+
+.cm-s-cypher span.cm-keyword { color: #70E0BC; }
+.cm-s-cypher span.cm-atom { color: #C2B470; }
+.cm-s-cypher span.cm-number { color: #B35E4D; }
+.cm-s-cypher span.cm-def {color: #C370E0;}
+.cm-s-cypher span.cm-variable { color:#D9BF8C; }
+.cm-s-cypher span.cm-variable-2 { color: #669199; }
+.cm-s-cypher span.cm-variable-3 { color: white; }
+.cm-s-cypher span.cm-property {color: #92A75C;}
+.cm-s-cypher span.cm-operator {color: #92A75C;}
+.cm-s-cypher span.cm-comment { color: #666; }
+.cm-s-cypher span.cm-string { color: #BCD279; }
+.cm-s-cypher span.cm-string-2 {color: #f50;}
+.cm-s-cypher span.cm-meta { color: #738C73; }
+.cm-s-cypher span.cm-error { color: #9d1e15; }
+.cm-s-cypher span.cm-qualifier {color: #555;}
+.cm-s-cypher span.cm-builtin { color: #C370E0; }
+.cm-s-cypher span.cm-bracket { color: #EBEFE7; }
+.cm-s-cypher span.cm-tag { color: #669199; }
+.cm-s-cypher span.cm-attribute {color: #00c;}
+.cm-s-cypher span.cm-header {color: #a0a;}
+.cm-s-cypher span.cm-quote {color: #090;}
+.cm-s-cypher span.cm-hr {color: #999;}
+.cm-s-cypher span.cm-link {color: #00c;}
