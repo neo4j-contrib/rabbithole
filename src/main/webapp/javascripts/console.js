@@ -236,29 +236,12 @@ $(document).ready(function () {
         if (e.keyCode == 27) $(".popup").hide();
 		return true;
     });
-/*
-    input.keypress(function(e) {
-        if (e.keyCode == 13) { // return, send
-           e.preventDefault();
-           e.stopPropagation();
-           e.stopImmediatePropagation();
-           e.cancelBubble = true;
-           return false;
-        }
-        return true;
+
+    input.keydown(function(e) {
+      if(e.keyCode == 13 && !e.shiftKey) {
+        send(input.val()); 
+      }
+      
+      return true;
     });
-    input.keyup(function(e) {
-		 if (e.keyCode == 40) { // arrow down, add line
-		 }
-         if (e.keyCode == 13) { // return, send
-            send(input.val());
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            e.cancelBubble = true;
-            return false;
-         }
-         return true;
-     });
-*/
 });
