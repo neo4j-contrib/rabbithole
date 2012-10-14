@@ -1,3 +1,14 @@
+var inputeditor;
+
+function getSelectedRange(editor) {
+  return { from: editor.getCursor(true), to: editor.getCursor(false) };
+}
+     
+function autoFormatSelection(editor) {
+  var range = getSelectedRange(editor);
+  editor.autoFormatRange(range.from, range.to);
+}
+      
 function append(element, text) {
   if (!text) {
     return;
@@ -198,7 +209,9 @@ function showResults(data) {
   }
   if (data["query"]) {
     append($("#output"), data["query"].trim());
-    $("#input").val(data["query"]);
+    inputeditor.setValue(data["query"]);
+    CodeMirror.commands["selectAll"](inputeditor);
+    autoFormatSelection(inputeditor);
   }
   if (data["result"]) {
     append($("#output"), data["result"]);
@@ -238,29 +251,47 @@ function showWelcome(json) {
   }
 }
 
+function resizeOutput() {
+  $("#output").css({'height':($("body").height() - $(".CodeMirror-scroll").height() - 15)+'px'});
+  $("#output").animate({ scrollTop: $("#output").prop("scrollHeight") }, 10);
+}
+
 $(document).ready(function () {
-  post( "/console/init", JSON.stringify( getParameters() ), function ( json ) {
-    showResults( json );
-    showVersion( json );
-    showWelcome( json )
-  }, "json" );
-  $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
-  var input=$("#input");
-  $("#form").submit(function () {
-    send(input.val());
-    return false;
+  inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
+    lineNumbers: false,
+    readOnly: false,
+    mode: "cypher",
+    theme: "cypher",
+    onKeyEvent: function(inputeditor, e) {
+      if(e.type != 'keyup') {
+      // resize output while typing...
+        if(e.keyCode == 13 && !e.shiftKey) {
+          send(inputeditor.getValue().replace(/\n/g, ''));
+          // cancel normal enter (must type shift enter to add lines)
+          e.stop();
+          return true;
+        }
+        // allow the rest to go through.
+        return false;
+      }
+    }
   });
+  
+  post( "/console/init", JSON.stringify( getParameters() ), function ( json ) {
+      showResults( json );
+      showVersion( json );
+      showWelcome( json )
+    }, "json" );
+
+  $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
   var isInIFrame = window.location != window.parent.location;
-  if (!isInIFrame) $("#input").focus();
+  if (!isInIFrame) {
+    inputeditor.focus();
+  }
 
   $("body").keyup(function(e) {
-  if (e.keyCode == 27) $(".popup").hide();
-    return true;
-  });
-
-  input.keydown(function(e) {
-    if(e.keyCode == 13 && !e.shiftKey) {
-      send(input.val()); 
+    if (e.keyCode == 27) {
+      $(".popup").hide();
     }
     return true;
   });
