@@ -264,7 +264,8 @@ $(document).ready(function () {
     theme: "cypher",
     onKeyEvent: function(inputeditor, e) {
       if(e.type != 'keyup') {
-      // resize output while typing...
+        // resize output while typing...
+        resizeOutput();
         if(e.keyCode == 13 && !e.shiftKey) {
           send(inputeditor.getValue().replace(/\n/g, ''));
           // cancel normal enter (must type shift enter to add lines)
