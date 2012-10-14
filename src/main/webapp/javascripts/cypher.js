@@ -7,12 +7,12 @@ CodeMirror.defineMode("cypher", function(config) {
   var curPunc;
 
   var funcs = wordRegexp(["str", "min", "max", "type", "lower", "upper", "length", "type", "id",
-     "coalesce", "head", "last", "nodes", "relationships", "extract", "filter", "tail", "range",
-     "reduce", "abs", "round", "sqrt", "sign", "replace", "substring", "left", "right", "ltrim", 
-     "rtrim", "trim", "collect"]);
+    "coalesce", "head", "last", "nodes", "relationships", "extract", "filter", "tail", "range",
+    "reduce", "abs", "round", "sqrt", "sign", "replace", "substring", "left", "right", "ltrim", 
+    "rtrim", "trim", "collect"]);
   var preds = wordRegexp(["all", "any", "none", "single", "not", "in", "has", "and", "or"]);
   var keywords = wordRegexp(["start", "match", "where", "with", "limit", "skip", "order", "by",
-                             "return"]);
+    "return"]);
   var operatorChars = /[*+\-<>=&|~]/;
 
   function tokenBase(stream, state) {
@@ -66,6 +66,7 @@ CodeMirror.defineMode("cypher", function(config) {
   function pushContext(state, type, col) {
     state.context = {prev: state.context, indent: state.indent, col: col, type: type};
   }
+
   function popContext(state) {
     state.indent = state.context.indent;
     state.context = state.context.prev;
@@ -81,27 +82,41 @@ CodeMirror.defineMode("cypher", function(config) {
 
     token: function(stream, state) {
       if (stream.sol()) {
-        if (state.context && state.context.align == null) state.context.align = false;
+        if (state.context && state.context.align == null) {
+          state.context.align = false;
+        }
         state.indent = stream.indentation();
       }
-      if (stream.eatSpace()) return null;
+      if (stream.eatSpace()) {
+        return null;
+      }
+
       var style = state.tokenize(stream, state);
 
       if (style != "comment" && state.context && state.context.align == null && state.context.type != "pattern") {
         state.context.align = true;
       }
 
-      if (curPunc == "(") pushContext(state, ")", stream.column());
-      else if (curPunc == "[") pushContext(state, "]", stream.column());
-      else if (curPunc == "{") pushContext(state, "}", stream.column());
-      else if (/[\]\}\)]/.test(curPunc)) {
-        while (state.context && state.context.type == "pattern") popContext(state);
-        if (state.context && curPunc == state.context.type) popContext(state);
+      if (curPunc == "(") {
+        pushContext(state, ")", stream.column());
+      } else if (curPunc == "[") {
+        pushContext(state, "]", stream.column());
+      } else if (curPunc == "{") {
+        pushContext(state, "}", stream.column());
       }
-      else if (curPunc == "." && state.context && state.context.type == "pattern") popContext(state);
-      else if (/atom|string|variable/.test(style) && state.context) {
-        if (/[\}\]]/.test(state.context.type))
+      else if (/[\]\}\)]/.test(curPunc)) {
+        while (state.context && state.context.type == "pattern") {
+          popContext(state);
+        }
+        if (state.context && curPunc == state.context.type) {
+          popContext(state);
+        }
+      } else if (curPunc == "." && state.context && state.context.type == "pattern") {
+        popContext(state);
+      } else if (/atom|string|variable/.test(style) && state.context) {
+        if (/[\}\]]/.test(state.context.type)) {
           pushContext(state, "pattern", stream.column());
+        }
         else if (state.context.type == "pattern" && !state.context.align) {
           state.context.align = true;
           state.context.col = stream.column();
@@ -128,14 +143,10 @@ CodeMirror.defineMode("cypher", function(config) {
         return context.indent + (closing ? 0 : indentUnit);
     }
   };
-  
-
 });
 
 CodeMirror.modeExtensions["cypher"] = {
   autoFormatLineBreaks: function (text) {
-    var keywords = wordRegexp(["start", "match", "where", "with", "limit", "skip", "order",
-                               "return"]);
     var lines = text.split("\n");
     var reProcessedPortion = /(return|where|order by|match)/gi;
     for (var i = 0; i < lines.length; i++) {

@@ -1,13 +1,4 @@
 var inputeditor;
-
-function getSelectedRange(editor) {
-  return { from: editor.getCursor(true), to: editor.getCursor(false) };
-}
-     
-function autoFormatSelection(editor) {
-  var range = getSelectedRange(editor);
-  editor.autoFormatRange(range.from, range.to);
-}
       
 function append(element, text) {
   if (!text) {
@@ -254,6 +245,15 @@ function showWelcome(json) {
 function resizeOutput() {
   $("#output").css({'height':($("body").height() - $(".CodeMirror-scroll").height() - 15)+'px'});
   $("#output").animate({ scrollTop: $("#output").prop("scrollHeight") }, 10);
+}
+
+function getSelectedRange(editor) {
+  return { from: editor.getCursor(true), to: editor.getCursor(false) };
+}
+     
+function autoFormatSelection(editor) {
+  var range = getSelectedRange(editor);
+  editor.autoFormatRange(range.from, range.to);
 }
 
 $(document).ready(function () {
