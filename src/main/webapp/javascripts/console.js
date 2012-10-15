@@ -243,7 +243,7 @@ function showWelcome(json) {
 }
 
 function resizeOutput() {
-  $("#output").css({'height':($("body").height() - $(".CodeMirror-scroll").height() - 15)+'px'});
+  $("#output").css({'height':($(window).height() - $(".CodeMirror-scroll").height() - 15)+'px'});
   $("#output").animate({ scrollTop: $("#output").prop("scrollHeight") }, 10);
 }
 
