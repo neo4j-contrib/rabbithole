@@ -18,6 +18,10 @@
     </repository>
     <repository>
       <id>Neo4j releases</id>
+      <url>http://m2.neo4j.org/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <id>Neo4j snapshots</id>
       <url>http://m2.neo4j.org/content/repositories/snapshots</url>
     </repository>
     <repository>
@@ -34,7 +38,7 @@
       <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j-rest-graphdb</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.8</version>
           <exclusions>
             <exclusion>
                 <groupId>org.neo4j</groupId>
