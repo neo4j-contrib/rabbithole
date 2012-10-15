@@ -84,7 +84,7 @@ function viz(data) {
   if (data) {
     visualize("graph", graph.width(), graph.height(),data)
   } else {
-    var query = $("#input").val();
+    var query = getQuery();
     if (!isCypher(query)) {
       query = "";
     }
@@ -167,7 +167,7 @@ function toggleShare() {
     dataType: "text",
     success:function (data) {
       $('#share_init').val(data);
-      var query = $("#input").val();
+      var query = getQuery();
       query = isCypher(query) ? query : null;
       $('#share_query').val(query);
       $('#shareUrl').toggle();
@@ -257,6 +257,10 @@ function autoFormatSelection(editor) {
   editor.autoFormatRange(range.from, range.to);
 }
 
+function getQuery() {
+  return inputeditor.getValue().replace(/\n/g, '');
+}
+
 $(document).ready(function () {
   inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
     lineNumbers: false,
@@ -268,7 +272,7 @@ $(document).ready(function () {
         // resize output while typing...
         resizeOutput();
         if(e.keyCode == 13 && !e.shiftKey) {
-          send(inputeditor.getValue().replace(/\n/g, ''));
+          send(getQuery());
           // cancel normal enter (must type shift enter to add lines)
           e.stop();
           return true;
