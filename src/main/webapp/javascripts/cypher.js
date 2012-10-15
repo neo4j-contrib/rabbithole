@@ -18,7 +18,10 @@ CodeMirror.defineMode("cypher", function(config) {
   function tokenBase(stream, state) {
     var ch = stream.next();
     curPunc = null;
-    if (/[{}\(\),\.;\[\]]/.test(ch)) {
+    if (ch == '"' || ch == "'") {
+      stream.match(/.+?["']/);
+      return "string";
+    } if (/[{}\(\),\.;\[\]]/.test(ch)) {
       curPunc = ch;
       return "node";
     } else if (ch == "//") {
@@ -148,9 +151,9 @@ CodeMirror.defineMode("cypher", function(config) {
 CodeMirror.modeExtensions["cypher"] = {
   autoFormatLineBreaks: function (text) {
     var lines = text.split("\n");
-    var reProcessedPortion = /(return|where|order by|match)/gi;
+    var reProcessedPortion = /\s?(return|where|order by|match|with|skip|limit)/gi;
     for (var i = 0; i < lines.length; i++) {
-      lines[i] = lines[i].replace(reProcessedPortion, "\n$1");
+      lines[i] = lines[i].replace(reProcessedPortion, " \n$1");
     }
     return lines.join("\n");
   }
