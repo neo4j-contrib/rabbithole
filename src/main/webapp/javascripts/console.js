@@ -35,7 +35,7 @@ function highlight(text) {
 
 function post(uri, data, done, dataType) {
   data = data.trim();
-  console.log("Post data: " + data);
+  //console.log("Post data: " + data);
   $.ajax(uri, {
     type:"POST",
     data:data,
@@ -142,7 +142,7 @@ function store_graph_info() {
     }),
     success: function(data) {
       var uri = (data.indexOf("http")!=0) ? base_url() + "/r/" + data : data;
-      console.log(uri);
+      //console.log(uri);
       var frame = '<iframe width="600" height="300" src="'+uri+'"/>';
       $('#share_iFrame').val(frame);
       $('#share_url').attr("href",uri);
