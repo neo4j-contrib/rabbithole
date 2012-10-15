@@ -25,7 +25,7 @@ function highlight(text) {
     text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/gi, '<span class="relationship">$1</span>');
   } else if (isCypher(text)) {
     // Cypher
-    text = text.replace(/\b(start|with|create|delete|relate|skip|limit|order by|set|match|where|return)\b/gi, '\n$1');
+    text = text.replace(/\b(start|with|create|delete|relate|skip|limit|order by|set|match|where|return)\b/gi, '$1');
     text = text.replace(/\b(start|with|create|delete|relate|skip|limit|distinct|desc|asc|as|order by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
     text = text.replace(/\b(and|or|not|has|node)\b/gi, '<span class="keyword">$1</span>');
     text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>(');
@@ -200,7 +200,7 @@ function showResults(data) {
   }
   if (data["query"]) {
     append($("#output"), data["query"].trim());
-    inputeditor.setValue(data["query"].trim());
+    inputeditor.setValue(data["query"].replace(/\n/g, '').trim());
     CodeMirror.commands["selectAll"](inputeditor);
     autoFormatSelection(inputeditor);
     resizeOutput();
@@ -258,7 +258,7 @@ function autoFormatSelection(editor) {
 }
 
 function getQuery() {
-  return inputeditor.getValue().replace(/\n/g, '');
+  return inputeditor.getValue();
 }
 
 $(document).ready(function () {
@@ -272,6 +272,10 @@ $(document).ready(function () {
         // resize output while typing...
         resizeOutput();
         if(e.keyCode == 13 && !e.shiftKey) {
+          inputeditor.setValue(getQuery().replace(/\n/g, '').trim());
+          CodeMirror.commands["selectAll"](inputeditor);
+          autoFormatSelection(inputeditor);
+          resizeOutput();
           send(getQuery());
           // cancel normal enter (must type shift enter to add lines)
           e.stop();
