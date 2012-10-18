@@ -161,7 +161,15 @@ public class CypherQueryExecutor {
         try {
             return (Tuple2<scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>>, String>) createTimedResults.invoke(result);
         } catch (Exception e) {
-            throw new RuntimeException("Error extracting cypher results", e);
+            Throwable root = e.getCause();
+            while (root.getCause() != null) {
+                root = root.getCause();
+            }
+            if(root != null) {
+                throw new RuntimeException(root); 
+            } else {
+                throw new RuntimeException("Unable to extract cypher results", e);
+            }
         }
     }
 
