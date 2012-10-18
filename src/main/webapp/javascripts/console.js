@@ -7,10 +7,21 @@ function append(element, text) {
   if (typeof(text) == 'object') {
      text = JSON.stringify(text);
   }
-  text = highlight(text);
-  element.html(element.html() + "\n" + text);
+  var newtext = "";
+  function appendToNewtext(text, typeClass) {
+    if(typeClass == null) {
+       newtext = newtext + text;
+    } else {
+       newtext = newtext + "<span class=\"cm-" + typeClass + "\">" + text + "</span>";
+    }
+  }
+  text = "\n" + text;
+  CodeMirror.runMode(text, "cypher", appendToNewtext);
+
+  element.html(element.html() + newtext);
   element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
+
 
 function highlight(text) {
   if (!text) {
@@ -199,10 +210,10 @@ function showResults(data) {
     append($("#output"), "--------------------------------------------------------------------------------");
   }
   if (data["query"]) {
-    append($("#output"), data["query"].trim());
     inputeditor.setValue(data["query"].replace(/\n/g, '').trim());
     CodeMirror.commands["selectAll"](inputeditor);
     autoFormatSelection(inputeditor);
+    append($("#output"), inputeditor.getValue());
     resizeOutput();
   }
   if (data["result"]) {
@@ -237,9 +248,10 @@ function welcome_msg() {
 }
 
 function showWelcome(json) {
-  append( $( "#output" ), welcome_msg() );
+  var output = $("#output");
+  output.html(output.html() + welcome_msg());
   if (json['message']) {
-    append( $( "#output" ), json['message'] );
+    output.html(output.html() + json['message']);
   }
 }
 
@@ -268,7 +280,7 @@ $(document).ready(function () {
     mode: "cypher",
     theme: "cypher",
     onKeyEvent: function(inputeditor, e) {
-      if(e.type != 'keyup') {
+      if(e.type == 'keydown') {
         // resize output while typing...
         resizeOutput();
         if(e.keyCode == 13 && !e.shiftKey) {
