@@ -11,6 +11,7 @@
     <script type="text/javascript" src="javascripts/codemirror.js"></script>
     <script type="text/javascript" src="javascripts/cypher.js"></script>
     <script type="text/javascript" src="javascripts/formatting.js"></script>
+    <script type="text/javascript" src="javascripts/runmode.js"></script>
     <script type="text/javascript" src="javascripts/console.js"></script>
     <style type="text/css">
       @import url("stylesheets/main.css");
@@ -47,7 +48,7 @@
         <option value="1.8">cypher parser v1.8</option>
         <option value="1.7">cypher parser v1.7</option>
       </select>
-      <div id="output" class="console">
+      <div id="output" class="console cm-s-cypher">
       </div>
       <form id="form" action="#">
         <textarea id="input">start n=node(*) return n;</textarea>
