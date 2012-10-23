@@ -24,3 +24,13 @@ Endpoints:
 Running locally:
 
     mvn clean install exec:java  
+
+potential arguments for local execution:
+
+    java org.neo4j.community.console.Console port /path/to/db [expose]
+
+(expose will write and read-through otherwise it will pull the content in a in-memory db)
+
+it can also import the data from a remote server
+
+	http://console.neo4j.org?init=http://server:port/db/data/cypher
