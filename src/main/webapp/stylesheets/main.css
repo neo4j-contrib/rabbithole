@@ -119,7 +119,7 @@ a:link, a:visited {
 	position:absolute;
 	right:1px;
 	bottom:1px;
-	width:1.7%;
+	width:4.7%;
 	margin:0px;
 }
 
@@ -158,7 +158,7 @@ h3 {
 .CodeMirror {
   border: 1px solid #eee;
   position:absolute;
-  width:98%;
+  width:95%;
   bottom:0px;
 }
 
