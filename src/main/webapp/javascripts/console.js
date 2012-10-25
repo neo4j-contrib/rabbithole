@@ -258,6 +258,7 @@ function showWelcome(json) {
 function resizeOutput() {
   $("#output").css({'height':($(window).height() - $(".CodeMirror-scroll").height() - 15)+'px'});
   $("#output").animate({ scrollTop: $("#output").prop("scrollHeight") }, 10);
+  $("#query_button").css({'height':$(".CodeMirror-scroll").height()+'px'});
 }
 
 function getSelectedRange(editor) {
@@ -273,6 +274,14 @@ function getQuery() {
   return inputeditor.getValue();
 }
 
+function query() {
+    inputeditor.setValue(getQuery().replace(/\n/g, '').trim());
+    CodeMirror.commands["selectAll"](inputeditor);
+    autoFormatSelection(inputeditor);
+    resizeOutput();
+    send(getQuery());
+}
+
 $(document).ready(function () {
   inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
     lineNumbers: false,
@@ -284,11 +293,7 @@ $(document).ready(function () {
         // resize output while typing...
         resizeOutput();
         if(e.keyCode == 13 && !e.shiftKey) {
-          inputeditor.setValue(getQuery().replace(/\n/g, '').trim());
-          CodeMirror.commands["selectAll"](inputeditor);
-          autoFormatSelection(inputeditor);
-          resizeOutput();
-          send(getQuery());
+          query();
           // cancel normal enter (must type shift enter to add lines)
           e.stop();
           return true;

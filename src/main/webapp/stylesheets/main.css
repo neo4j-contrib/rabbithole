@@ -112,6 +112,16 @@ a:link, a:visited {
   top: 5px;
   right: 26px;
 }
+#input {
+}
+
+#query_button {
+	position:absolute;
+	right:1px;
+	bottom:1px;
+	width:1.7%;
+	margin:0px;
+}
 
 code {
   background-color: #3d3d3d;
@@ -148,7 +158,7 @@ h3 {
 .CodeMirror {
   border: 1px solid #eee;
   position:absolute;
-  width:99%;
+  width:98%;
   bottom:0px;
 }
 

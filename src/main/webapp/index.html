@@ -43,15 +43,16 @@
       <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="img/link.png"/>
       <img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
       <select id="version" class="button">
-        <option selected="selected" value="">current cypher parser version</option>
-        <option value="1.9">cypher parser v1.9</option>
-        <option value="1.8">cypher parser v1.8</option>
-        <option value="1.7">cypher parser v1.7</option>
+        <option selected="selected" value="" title="cypher parser version">latest</option>
+        <option value="1.9">v1.9</option>
+        <option value="1.8">v1.8</option>
+        <option value="1.7">v1.7</option>
       </select>
       <div id="output" class="console cm-s-cypher">
       </div>
       <form id="form" action="#">
         <textarea id="input">start n=node(*) return n;</textarea>
+        <button id="query_button" onclick="query();return false;">&#x21a9;</button>
       </form>
       <div id="graph">
       </div>
