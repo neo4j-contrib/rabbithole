@@ -151,9 +151,9 @@ CodeMirror.defineMode("cypher", function(config) {
 CodeMirror.modeExtensions["cypher"] = {
   autoFormatLineBreaks: function (text) {
     var lines = text.split("\n");
-    var reProcessedPortion = /\s+(return|where|order by|match|with|skip|limit|create|delete|set)/gi;
+    var reProcessedPortion = /\s+(return|where|order by|match|with|skip|limit|create|delete|set)\s/gi;
     for (var i = 0; i < lines.length; i++) {
-      lines[i] = lines[i].replace(reProcessedPortion, " \n$1").trim();
+      lines[i] = lines[i].replace(reProcessedPortion, " \n$1 ").trim();
     }
     return lines.join("\n");
   }
