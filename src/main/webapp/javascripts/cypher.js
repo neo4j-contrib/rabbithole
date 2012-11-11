@@ -9,10 +9,10 @@ CodeMirror.defineMode("cypher", function(config) {
   var funcs = wordRegexp(["str", "min", "max", "type", "lower", "upper", "length", "type", "id",
     "coalesce", "head", "last", "nodes", "relationships", "extract", "filter", "tail", "range",
     "reduce", "abs", "round", "sqrt", "sign", "replace", "substring", "left", "right", "ltrim", 
-    "rtrim", "trim", "collect"]);
+    "rtrim", "trim", "collect", "distinct"]);
   var preds = wordRegexp(["all", "any", "none", "single", "not", "in", "has", "and", "or"]);
   var keywords = wordRegexp(["start", "match", "where", "with", "limit", "skip", "order", "by",
-    "return", "create", "delete", "set"]);
+    "return", "create", "delete", "set", "unique"]);
   var operatorChars = /[*+\-<>=&|~]/;
 
   function tokenBase(stream, state) {
@@ -151,9 +151,9 @@ CodeMirror.defineMode("cypher", function(config) {
 CodeMirror.modeExtensions["cypher"] = {
   autoFormatLineBreaks: function (text) {
     var lines = text.split("\n");
-    var reProcessedPortion = /\s*(return|where|order by|match|with|skip|limit|create|delete|set)/gi;
+    var reProcessedPortion = /\s+(return|where|order by|match|with|skip|limit|create|delete|set)\s/gi;
     for (var i = 0; i < lines.length; i++) {
-      lines[i] = lines[i].replace(reProcessedPortion, " \n$1").trim();
+      lines[i] = lines[i].replace(reProcessedPortion, " \n$1 ").trim();
     }
     return lines.join("\n");
   }
