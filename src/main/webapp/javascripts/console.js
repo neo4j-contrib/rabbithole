@@ -275,7 +275,7 @@ function getQuery() {
 }
 
 function query() {
-    inputeditor.setValue(getQuery().replace(/\n/g, '').trim());
+    inputeditor.setValue(getQuery().replace(/\n/g, ' ').trim());
     CodeMirror.commands["selectAll"](inputeditor);
     autoFormatSelection(inputeditor);
     resizeOutput();
