@@ -26,7 +26,7 @@ public class CypherQueryExecutor {
 
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
         this.index = index;
-        executionEngine = new org.neo4j.cypher.ExecutionEngine(gdb);
+        executionEngine = new org.neo4j.cypher.ExecutionEngine(gdb,null);
     }
 
     public boolean isMutatingQuery(String query) {
