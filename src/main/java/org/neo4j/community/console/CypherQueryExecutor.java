@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.neo4j.kernel.impl.util.StringLogger;
 import org.neo4j.cypher.PipeExecutionResult;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -26,7 +27,7 @@ public class CypherQueryExecutor {
 
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
         this.index = index;
-        executionEngine = new org.neo4j.cypher.ExecutionEngine(gdb,null);
+        executionEngine = new org.neo4j.cypher.ExecutionEngine(gdb,StringLogger.DEV_NULL);
     }
 
     public boolean isMutatingQuery(String query) {
@@ -41,11 +42,11 @@ public class CypherQueryExecutor {
         private final String text;
         private final Collection<Map<String, Object>> rows;
 
-        public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>> rows) {
+        public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.immutable.List<scala.collection.Map<String, Object>> rows) {
             this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows));
         }
 
-        public CypherResult(java.util.List<String> columns, String text, Iterable<scala.collection.immutable.Map<String, Object>> rows) {
+        public CypherResult(java.util.List<String> columns, String text, Iterable<scala.collection.Map<String, Object>> rows) {
             this.columns = columns;
             this.text = text;
             this.rows = IteratorUtil.addToCollection(iterate(rows), new ArrayList<Map<String, Object>>());
@@ -69,10 +70,10 @@ public class CypherQueryExecutor {
             return rows.iterator();
         }
 
-        public Iterator<Map<String, Object>> iterate(Iterable<scala.collection.immutable.Map<String, Object>> rows) {
-            return new IteratorWrapper<Map<String, Object>, scala.collection.immutable.Map<String, Object>>(rows.iterator()) {
+        public Iterator<Map<String, Object>> iterate(Iterable<scala.collection.Map<String, Object>> rows) {
+            return new IteratorWrapper<Map<String, Object>, scala.collection.Map<String, Object>>(rows.iterator()) {
                 @Override
-                protected Map<String, Object> underlyingObjectToObject(scala.collection.immutable.Map<String, Object> row) {
+                protected Map<String, Object> underlyingObjectToObject(scala.collection.Map<String, Object> row) {
                     return JavaConversions.mapAsJavaMap(row);
                 }
             };
@@ -129,7 +130,7 @@ public class CypherQueryExecutor {
         }
         query = removeSemicolon( query );
         org.neo4j.cypher.PipeExecutionResult result = (org.neo4j.cypher.PipeExecutionResult) executionEngine.execute(query);
-        Tuple2<scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>>, String> timedResults = createTimedResults(result);
+        Tuple2<scala.collection.immutable.List<scala.collection.Map<String, Object>>, String> timedResults = createTimedResults(result);
         return new CypherResult(result.columns(), result.dumpToString(), timedResults._1());
     }
 
@@ -157,9 +158,9 @@ public class CypherQueryExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    private Tuple2<scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>>, String> createTimedResults(PipeExecutionResult result) {
+    private Tuple2<scala.collection.immutable.List<scala.collection.Map<String, Object>>, String> createTimedResults(PipeExecutionResult result) {
         try {
-            return (Tuple2<scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>>, String>) createTimedResults.invoke(result);
+            return (Tuple2<scala.collection.immutable.List<scala.collection.Map<String, Object>>, String>) createTimedResults.invoke(result);
         } catch (Exception e) {
             Throwable root = e.getCause();
             while (root.getCause() != null) {
