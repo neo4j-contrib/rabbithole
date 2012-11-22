@@ -1,6 +1,7 @@
 package org.neo4j.community.console;
 
 import org.neo4j.cypher.PipeExecutionResult;
+import org.neo4j.cypher.javacompat.QueryStatistics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -38,8 +39,10 @@ public class CypherQueryExecutor {
 
     public static class CypherResult implements Iterable<Map<String, Object>> {
         private final List<String> columns;
-        private final String text;
+        private String text;
         private final Collection<Map<String, Object>> rows;
+        private QueryStatistics queryStatistics;
+        private long time;
 
         public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.immutable.List<scala.collection.immutable.Map<String, Object>> rows) {
             this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows));
@@ -56,7 +59,55 @@ public class CypherQueryExecutor {
         }
 
         public String getText() {
+            if (text==null) {
+                text = new ResultPrinter().generateText(columns,rows,time,queryStatistics);
+            }
             return text;
+        }
+
+
+        /*
+  def dumpToString(writer: PrintWriter) {
+    val (eagerResult, timeTaken) = createTimedResults
+
+    val columnSizes = calculateColumnSizes(eagerResult)
+
+    if (columns.nonEmpty) {
+      val headers = columns.map((c) => Map[String, Any](c -> Some(c))).reduceLeft(_ ++ _)
+      val headerLine: String = createString(columns, columnSizes, headers)
+      val lineWidth: Int = headerLine.length - 2
+      val --- = "+" + repeat("-", lineWidth) + "+"
+
+      val row = if (eagerResult.size > 1) "rows" else "row"
+      val footer = "%d %s".format(eagerResult.size, row)
+
+      writer.println(---)
+      writer.println(headerLine)
+      writer.println(---)
+
+      eagerResult.foreach(resultLine => writer.println(createString(columns, columnSizes, resultLine)))
+
+      writer.println(---)
+      writer.println(footer)
+      if (queryStatistics.containsUpdates) {
+        writer.print(queryStatistics.toString)
+      }
+    } else {
+      if (queryStatistics.containsUpdates) {
+        writer.println("+-------------------+")
+        writer.println("| No data returned. |")
+        writer.println("+-------------------+")
+        writer.print(queryStatistics.toString)
+      } else {
+        writer.println("+--------------------------------------------+")
+        writer.println("| No data returned, and nothing was changed. |")
+        writer.println("+--------------------------------------------+")
+      }
+    }
+
+         */
+        private String generateText() {
+            return null;
         }
 
         @Override
