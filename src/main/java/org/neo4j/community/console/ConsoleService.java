@@ -107,6 +107,7 @@ public class ConsoleService {
                 result = service.cypherQuery(query);
                 data.put("result", result.getText());
                 data.put("json", result.getJson());
+                data.put("columns", result.getColumns());
             }
             time = trace("cypher", time);
             data.put("visualization", service.cypherQueryViz(result));

@@ -86,7 +86,7 @@ public class CypherQueryExecutorTest {
     public void testCypherQuery() throws Exception {
         final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node(0) return n",null);
         assertEquals(asList("n"), result.getColumns());
-        assertTrue(result.getText().contains("Node[0]"));
+        assertTrue(result.getText(),result.getText().contains("Node[0]"));
         for (Map<String, Object> row : result) {
             assertEquals(1,row.size());
             assertEquals(true,row.containsKey("n"));

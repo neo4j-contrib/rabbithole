@@ -217,8 +217,9 @@ function showResults(data) {
     resizeOutput();
   }
   if (data["result"]) {
-    append($("#output"), data["result"]);
-//	    append($("#output"), "--------------------------------------------------------------------------------");
+    // append($("#output"), data["result"]);
+    append($("#output"),"\n");
+    renderResult("output",data)
   }
   if (data["error"]) {
     append($("#output"), "Error: " + data["error"]);
