@@ -6,7 +6,9 @@ table {
     border-left: 2px dashed white;
     border-bottom: 2px dashed white;
     border-top: 2px dashed white;
+/*
     padding: 5px;
+*/
     min-width: 50%;
 }
 thead {
