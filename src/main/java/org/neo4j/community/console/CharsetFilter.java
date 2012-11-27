@@ -18,7 +18,7 @@ public class CharsetFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
         final String contentType = servletRequest.getContentType();
-        if (contentType!=null &&     contentType.contains("text/html")) {
+        if (contentType!=null && contentType.contains("text/html")) {
             servletResponse.setContentType("text/html;charset=UTF-8");
         }
         if (servletResponse.getCharacterEncoding().equalsIgnoreCase("ISO-8859-1"))

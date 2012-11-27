@@ -2,6 +2,7 @@ package org.neo4j.community.console;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -59,8 +60,19 @@ public class Console
         root.setParentLoaderPriority(true);
         root.setAttribute(ConsoleFilter.DATABASE_ATTRIBUTE, databaseInfo);
         setupRequestLimits(root, REQUEST_TIME_LIMIT, MAX_OPS_LIMIT);
-        server.setHandler(root);
+        final HandlerList handlers = new HandlerList();
+        final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
+        handlers.setHandlers(new Handler[]{resourceHandler,root});
+        server.setHandler(handlers);
         server.start();
+    }
+
+    private Handler createResourceHandler(String context, String resourceBase) {
+        WebAppContext ctx = new WebAppContext();
+        ctx.setContextPath(context);
+        ctx.setResourceBase(resourceBase);
+        ctx.setParentLoaderPriority(true);
+        return ctx;
     }
 
     private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {

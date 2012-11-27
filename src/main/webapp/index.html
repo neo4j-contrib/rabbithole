@@ -3,24 +3,24 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="icon" href="http://neo4j.org/favicon.ico" />
-    <link rel="stylesheet" href="stylesheets/codemirror.css">
-    <link rel="stylesheet" href="stylesheets/cypher.css">
-    <link rel="stylesheet" href="stylesheets/datatable.css">
+    <link rel="stylesheet" href="console_assets/stylesheets/codemirror.css">
+    <link rel="stylesheet" href="console_assets/stylesheets/cypher.css">
+    <link rel="stylesheet" href="console_assets/stylesheets/datatable.css">
     <title>Neo4j Console</title>
-    <script type="text/javascript" src="javascripts/jquery-1.6.4.min.js"></script>
-    <script type="text/javascript" src="javascripts/d3.min.js"></script>
-    <script type="text/javascript" src="javascripts/visualization.js"></script>
-    <script type="text/javascript" src="javascripts/codemirror.min.js"></script>
-    <script type="text/javascript" src="javascripts/cypher.js"></script>
-    <script type="text/javascript" src="javascripts/formatting.js"></script>
-    <script type="text/javascript" src="javascripts/runmode.js"></script>
-    <script type="text/javascript" src="javascripts/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="javascripts/cypher.datatable.js"></script>
-    <script type="text/javascript" src="javascripts/console.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/d3.min.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/visualization.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/codemirror.min.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/cypher.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/formatting.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/runmode.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/cypher.datatable.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/console.js"></script>
     <style type="text/css">
-      @import url("stylesheets/main.css");
-      @import url("stylesheets/highlight.css");
-      @import url("stylesheets/d3.css");
+      @import url("console_assets/stylesheets/main.css");
+      @import url("console_assets/stylesheets/highlight.css");
+      @import url("console_assets/stylesheets/d3.css");
     </style>
     <script type="text/javascript">
   var _gaq = _gaq || [];
@@ -38,14 +38,14 @@
     <span id="welcome_msg" style="display:none;">
       <span class="welcome">	
         You can modify and query this graph by entering statements in the input field at the bottom.
-        For some syntax help hit the <img title="Info" onclick="$('#info').toggle();" class="button" src="img/info.png"/> button. 
-        If you want to share your graph, just do it with <img title="Share this graph" onclick="toggleShare();" class="button" src="img/link.png"/>
+        For some syntax help hit the <img title="Info" onclick="$('#info').toggle();" class="button" src="console_assets/img/info.png"/> button.
+        If you want to share your graph, just do it with <img title="Share this graph" onclick="toggleShare();" class="button" src="console_assets/img/link.png"/>
       </span>
     </span>
     <div id="main">
-      <img title="Info" onclick="$('#info').toggle();" class="info button" src="img/info.png"/>
-      <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="img/link.png"/>
-      <img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="img/graph.png"/>
+      <img title="Info" onclick="$('#info').toggle();" class="info button" src="console_assets/img/info.png"/>
+      <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="console_assets/img/link.png"/>
+      <img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="console_assets/img/graph.png"/>
       <select id="version" class="button">
         <option selected="selected" value="" title="cypher parser version">latest</option>
         <option value="1.9">v1.9</option>
@@ -108,7 +108,7 @@
       </div>
       <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f895f9309279e1e"></script>
       <!-- AddThis Button END -->
-      <a id="share_yuml" href="#" target="neo4j-console"><img src="/img/yUML.png" height="16"/></a>
+      <a id="share_yuml" href="#" target="neo4j-console"><img src="console_assets/img/yUML.png" height="16"/></a>
       <br/>
       Paste HTML to embed in website (Adjust width and height):<br/>
       <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/>
