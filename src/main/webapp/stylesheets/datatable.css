@@ -8,8 +8,8 @@ table {
     border-top: 2px dashed white;
 /*
     padding: 5px;
-*/
     min-width: 50%;
+*/
 }
 thead {
     border-bottom: 2px dashed white;

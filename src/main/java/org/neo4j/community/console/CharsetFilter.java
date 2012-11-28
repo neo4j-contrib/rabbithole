@@ -17,12 +17,12 @@ public class CharsetFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
-        final String contentType = servletRequest.getContentType();
+            final String contentType = servletResponse.getContentType();
         if (contentType!=null && contentType.contains("text/html")) {
             servletResponse.setContentType("text/html;charset=UTF-8");
+            if (servletResponse.getCharacterEncoding().equalsIgnoreCase("ISO-8859-1"))
+                servletResponse.setCharacterEncoding("UTF-8");
         }
-        if (servletResponse.getCharacterEncoding().equalsIgnoreCase("ISO-8859-1"))
-            servletResponse.setCharacterEncoding("UTF-8");
         chain.doFilter(servletRequest,servletResponse);
     }
 

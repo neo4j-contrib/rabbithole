@@ -293,10 +293,10 @@ $(document).ready(function () {
       if(e.type == 'keydown') {
         // resize output while typing...
         resizeOutput();
-        if(e.keyCode == 13 && !e.shiftKey) {
+        if(e.which == 13 && !e.shiftKey) {
           query();
           // cancel normal enter (must type shift enter to add lines)
-          e.stop();
+          e.preventDefault();
           return true;
         }
         // allow the rest to go through.
@@ -318,7 +318,7 @@ $(document).ready(function () {
   }
 
   $("body").keyup(function(e) {
-    if (e.keyCode == 27) {
+    if (e.which == 27) {
       $(".popup").hide();
     }
     return true;
