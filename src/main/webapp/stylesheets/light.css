@@ -1,0 +1,92 @@
+/* main */
+
+body {
+    background-color: #EEE;
+}
+
+.console {
+    color: #111;
+    background-color: #EEE;
+}
+
+a:link, a:visited {
+    color: black;
+}
+
+.popup {
+    background-color: #EEE;
+    color: #111;
+    border-color: #a9a9a9;
+}
+
+code {
+    background-color: #CCC;
+}
+
+.textblock {
+    /*background-color: #AAA;*/
+}
+
+.CodeMirror {
+    border-color: #111;
+}
+
+.cm-s-cypher .CodeMirror-gutter {
+    background: #EEE;
+    color: #111;
+}
+
+.cm-s-cypher div.CodeMirror-selected {
+    background: #CCC !important;
+}
+
+/* 33322B*/
+
+.cm-s-cypher {
+    text-shadow: none;
+    background: #EEE;
+    color: black;
+}
+
+.cm-s-cypher span {
+
+}
+
+.cm-s-cypher span.cm-keyword { color: #498a75; }
+.cm-s-cypher span.cm-atom { color: #615939; }
+.cm-s-cypher span.cm-variable { color:black; }
+.cm-s-cypher span.cm-string { color: #0dab05; }
+/* datatable */
+
+table, thead, th, td {
+    color: black;
+    border: 1px solid black;
+}
+
+
+.even, thead {
+    background: #CCC;
+}
+
+.odd {
+    background: #EEE;
+}
+
+/* d3 */
+
+.link {
+    stroke: #222;
+}
+
+.shadow {
+    stroke: #EEE;
+}
+
+.marker {
+    stroke: #222;
+    fill: #222;
+}
+
+text {
+    fill: #111;
+}

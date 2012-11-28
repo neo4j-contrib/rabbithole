@@ -18,7 +18,7 @@ function append(element, text) {
   text = "\n" + text;
   CodeMirror.runMode(text, "cypher", appendToNewtext);
 
-  element.html(element.html() + newtext);
+  element.html(element.html() + "<span class='textblock'>"+newtext+"</span>");
   element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
 
@@ -207,7 +207,7 @@ function showResults(data) {
   if (data["init"]) {
     append($("#output"), "Graph Setup:");
     append($("#output"), data["init"]);
-    append($("#output"), "--------------------------------------------------------------------------------");
+    // append($("#output"), "--------------------------------------------------------------------------------");
   }
   if (data["query"]) {
     inputeditor.setValue(data["query"].replace(/\n/g, '').trim());
