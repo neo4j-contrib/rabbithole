@@ -23,7 +23,9 @@ function convertResult(data) {
     }
     var windowWith=$(window).width() / 2 ;
     for (var col=0;col<count;col++) {
-        result.columns[col].sWidth=windowWith * result.columns[col].sWidth / width;
+        // result.columns[col].sWidth=windowWith * result.columns[col].sWidth / width;
+        result.columns[col].sWidth=""+Math.round(100 * result.columns[col].sWidth / width)+"%";
+        // console.log(result.columns[col].sWidth);
     }
     return result;
 }
@@ -51,7 +53,7 @@ function convertCell(cell) {
 
 function renderResult(id, data) {
     var result = convertResult(data);
-    var table=$('<table cellpadding="0" cellspacing="0" border="0"></table>').appendTo($("#"+id));
+    var table=$('<table cellpadding="0" cellspacing="0" border="0" width="100%"></table>').appendTo($("#"+id));
     var dataTable=table.dataTable({
         aoColumns: result.columns,
         aaData: result.data,

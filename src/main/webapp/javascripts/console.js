@@ -18,7 +18,7 @@ function append(element, text) {
   text = "\n" + text;
   CodeMirror.runMode(text, "cypher", appendToNewtext);
 
-  element.html(element.html() + "<span class='textblock'>"+newtext+"</span>");
+  element.append( $("<span class='textblock'>"+newtext+"</span>"));
   element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
 
@@ -250,9 +250,10 @@ function welcome_msg() {
 
 function showWelcome(json) {
   var output = $("#output");
-  output.html(output.html() + welcome_msg());
   if (json['message']) {
-    output.html(output.html() + json['message']);
+      output.append( $(json['message']) );
+  } else {
+    output.append( welcome_msg() );
   }
 }
 
