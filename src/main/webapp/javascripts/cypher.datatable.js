@@ -17,6 +17,14 @@ function convertResult(data) {
         }
         result.data[row]=newRow;
     }
+    var width=0;
+    for (var col=0;col<count;col++) {
+        width+=result.columns[col].sWidth;
+    }
+    var windowWith=$(window).width() / 2 ;
+    for (var col=0;col<count;col++) {
+        result.columns[col].sWidth=windowWith * result.columns[col].sWidth / width;
+    }
     return result;
 }
 
@@ -57,6 +65,6 @@ function renderResult(id, data) {
                 sPrevious : " << "
             }
         }
-
     });
+    table.css({width:"100%;"});
 }
