@@ -6,8 +6,8 @@ table {
     border-left: 2px dashed white;
     border-bottom: 2px dashed white;
     border-top: 2px dashed white;
-    max-width: 75%;
-    min-width: 50%;
+    /*max-width: 75%;*/
+    /*min-width: 50%;*/
 /*
     padding: 5px;
     min-width: 50%;
@@ -31,10 +31,10 @@ th {
 
 .dataTables_wrapper {
     display: inline-block;
-/*
+    max-width: 75%;
     min-width: 50%;
-*/
 }
+
 .dataTables_length {
     float: left;
 }
