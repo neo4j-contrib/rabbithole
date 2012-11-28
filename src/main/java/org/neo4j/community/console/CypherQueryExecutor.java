@@ -159,6 +159,9 @@ public class CypherQueryExecutor {
                 result.put("_type",relationship.getType().name());
                 return result;
             }
+            if (value instanceof scala.collection.Iterable) {
+                return toJsonCompatible(JavaConversions.asJavaIterable((scala.collection.Iterable)value));
+            }
             if (value instanceof Iterable) {
                 final List<Object> result = new ArrayList<Object>();
                 for (Object inner : (Iterable)value) {
