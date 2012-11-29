@@ -56,6 +56,11 @@ code {
 .cm-s-cypher span.cm-atom { color: #615939; }
 .cm-s-cypher span.cm-variable { color:black; }
 .cm-s-cypher span.cm-string { color: #0dab05; }
+
+.button.shareUrl {
+    display: none;
+}
+
 /* datatable */
 
 table, thead, th, td {

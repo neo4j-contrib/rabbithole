@@ -68,5 +68,4 @@ function renderResult(id, data) {
             }
         }
     });
-    table.css({width:"100%;"});
 }
