@@ -90,16 +90,16 @@ function viz(data) {
   if ($('#graph').is(":hidden")) {
     return;
   }
-  var graph = $("#graph");
-  graph.empty();
+  var output = $("#output");
+  output.children('#graph').remove();
   if (data) {
-    visualize("graph", graph.width(), graph.height(),data)
+    visualize("output", output.width(), output.height(),data)
   } else {
     var query = getQuery();
     if (!isCypher(query)) {
       query = "";
     }
-    render("graph", graph.width(), graph.height(), "/console/visualization?query=" + encodeURIComponent(query));
+    render("output", output.width(), output.height(), "/console/visualization?query=" + encodeURIComponent(query));
   }
   graph.show();
 }

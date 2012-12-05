@@ -42,11 +42,13 @@ function title(ob) {
 	}
 	return ob.id;
 }
-
 function visualize(id,w,h,data) {
-  var vis = d3.select("#"+id).append("svg")
-    .attr("width", w)
-    .attr("height", h);
+    var vis = d3.select("#"+id).append("svg")
+        .attr("id", "graph")
+        .attr("width", w/2)
+        .attr("height", h)
+        .attr("style","pointer-events:auto; margin-left:"+w/2);
+
 
     var force = self.force = d3.layout.force()
         .nodes(data.nodes)
@@ -54,7 +56,7 @@ function visualize(id,w,h,data) {
         .gravity(.2)
         .distance(80)
         .charge(-1000)
-        .size([w, h])
+        .size([w/2, h])
         .start();
 
 
