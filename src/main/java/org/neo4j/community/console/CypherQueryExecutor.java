@@ -11,7 +11,6 @@ import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.StringLogger;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
-
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -44,15 +43,16 @@ public class CypherQueryExecutor {
         private String text;
         private final Collection<Map<String, Object>> rows;
         private QueryStatistics queryStatistics;
-        private long time;
+        private final int time;
 
-        public CypherResult(scala.collection.immutable.List<String> columns, scala.collection.Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
-            this(JavaConversions.seqAsJavaList(columns), JavaConversions.asJavaIterable(rows),queryStatistics);
+        public CypherResult(scala.collection.immutable.List<String> columns, scala.collection.Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics, int time) {
+            this(JavaConversions.seqAsJavaList(columns), JavaConversions.asJavaIterable(rows),queryStatistics,time);
         }
 
-        public CypherResult(List<String> columns, Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
+        public CypherResult(List<String> columns, Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics, int time) {
             this.columns = columns;
             this.queryStatistics = queryStatistics;
+            this.time = time;
             this.rows = IteratorUtil.addToCollection(iterate(rows), new ArrayList<Map<String, Object>>());
         }
 
@@ -170,7 +170,7 @@ public class CypherQueryExecutor {
         query = removeSemicolon( query );
         org.neo4j.cypher.PipeExecutionResult result = (org.neo4j.cypher.PipeExecutionResult) executionEngine.execute(query);
         Tuple2<scala.collection.Iterable<scala.collection.Map<String, Object>>, String> timedResults = createTimedResults(result);
-        return new CypherResult(result.columns(), timedResults._1(), result.queryStatistics());
+        return new CypherResult(result.columns(), timedResults._1(), result.queryStatistics(),Integer.parseInt(timedResults._2()));
     }
 
     private String removeSemicolon( String query )

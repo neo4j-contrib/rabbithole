@@ -66,7 +66,7 @@ public class SubGraphTest {
 
     private CypherQueryExecutor.CypherResult result(String column, Object value) {
         final scala.collection.immutable.Map row = new scala.collection.immutable.HashMap().updated(column, value);
-        return new CypherQueryExecutor.CypherResult(asList(column), (Iterable) asList(row), null);
+        return new CypherQueryExecutor.CypherResult(asList(column), (Iterable) asList(row), null,0);
     }
 
     @Test
