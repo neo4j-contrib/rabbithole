@@ -56,6 +56,7 @@ code {
 .cm-s-cypher span.cm-atom { color: #615939; }
 .cm-s-cypher span.cm-variable { color:black; }
 .cm-s-cypher span.cm-string { color: #0dab05; }
+.cm-s-cypher .CodeMirror-cursor { border-left: 1px solid black !important; }
 
 .button.shareUrl {
     display: none;
