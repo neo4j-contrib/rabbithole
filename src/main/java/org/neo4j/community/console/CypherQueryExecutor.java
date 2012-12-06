@@ -1,12 +1,13 @@
 package org.neo4j.community.console;
 
 import org.neo4j.cypher.PipeExecutionResult;
-import org.neo4j.cypher.javacompat.QueryStatistics;
+import org.neo4j.cypher.QueryStatistics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.IteratorWrapper;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.StringLogger;
 import scala.Tuple2;
 import scala.collection.JavaConversions;
@@ -45,13 +46,14 @@ public class CypherQueryExecutor {
         private QueryStatistics queryStatistics;
         private long time;
 
-        public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.Iterable<scala.collection.Map<String, Object>> rows) {
-            this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows));
+        public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.Iterable<scala.collection.Map<String, Object>> rows,QueryStatistics queryStatistics) {
+            this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows),queryStatistics);
         }
 
-        public CypherResult(java.util.List<String> columns, String text, Iterable<scala.collection.Map<String, Object>> rows) {
+        public CypherResult(List<String> columns, String text, Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
             this.columns = columns;
             this.text = text;
+            this.queryStatistics = queryStatistics;
             this.rows = IteratorUtil.addToCollection(iterate(rows), new ArrayList<Map<String, Object>>());
         }
 
@@ -59,6 +61,27 @@ public class CypherQueryExecutor {
             return columns;
         }
 
+        public int getRowCount() {
+            return rows.size();
+        }
+        
+        public Map getQueryStatistics() {
+            final Map<String, Object> stats = MapUtil.map(
+                    "rows", getRowCount(),
+                    "time", getTime()
+            );
+            if (queryStatistics!=null) {
+                stats.put("containsUpdates", queryStatistics.containsUpdates());
+                stats.put("nodesDeleted", queryStatistics.deletedNodes());
+                stats.put("relationshipsDeleted", queryStatistics.deletedRelationships());
+                stats.put("nodesCreated", queryStatistics.nodesCreated());
+                stats.put("relationshipsCreated", queryStatistics.relationshipsCreated());
+                stats.put("propertiesSet", queryStatistics.propertiesSet());
+                stats.put("text", queryStatistics.toString());
+            }
+            return stats;
+        }
+        
         public String getText() {
             if (text==null) {
                 text = new ResultPrinter().generateText(columns,rows,time,queryStatistics);
@@ -171,6 +194,10 @@ public class CypherQueryExecutor {
             }
             return value;
         }
+
+        public long getTime() {
+            return time;
+        }
     }
 
     public CypherResult cypherQuery(String query, String version) {
@@ -185,7 +212,7 @@ public class CypherQueryExecutor {
         query = removeSemicolon( query );
         org.neo4j.cypher.PipeExecutionResult result = (org.neo4j.cypher.PipeExecutionResult) executionEngine.execute(query);
         Tuple2<scala.collection.Iterable<scala.collection.Map<String, Object>>, String> timedResults = createTimedResults(result);
-        return new CypherResult(result.columns(), result.dumpToString(), timedResults._1());
+        return new CypherResult(result.columns(), result.dumpToString(), timedResults._1(), result.queryStatistics());
     }
 
     private String removeSemicolon( String query )

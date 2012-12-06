@@ -108,6 +108,7 @@ public class ConsoleService {
                 data.put("result", result.getText());
                 data.put("json", result.getJson());
                 data.put("columns", result.getColumns());
+                data.put("stats", result.getQueryStatistics());
             }
             time = trace("cypher", time);
             data.put("visualization", service.cypherQueryViz(result));
@@ -117,7 +118,7 @@ public class ConsoleService {
             data.put("error", e.toString());
         }
         time = trace("all", start);
-        data.put("time", time);
+        data.put("time", time-start);
         return data;
     }
 

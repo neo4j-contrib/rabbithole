@@ -1,6 +1,6 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.javacompat.QueryStatistics;
+import org.neo4j.cypher.QueryStatistics;
 
 import java.util.*;
 

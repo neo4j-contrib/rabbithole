@@ -52,6 +52,7 @@ function convertCell(cell) {
 }
 
 function renderResult(id, data) {
+    if (!data.stats.rows) return;
     var result = convertResult(data);
     var table=$('<table cellpadding="0" cellspacing="0" border="0" width="100%"></table>').appendTo($("#"+id));
     var dataTable=table.dataTable({

@@ -1,47 +1,30 @@
 var inputeditor;
       
-function append(element, text) {
+function append(element, text,doHighlight) {
   if (!text) {
     return;
   }
   if (typeof(text) == 'object') {
      text = JSON.stringify(text);
   }
-  var newtext = "";
-  function appendToNewtext(text, typeClass) {
-    if(typeClass == null) {
-       newtext = newtext + text;
-    } else {
-       newtext = newtext + "<span class=\"cm-" + typeClass + "\">" + text + "</span>";
-    }
-  }
-  text = "\n" + text;
-  CodeMirror.runMode(text, "cypher", appendToNewtext);
 
-  element.append( $("<span class='textblock'>"+newtext+"</span>"));
+  text = "\n" + text;
+  if (doHighlight) text = highlight(text);
+  element.append( $("<span class='textblock'>"+text+"</span>"));
   element.prop("scrollTop", element.prop("scrollHeight") - element.height());
 }
 
-
 function highlight(text) {
-  if (!text) {
-    return text;
-  }
-  text = text.replace(/<null>/gi, '&lt;null&gt;');
-  if (text[0] == "(" || text[0] == "[") {
-    // Geoff
-    // colour nodes
-    text = text.replace(/(\([0-9A-Za-z_]*?\))/gi, '<span class="node">$1</span>');
-    // colour rels
-    text = text.replace(/((<?-)?\[[0-9A-Za-z_:\.]*?\](->?)?)/gi, '<span class="relationship">$1</span>');
-  } else if (isCypher(text)) {
-    // Cypher
-    text = text.replace(/\b(start|with|create|delete|relate|skip|limit|order by|set|match|where|return)\b/gi, '$1');
-    text = text.replace(/\b(start|with|create|delete|relate|skip|limit|distinct|desc|asc|as|order by|foreach|set|match|where|return)\b/gi, '<span class="keyword">$1</span>');
-    text = text.replace(/\b(and|or|not|has|node)\b/gi, '<span class="keyword">$1</span>');
-    text = text.replace(/\b(type|collect|sum|sqrt|round|max|min|nodes|count|length|avg|rels)\b\(/gi, '<span class="function">$1</span>(');
-  }
-  return text;
+    var newtext = "";
+    function appendToNewtext(text, typeClass) {
+      if(typeClass == null) {
+         newtext = newtext + text;
+      } else {
+         newtext = newtext + "<span class=\"cm-" + typeClass + "\">" + text + "</span>";
+      }
+    }
+    CodeMirror.runMode(text, "cypher", appendToNewtext);
+    return newtext;
 }
 
 function post(uri, data, done, dataType) {
@@ -203,26 +186,54 @@ function export_graph(format) {
   });
 }
 
+function readable(prefix, map) {
+    var col=[];
+    for (var key in map) {
+        if (map.hasOwnProperty(key) && map[key]) {
+            col.push(map[key]+" "+key+(map[key]>1 ? "s" : ""));
+        }
+    }
+    if (!col.length) return "";
+    if (col.length==1) return prefix + " "+col[0]+" ";
+    return prefix +" "+ col.slice(0,-1).join(", ")+" and "+col[col.length-1]+" ";
+}
+
+function computeInfo(data) {
+    var stats = data.stats;
+    var info="Query took "+stats.time+" ms";
+    var count = data.json ? stats.rows : 0;
+    info += " and returned " + (count ? count : "no") + " rows. ";
+    if (stats.containsUpdates) {
+        var updates="\nUpdated the graph - "
+            + readable("created",{node:stats.nodesCreated,relationship:stats.relationshipsCreated})
+            + readable("deleted",{node:stats.nodesDeleted,relationship:stats.relationshipsDeleted})
+            + readable("set",{property:stats.propertiesSet}).replace("propertys","properties");
+        info += updates;
+    }
+    return info;
+}
+
 function showResults(data) {
   if (data["init"]) {
     append($("#output"), "Graph Setup:");
-    append($("#output"), data["init"]);
+    append($("#output"), data["init"],true);
     // append($("#output"), "--------------------------------------------------------------------------------");
   }
   if (data["query"]) {
+    append($("#output"),"\nQuery:");
     inputeditor.setValue(data["query"].replace(/\n/g, '').trim());
     CodeMirror.commands["selectAll"](inputeditor);
     autoFormatSelection(inputeditor);
-    append($("#output"), inputeditor.getValue());
+    append($("#output"), inputeditor.getValue(),true);
     resizeOutput();
   }
   if (data["result"]) {
-    // append($("#output"), data["result"]);
     append($("#output"),"\n");
-    renderResult("output",data)
+    renderResult("output",data);
+    append($("#output"),computeInfo(data)+"\n");
   }
   if (data["error"]) {
-    append($("#output"), "Error: " + data["error"]);
+    append($("#output"), "Error: " + data["error"],true);
   }
   if (data["visualization"]) {
     viz(data.visualization);
