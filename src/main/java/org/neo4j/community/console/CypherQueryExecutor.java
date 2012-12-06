@@ -46,13 +46,12 @@ public class CypherQueryExecutor {
         private QueryStatistics queryStatistics;
         private long time;
 
-        public CypherResult(scala.collection.immutable.List<String> columns, String text, scala.collection.Iterable<scala.collection.Map<String, Object>> rows,QueryStatistics queryStatistics) {
-            this(JavaConversions.seqAsJavaList(columns),text,JavaConversions.asJavaIterable(rows),queryStatistics);
+        public CypherResult(scala.collection.immutable.List<String> columns, scala.collection.Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
+            this(JavaConversions.seqAsJavaList(columns), JavaConversions.asJavaIterable(rows),queryStatistics);
         }
 
-        public CypherResult(List<String> columns, String text, Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
+        public CypherResult(List<String> columns, Iterable<scala.collection.Map<String, Object>> rows, QueryStatistics queryStatistics) {
             this.columns = columns;
-            this.text = text;
             this.queryStatistics = queryStatistics;
             this.rows = IteratorUtil.addToCollection(iterate(rows), new ArrayList<Map<String, Object>>());
         }
@@ -70,7 +69,7 @@ public class CypherQueryExecutor {
                     "rows", getRowCount(),
                     "time", getTime()
             );
-            if (queryStatistics!=null) {
+            if (queryStatistics!=null && queryStatistics.containsUpdates()) {
                 stats.put("containsUpdates", queryStatistics.containsUpdates());
                 stats.put("nodesDeleted", queryStatistics.deletedNodes());
                 stats.put("relationshipsDeleted", queryStatistics.deletedRelationships());
@@ -84,54 +83,13 @@ public class CypherQueryExecutor {
         
         public String getText() {
             if (text==null) {
-                text = new ResultPrinter().generateText(columns,rows,time,queryStatistics);
+                text = generateText();
             }
             return text;
         }
 
-
-        /*
-  def dumpToString(writer: PrintWriter) {
-    val (eagerResult, timeTaken) = createTimedResults
-
-    val columnSizes = calculateColumnSizes(eagerResult)
-
-    if (columns.nonEmpty) {
-      val headers = columns.map((c) => Map[String, Any](c -> Some(c))).reduceLeft(_ ++ _)
-      val headerLine: String = createString(columns, columnSizes, headers)
-      val lineWidth: Int = headerLine.length - 2
-      val --- = "+" + repeat("-", lineWidth) + "+"
-
-      val row = if (eagerResult.size > 1) "rows" else "row"
-      val footer = "%d %s".format(eagerResult.size, row)
-
-      writer.println(---)
-      writer.println(headerLine)
-      writer.println(---)
-
-      eagerResult.foreach(resultLine => writer.println(createString(columns, columnSizes, resultLine)))
-
-      writer.println(---)
-      writer.println(footer)
-      if (queryStatistics.containsUpdates) {
-        writer.print(queryStatistics.toString)
-      }
-    } else {
-      if (queryStatistics.containsUpdates) {
-        writer.println("+-------------------+")
-        writer.println("| No data returned. |")
-        writer.println("+-------------------+")
-        writer.print(queryStatistics.toString)
-      } else {
-        writer.println("+--------------------------------------------+")
-        writer.println("| No data returned, and nothing was changed. |")
-        writer.println("+--------------------------------------------+")
-      }
-    }
-
-         */
         private String generateText() {
-            return null;
+            return new ResultPrinter().generateText(columns,rows,time,queryStatistics);
         }
 
         @Override
@@ -212,7 +170,7 @@ public class CypherQueryExecutor {
         query = removeSemicolon( query );
         org.neo4j.cypher.PipeExecutionResult result = (org.neo4j.cypher.PipeExecutionResult) executionEngine.execute(query);
         Tuple2<scala.collection.Iterable<scala.collection.Map<String, Object>>, String> timedResults = createTimedResults(result);
-        return new CypherResult(result.columns(), result.dumpToString(), timedResults._1(), result.queryStatistics());
+        return new CypherResult(result.columns(), timedResults._1(), result.queryStatistics());
     }
 
     private String removeSemicolon( String query )
