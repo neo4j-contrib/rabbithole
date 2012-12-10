@@ -37,18 +37,26 @@ function convertCell(cell) {
         for (var i=0;i<cell.length;i++) {
             result.push(convertCell(cell[i]));
         }
-        return result;
+        return "["+result.join(", ")+"]";
     }
     if (cell instanceof Object) {
-        var id="["+cell["_id"]+"] ";
-		var value = (cell["_type"]) ? ":"+cell["_type"]+id : "Node"+id;
-        var props = {};
-        var hasProps = false;
-        for (key in cell) { if (cell.hasOwnProperty(key) && key[0]!='_') { hasProps = true; props[key] = cell[key]; } }
-        if (hasProps) value += JSON.stringify(props);
-        return value;
+        if (cell["_type"]) {
+            return "("+cell["_start"]+")-["+cell["_id"]+":" + cell["_type"] + props(cell)+"]->("+cell["_end"]+")";
+        } else {
+            return "(" + cell["_id"] + props(cell)+")";
+        }
     }
     return cell;
+}
+
+function props(cell) {
+    var props = [];
+    for (key in cell) {
+        if (cell.hasOwnProperty(key) && key[0] != '_') {
+            props.push([key] + ":"+ JSON.stringify(cell[key]));
+        }
+    }
+    return props.length ? " {" + props.join(", ") + "}" : "";
 }
 
 function renderResult(id, data) {

@@ -3,9 +3,9 @@ table {
     clear: both;
 */
     color: #C2B470;
-    border-left: 2px dashed white;
-    border-bottom: 2px dashed white;
-    border-top: 2px dashed white;
+/*    border-left: 2px dashed white;*/
+/*    border-bottom: 2px dashed white;*/
+/*    border-top: 2px dashed white;*/
     /*max-width: 75%;*/
     /*min-width: 50%;*/
 /*
@@ -14,16 +14,16 @@ table {
 */
 }
 thead {
-    border-bottom: 2px dashed white;
+/*    border-bottom: 2px dashed white;*/
 }
 
 th, td {
-    border-right: 2px dashed white;
+/*    border-right: 2px dashed white;*/
     padding: 5px;
 }
 
 th {
-    border-bottom: 2px dashed white;
+/*    border-bottom: 2px dashed white;*/
 }
 .odd {
     background: #222;
