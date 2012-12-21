@@ -107,11 +107,7 @@ a:link, a:visited {
   height: 16px;
 }
 
-.button.info {
-  position: absolute;
-  top: 5px;
-  right: 26px;
-}
+
 #input {
 }
 
@@ -131,25 +127,7 @@ code {
   font-family: sans-serif;
 }
 
-#version {
-  position: absolute;
-  top: 5px;
-  font-size: 0.8em;
-  right: 70px;
-  width:auto;
-}
 
-.button.graph {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-}
-
-.button.shareUrl {
-  position: absolute;
-  top: 5px;
-  right: 50px;
-}
 
 h3 {
   margin: 1px;

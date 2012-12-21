@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="console_assets/stylesheets/codemirror.css">
     <link rel="stylesheet" href="console_assets/stylesheets/cypher.css">
     <link rel="stylesheet" href="console_assets/stylesheets/datatable.css">
+    <link rel="stylesheet" href="console_assets/stylesheets/bootstrap.min.css">
     <title>Neo4j Console</title>
+    <script type="text/javascript" src="console_assets/javascripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/jquery-1.6.4.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/d3.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/visualization.js"></script>
@@ -18,41 +20,56 @@
     <script type="text/javascript" src="console_assets/javascripts/cypher.datatable.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/console.js"></script>
     <style type="text/css">
-      @import url("console_assets/stylesheets/main.css");
-      @import url("console_assets/stylesheets/highlight.css");
-      @import url("console_assets/stylesheets/d3.css");
-      @import url("console_assets/stylesheets/light.css_");
+        @import url("console_assets/stylesheets/main.css");
+        @import url("console_assets/stylesheets/highlight.css");
+        @import url("console_assets/stylesheets/d3.css");
+        @import url("console_assets/stylesheets/light.css_");
     </style>
     <script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-1192232-25']);
-  _gaq.push(['_trackPageview']);
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-1192232-25']);
+        _gaq.push(['_trackPageview']);
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
     </script>
-  </head>
-  <body>
-    <span id="welcome_msg" style="display:none;">
+</head>
+<body>
+<span id="welcome_msg" style="display:none;">
       <span class="welcome">	
         You can modify and query this graph by entering statements in the input field at the bottom.
-        For some syntax help hit the <img title="Info" onclick="$('#info').toggle();" class="button" src="console_assets/img/info.png"/> button.
-        If you want to share your graph, just do it with <img title="Share this graph" onclick="toggleShare();" class="button" src="console_assets/img/link.png"/>
+        For some syntax help hit the <img title="Info" onclick="$('#info').toggle();" class="button"
+                                          src="console_assets/img/info.png"/> button.
+        If you want to share your graph, just do it with <img title="Share this graph" onclick="toggleShare();"
+                                                              class="button" src="console_assets/img/link.png"/>
       </span>
     </span>
-    <div id="main">
-      <img title="Info" onclick="$('#info').toggle();" class="info button" src="console_assets/img/info.png"/>
-      <img title="Share this graph" onclick="toggleShare();" class="shareUrl button" src="console_assets/img/link.png"/>
-      <img title="Toggle Vizualization" onclick="toggleGraph();" class="graph button" src="console_assets/img/graph.png"/>
-      <select id="version" class="button">
-        <option selected="selected" value="" title="cypher parser version">latest</option>
-        <option value="1.9">v1.9</option>
-        <option value="1.8">v1.8</option>
-        <option value="1.7">v1.7</option>
-      </select>
+
+<div id="main">
+    <div class="navbar navbar-fixed-top pull-right">
+        <div class="pull-right">
+    
+            <div title="Info" onclick="$('#info').toggle();" class="btn_pretty">
+                Info
+            </div>
+            <div title="Share this graph" onclick="toggleShare();" class="btn_pretty">Share</div>
+            <div title="Toggle Vizualization" onclick="toggleGraph();" class="btn_pretty">Toggle Viz</div>
+            <select id="version" class="selectpicker">
+                <option selected="selected" value="">Latest Cypher syntax</option>
+                <option value="1.9">Cypher parser v1.9</option>
+                <option value="1.8">Cypher parser v1.8</option>
+                <option value="1.7">Cypher parser v1.7</option>
+            </select>
+            </span>
+            </div>
+        </div>
+
       <div id="output" class="console cm-s-cypher">
       </div>
       <form id="form" action="#">
