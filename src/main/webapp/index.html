@@ -42,15 +42,15 @@
 <span id="welcome_msg" style="display:none;">
       <span class="welcome">	
         You can modify and query this graph by entering statements in the input field at the bottom.
-        For some syntax help hit the <button onclick="toggleGraph();" class="btn_pretty">Toggle Viz</button> button.
+        For some syntax help hit the <button type="button" onclick="$('#info').toggle();" class="btn_pretty">Help</button> button.
         If you want to share your graph, just do it with <button onclick="toggleShare();" class="btn_pretty">Share</button>
       </span>
     </span>
 
 <div id="main">
-    <div style="float: right;">
+    <div style="position: absolute;top: 5px;right: 5px;">
 
-        <button type="button" onclick="$('#info').toggle();" class="btn_pretty">Info</button>
+        <button type="button" onclick="$('#info').toggle();" class="btn_pretty">Help</button>
         <button onclick="toggleShare();" class="btn_pretty">Share</button>
         <button onclick="toggleGraph();" class="btn_pretty">Toggle Viz</button>
         <select id="version" class="selectpicker">
@@ -71,6 +71,7 @@
     <!--div id="graph">
     </div-->
     <div id="info" class="popup">
+        <button type="button" onclick="$('#info').toggle();" style="position: absolute;right: 5px;" class="btn_pretty">Close</button>
         <h3>Welcome to the Neo4j Console</h3>
 
         <p>This is an interactive console (REPL) for graphs with integrated visualization.
@@ -104,6 +105,7 @@
             the database.</p>
     </div>
     <div id="shareUrl" class="popup">
+        <button type="button" onclick="$('#shareUrl').toggle();" style="position: absolute;right: 5px;" class="btn_pretty">Close</button>
         <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a> or <a href="#"
                                                                                                              onclick="export_graph('geoff');return false;">Geoff</a>):
         </h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>
