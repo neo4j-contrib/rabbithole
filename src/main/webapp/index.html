@@ -71,7 +71,7 @@
     <!--div id="graph">
     </div-->
     <div id="info" class="popup">
-        <button type="button" onclick="$('#info').toggle();" style="position: absolute;right: 5px;" class="btn_pretty">Close</button>
+        <button type="button" onclick="$('#info').toggle();" class="btn_pretty btn_close">Close</button>
         <h3>Welcome to the Neo4j Console</h3>
 
         <p>This is an interactive console (REPL) for graphs with integrated visualization.
@@ -105,7 +105,7 @@
             the database.</p>
     </div>
     <div id="shareUrl" class="popup">
-        <button type="button" onclick="$('#shareUrl').toggle();" style="position: absolute;right: 5px;" class="btn_pretty">Close</button>
+        <button type="button" onclick="$('#shareUrl').toggle();" class="btn_pretty btn_close">Close</button>
         <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a> or <a href="#"
                                                                                                              onclick="export_graph('geoff');return false;">Geoff</a>):
         </h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>

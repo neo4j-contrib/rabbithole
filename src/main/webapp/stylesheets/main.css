@@ -113,6 +113,12 @@ a:link, a:visited {
 #input {
 }
 
+.btn_close {
+    position: absolute;
+    right: 5px; 
+    top:5px;
+}
+
 #query_button {
     position: absolute;
     right: 1px;
