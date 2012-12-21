@@ -48,8 +48,9 @@ a:link, a:visited {
   position: absolute;
   background: none;
   z-index: 10;
-  top: 0;
+  top: 30px;
   right: 15px;
+    
   /*
   filter:alpha(opacity=20);
   -moz-opacity:0.2;

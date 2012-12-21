@@ -84,7 +84,7 @@ function viz(data) {
     }
     render("output", output.width(), output.height(), "/console/visualization?query=" + encodeURIComponent(query));
   }
-  graph.show();
+//  graph.show();
 }
 
 function reset(done) {
