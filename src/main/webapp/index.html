@@ -71,7 +71,7 @@
     <!--div id="graph">
     </div-->
     <div id="info" class="popup">
-        <button type="button" onclick="$('#info').toggle();" class="btn_pretty btn_close">Close</button>
+        <button type="button" class="btn_pretty btn_close">Close</button>
         <h3>Welcome to the Neo4j Console</h3>
 
         <p>This is an interactive console (REPL) for graphs with integrated visualization.
@@ -100,13 +100,17 @@
                 m,r</code></li>
         </ul>
         </p>
-        <iframe src="http://player.vimeo.com/video/56097037?badge=0" width="500" height="281" frameborder="0"
-                webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-        <p><a href="http://vimeo.com/56097037">Cypher Console 5min tutorial</a> from <a
-                href="http://vimeo.com/user1375223">Peter Neubauer</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+		<h4>Intro Video: How to use the Console efficiently</h4>
+        <img id='video' src="/img/play_button.jpg" video="http://player.vimeo.com/video/56097037" width="200" height="150" style="display:inline-block;border: 1px solid darkgrey;"/>
     </div>
+    <div id="player" class="popup">
+    	<button type="button" class="btn_pretty btn_close">Close</button>
+		<h3>Intro Video: How to use the Console efficiently</h3>
+    	<iframe frameborder="0"
+            webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+	</div>
     <div id="shareUrl" class="popup">
-        <button type="button" onclick="$('#shareUrl').toggle();" class="btn_pretty btn_close">Close</button>
+        <button type="button" class="btn_pretty btn_close">Close</button>
         <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a> or <a href="#"
                                                                                                              onclick="export_graph('geoff');return false;">Geoff</a>):
         </h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>

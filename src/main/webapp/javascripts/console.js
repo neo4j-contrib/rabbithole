@@ -295,6 +295,10 @@ function query() {
     send(getQuery());
 }
 
+function close(id) {
+   $(id).hide().children("iframe").removeAttr("src");
+}
+
 $(document).ready(function () {
   inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
     lineNumbers: false,
@@ -331,8 +335,15 @@ $(document).ready(function () {
 
   $("body").keyup(function(e) {
     if (e.which == 27) {
-      $(".popup").hide();
+      close(".popup");
     }
     return true;
   });
+  $("#video").click(function() {
+	  close("#info");
+      url=$(this).attr("video")+"?badge=0&title=0&portrait=0&autoplay=1&rel=0&byline=0";
+      $("#player").show();
+      $("#player iframe").attr("width",$("#player").width()).attr("height",$("#player").height()).attr("src",url);
+  })
+  $(".popup .btn_close").click(function() { close($(this).parent())})
 });
