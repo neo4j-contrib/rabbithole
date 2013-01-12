@@ -58,6 +58,10 @@ a:link, a:visited {
     */
 }
 
+#version {
+   display: none;
+}
+
 .popup {
     font-family: monospace;
     background-color: #202020;

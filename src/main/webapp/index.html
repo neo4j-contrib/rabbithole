@@ -53,6 +53,7 @@
         <button type="button" onclick="$('#info').toggle();" class="btn_pretty">Help</button>
         <button onclick="toggleShare();" class="btn_pretty">Share</button>
         <button onclick="toggleGraph();" class="btn_pretty">Toggle Viz</button>
+        <button onclick="$('#version').show();" class="btn_pretty">Options</button>
         <select id="version" class="selectpicker">
             <option selected="selected" value="">Latest Cypher syntax</option>
             <option value="1.9">Cypher parser v1.9</option>
@@ -151,7 +152,8 @@
         <a id="share_yuml" href="#" target="neo4j-console"><img src="console_assets/img/yUML.png" height="16"/></a>
         <br/>
         Paste HTML to embed in website (Adjust width and height):<br/>
-        <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/>
+        <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/><br/>
+        If you nee a fresh, blank console, <a target="_blank" class="btn_pretty" href="http://console.neo4j.org/?init=&amp;no_root=true">click here</a>. 
     </div>
 </body>
 </html>

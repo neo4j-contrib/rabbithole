@@ -327,7 +327,7 @@ $(document).ready(function () {
       showWelcome( json )
     }, "json" );
 
-  $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json")});
+  $('#version').change(function() { post("/console/version",$('#version').val(),showVersion,"json"); $(this).hide(); });
   var isInIFrame = window.location != window.parent.location;
   if (!isInIFrame) {
     inputeditor.focus();
