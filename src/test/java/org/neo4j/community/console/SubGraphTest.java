@@ -1,18 +1,25 @@
 package org.neo4j.community.console;
 
+import org.apache.commons.collections.MapUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.neo4j.graphalgo.impl.util.PathImpl;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
@@ -67,6 +74,34 @@ public class SubGraphTest {
     private CypherQueryExecutor.CypherResult result(String column, Object value) {
         final scala.collection.immutable.Map row = new scala.collection.immutable.HashMap().updated(column, value);
         return new CypherQueryExecutor.CypherResult(asList(column), (Iterable) asList(row), null,0);
+    }
+
+    @Test
+    public void testAddRelsWithInjectedNode() throws Exception {
+        SubGraph graph = new SubGraph();
+        final Relationship rel = mock(Relationship.class);
+        final Node node1 = mockNode(1L);
+        final Node node2 = mockNode(2L);
+        final Node node3 = mockNode(3L);
+        when(rel.getStartNode()).thenReturn((node1));
+        when(rel.getEndNode()).thenReturn((node3));
+        when(rel.getType()).thenReturn((DynamicRelationshipType.withName("TEST")));
+        when(rel.getPropertyKeys()).thenReturn(Collections.EMPTY_LIST);
+        graph.add(rel);
+        graph.add(node2);
+        assertEquals(3,graph.getNodes().size());
+        final Map<String, Object> relData = IteratorUtil.first(graph.getRelationshipsWithIndexedEnds().values());
+        assertEquals(1L,relData.get("start"));
+        assertEquals(3L,relData.get("end"));
+        assertEquals(0,relData.get("source"));
+        assertEquals(2,relData.get("target"));
+    }
+
+    private Node mockNode(long id) {
+        final Node node1 = mock(Node.class);
+        when(node1.getId()).thenReturn(id);
+        when(node1.getPropertyKeys()).thenReturn(Collections.EMPTY_LIST);
+        return node1;
     }
 
     @Test

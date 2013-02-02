@@ -43,9 +43,15 @@ public class SubGraph {
 
     public Map<String, Object> add(Relationship rel) {
         final long id = rel.getId();
-        if (relationships.containsKey(id)) return relationships.get(id);
+        if (relationships.containsKey(id)) {
+            return relationships.get(id);
+        }
         final Map<String, Object> data = toMap(rel);
+
         addRel(id, data);
+
+        add(rel.getStartNode());
+        add(rel.getEndNode());
         return data;
     }
 
@@ -59,6 +65,18 @@ public class SubGraph {
         data.put("type", rel.getType().name());
         return data;
     }
+    
+    private Map<String, Object> relWithIndexEnds(Map<String, Object> rel) {
+        if (rel.containsKey("type") && rel.containsKey("start") && rel.containsKey("end")) {
+            final Map<String, Object> result = new TreeMap<String, Object>(rel);
+            result.put("source", nodeIndex((Long)rel.get("start")));
+            result.put("target", nodeIndex((Long)rel.get("end")));
+            return result;
+        }
+        return rel;
+    } 
+    
+    
 
     private int nodeIndex(long nodeId) {
         return nodes.headMap(nodeId).size();
@@ -119,6 +137,15 @@ public class SubGraph {
 
     public Map<Long, Map<String, Object>> getRelationships() {
         return relationships;
+    }
+
+    public Map<Long, Map<String, Object>> getRelationshipsWithIndexedEnds() {
+        SortedMap<Long,Map<String,Object>> result=new TreeMap<Long, Map<String, Object>>();
+
+        for (Map.Entry<Long, Map<String, Object>> entry : relationships.entrySet()) {
+            result.put(entry.getKey(),relWithIndexEnds(entry.getValue()));
+        }
+        return result;
     }
 
     public SubGraph markSelection(CypherQueryExecutor.CypherResult result) {
