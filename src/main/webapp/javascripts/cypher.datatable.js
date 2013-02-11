@@ -63,8 +63,13 @@ function renderResult(id, data) {
     if (!data.stats.rows) return;
     var result = convertResult(data);
     var table=$('<table cellpadding="0" cellspacing="0" border="0" width="100%"></table>').appendTo($("#"+id));
+	var large=result.data.length > 10;
     var dataTable=table.dataTable({
         aoColumns: result.columns,
+		bFilter : large,
+		bInfo : large,
+		bLengthChange : large,
+		bPaginate : large,
         aaData: result.data,
         // bAutoWidth: true,
         aLengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],

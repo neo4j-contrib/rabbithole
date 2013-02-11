@@ -20,7 +20,7 @@ body {
     right: 0;
     color: #EEE;
     background-color: black;
-    font-family: monospace;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
     margin: 0;
     border: none;
     padding: 5px;
@@ -63,7 +63,7 @@ a:link, a:visited {
 }
 
 .popup {
-    font-family: monospace;
+  	font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
     background-color: #202020;
     color: #EEE;
     border: 2px solid #a9a9a9;
@@ -132,6 +132,7 @@ a:link, a:visited {
 }
 
 code {
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
     background-color: #3d3d3d;
 }
 

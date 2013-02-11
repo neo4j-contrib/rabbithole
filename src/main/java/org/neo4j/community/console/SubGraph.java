@@ -162,7 +162,7 @@ public class SubGraph {
         String column = entry.getKey();
         Object value = entry.getValue();
         if (value instanceof Iterable) {
-            for (Object inner : (Iterable)value) {
+	        for (Object inner : (Iterable)value) {
                 markNodeOrRel(column,inner);
             }
         } else {

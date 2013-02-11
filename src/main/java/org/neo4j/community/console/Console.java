@@ -17,8 +17,8 @@ public class Console
 {
 
     private static final String WEBAPP_LOCATION = "src/main/webapp/";
-    public static final int REQUEST_TIME_LIMIT = 10 * 1000;
-    public static final int MAX_OPS_LIMIT = 100000;
+    public static final int REQUEST_TIME_LIMIT = 5 * 1000;
+    public static final int MAX_OPS_LIMIT = 10000;
     private Server server;
     private final DatabaseInfo databaseInfo;
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Console.class);
