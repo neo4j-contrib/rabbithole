@@ -29,8 +29,8 @@ public class QueryStatisticsTest {
         final int rowCount = result.getRowCount();
         assertEquals(1, rowCount);
         final long time = result.getTime();
-        assertTrue("time", time < 10);
-        assertTrue("time", time > 0);
+        assertTrue("time "+time, time < 2000);
+        assertTrue("time "+time, time > 0);
         final Map stats = result.getQueryStatistics();
         assertEquals(2, stats.size());
         assertEquals(rowCount, stats.get("rows"));
@@ -44,7 +44,7 @@ public class QueryStatisticsTest {
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
-        assertTrue("time", time < 10);
+        assertTrue("time", time < 2000);
         assertTrue("time", time > 0);
         final Map stats = result.getQueryStatistics();
         assertEquals(9, stats.size());
@@ -63,7 +63,7 @@ public class QueryStatisticsTest {
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
-        assertTrue("time", time < 10);
+        assertTrue("time", time < 2000);
         assertTrue("time", time > 0);
         final Map stats = result.getQueryStatistics();
         assertEquals(9, stats.size());
@@ -82,7 +82,7 @@ public class QueryStatisticsTest {
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
-        assertTrue("time", time < 10);
+        assertTrue("time", time < 2000);
         assertTrue("time", time > 0);
         final Map stats = result.getQueryStatistics();
         assertEquals(9, stats.size());
