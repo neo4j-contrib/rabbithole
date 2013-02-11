@@ -58,7 +58,7 @@ public class ConsoleService {
         "Cypher-[:KNOWS]->Smith, " + 
         "Smith-[:CODED_BY]->Architect";
             
-    static final String DEFAULT_QUERY = "start n=node:node_auto_index(name='Neo') match n-[r:KNOWS|LOVES]-m return n as Neo,r,m";
+    static final String DEFAULT_QUERY = "start n=node:node_auto_index(name='Neo') match n-[r:KNOWS*]-m return n as Neo,r,m";
 
     private GraphStorage storage;
 

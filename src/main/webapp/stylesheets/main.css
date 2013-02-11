@@ -137,7 +137,8 @@ code {
 }
 
 .welcome {
-    font-family: sans-serif;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    font-size: 1.2em;
 }
 
 h3 {

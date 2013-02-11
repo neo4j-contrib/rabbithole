@@ -213,17 +213,20 @@ function computeInfo(data) {
     return info;
 }
 
+function inputQuery(query) {
+    inputeditor.setValue(query.replace(/\n/g, '').trim());
+    CodeMirror.commands["selectAll"](inputeditor);
+    autoFormatSelection(inputeditor);
+
+}
 function showResults(data) {
   if (data["init"]) {
     append($("#output"), "Graph Setup:");
     append($("#output"), data["init"],true);
-    // append($("#output"), "--------------------------------------------------------------------------------");
   }
   if (data["query"]) {
     append($("#output"),"\nQuery:");
-    inputeditor.setValue(data["query"].replace(/\n/g, '').trim());
-    CodeMirror.commands["selectAll"](inputeditor);
-    autoFormatSelection(inputeditor);
+    inputQuery(data["query"]);
     append($("#output"), inputeditor.getValue(),true);
     resizeOutput();
   }
@@ -322,6 +325,9 @@ $(document).ready(function () {
   });
   
   post( "/console/init", JSON.stringify( getParameters() ), function ( json ) {
+      // viz(json["visualization"]);
+      // inputQuery(json["query"]);
+      // resizeOutput();
       showResults( json );
       showVersion( json );
       showWelcome( json )
