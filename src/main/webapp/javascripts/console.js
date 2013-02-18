@@ -219,6 +219,10 @@ function inputQuery(query) {
     autoFormatSelection(inputeditor);
 
 }
+function infoImage(data) {
+   return $('<img src="/img/info.png"/>').attr('title',data.result).click(
+            function(){ window.prompt ("Query Result - Copy to clipboard: Ctrl+C, Enter", data.result); });
+}
 function showResults(data) {
   if (data["init"]) {
     append($("#output"), "Graph Setup:");
@@ -233,7 +237,9 @@ function showResults(data) {
   if (data["result"]) {
     append($("#output"),"\n");
     renderResult("output",data);
-    append($("#output"),computeInfo(data)+"\n");
+    append($("#output"),computeInfo(data));
+    $("#output").append(infoImage(data));
+    append($("#output"),"\n");
   }
   if (data["error"]) {
     append($("#output"), "Error: " + data["error"],true);
