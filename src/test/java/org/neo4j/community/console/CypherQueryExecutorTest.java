@@ -135,4 +135,27 @@ public class CypherQueryExecutorTest {
         final Map pathNode2 = (Map) path.get(2);
         assertEquals(10, pathNode2.get("age"));
     }
+
+    @Test
+    public void testReplaceIndex() throws Exception {
+        String queryAuto="start n=node:node_auto_index(name='foo') return n;";
+        assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryAuto));
+        String queryId="start n=node(3,4,5) return n;";
+        assertEquals(queryId,cypherQueryExecutor.replaceIndex(queryId));
+        String queryEmpty="start n=node:(name='foo') return n;";
+        assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryEmpty));
+        String queryPeople="start n=node:people(name='foo') return n;";
+        assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryPeople));
+        String queryPeople2="start n=node:`pe op-le`(name='foo') return n;";
+        assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryPeople2));
+        String queryPeopleAndEmails="start n=node:people(name='foo'),m=node:emails(subject='foo') return n,m;";
+        assertEquals("start n=node:node_auto_index(name='foo'),m=node:node_auto_index(subject='foo') return n,m;",cypherQueryExecutor.replaceIndex(queryPeopleAndEmails));
+        String queryPeopleAndEmailsWith="start n=node:people(name='foo') with n start m=node:emails(subject='foo') return n,m;";
+        assertEquals("start n=node:node_auto_index(name='foo') with n start m=node:node_auto_index(subject='foo') return n,m;",cypherQueryExecutor.replaceIndex(queryPeopleAndEmailsWith));
+
+        String queryRelAuto="start r=relationship:relationship_auto_index(name='foo') return r;";
+        String queryRels="start r=relationship:`lo v e s`(name='foo') return r;";
+        assertEquals(queryRelAuto,cypherQueryExecutor.replaceIndex(queryRels));
+
+    }
 }

@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
  */
 public class CypherQueryExecutor {
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
+    private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
     private ExecutionEngine executionEngine;
     private final Index index;
 
@@ -140,6 +141,7 @@ public class CypherQueryExecutor {
     }
 
     public CypherResult cypherQuery(String query, String version) {
+        query = replaceIndex(query);
         if (version==null || version.isEmpty()) return cypherQuery(query);
         return cypherQuery("CYPHER "+version+" "+query);
     }
@@ -165,6 +167,17 @@ public class CypherQueryExecutor {
     private void registerProperties(String query) {
         Set<String> properties = extractProperties(query);
         index.registerProperty(properties);
+    }
+    
+    String replaceIndex(String query) {
+        Matcher matcher = INDEX_PATTERN.matcher(query);
+        if (!matcher.find()) return query;
+        StringBuffer sb=new StringBuffer();
+        do  {
+            matcher.appendReplacement(sb,"$1:$1_auto_index(");
+        } while (matcher.find());
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     // TODO should get metadata from the cypher query
