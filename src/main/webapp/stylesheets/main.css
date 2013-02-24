@@ -3,6 +3,7 @@ body {
     left: 1px;
     bottom: 1px;
     right: 1px;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
 }
 
 body, html, div, form, input {
@@ -60,6 +61,10 @@ a:link, a:visited {
 
 #version {
    display: none;
+}
+
+pre {
+  font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
 }
 
 .popup {

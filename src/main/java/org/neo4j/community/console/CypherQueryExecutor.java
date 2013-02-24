@@ -2,6 +2,7 @@ package org.neo4j.community.console;
 
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
+import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -41,13 +42,15 @@ public class CypherQueryExecutor {
         private String text;
         private final Collection<Map<String, Object>> rows;
         private QueryStatistics queryStatistics;
+        private final PlanDescription plan;
         private final long time;
 
-        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time) {
+        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan) {
             this.columns = columns;
             this.queryStatistics = queryStatistics;
             this.time = time;
             this.rows = rows;
+            this.plan = plan;
         }
 
         public List<String> getColumns() {
@@ -83,7 +86,15 @@ public class CypherQueryExecutor {
         }
 
         private String generateText() {
-            return new ResultPrinter().generateText(columns,rows,time,queryStatistics);
+            return new ResultPrinter().generateText(columns, rows, time, queryStatistics);
+        }
+
+        public Collection<Map<String, Object>> getRows() {
+            return rows;
+        }
+
+        public String getPlan() {
+            return plan!=null ? plan.toString() : "No Query Plan";
         }
 
         @Override
@@ -152,10 +163,10 @@ public class CypherQueryExecutor {
         }
         query = removeSemicolon( query );
         long time=System.currentTimeMillis();
-        final ExecutionResult result = executionEngine.execute(query);
+        final ExecutionResult result = executionEngine.profile(query);
         final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
         time=System.currentTimeMillis()-time;
-        return new CypherResult(result.columns(), data, result.getQueryStatistics(),time);
+        return new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription());
     }
 
     private String removeSemicolon( String query )

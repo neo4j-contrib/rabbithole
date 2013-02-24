@@ -220,8 +220,12 @@ function inputQuery(query) {
 
 }
 function infoImage(data) {
-   return $('<img src="/img/info.png"/>').attr('title',data.result).click(
-            function(){ window.prompt ("Query Result - Copy to clipboard: Ctrl+C, Enter", data.result); });
+   var text="";
+   for (var title in data) {
+       if (data.hasOwnProperty(title)) text+="<h4>"+title+"</h4>"+data[title]+"\n";
+   }
+   return $('<img src="/img/info.png"/>').attr('title',text).click(
+            function(){ $('#stats-output').html(text); $('#stats').show(); });
 }
 function showResults(data) {
   if (data["init"]) {
@@ -238,7 +242,7 @@ function showResults(data) {
     append($("#output"),"\n");
     renderResult("output",data);
     append($("#output"),computeInfo(data));
-    $("#output").append(infoImage(data));
+    $("#output").append(infoImage({"Query Results":data.result,"Execution Plan":data.plan}));
     append($("#output"),"\n");
   }
   if (data["error"]) {

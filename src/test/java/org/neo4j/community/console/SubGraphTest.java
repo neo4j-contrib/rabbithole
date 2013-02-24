@@ -72,7 +72,7 @@ public class SubGraphTest {
 
     private CypherQueryExecutor.CypherResult result(String column, Object value) {
         final Map<String, Object> row = Collections.singletonMap(column, value);
-        return new CypherQueryExecutor.CypherResult(asList(column), asList(row), null, 0);
+        return new CypherQueryExecutor.CypherResult(asList(column), asList(row), null, 0, null);
     }
 
     @Test
