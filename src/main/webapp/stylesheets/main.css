@@ -95,7 +95,7 @@ pre {
     box-shadow: 0 0 4px #000;
     border: none;
     background-color: #606060;
-    padding: 5px;
+    padding: 3px;
     display: inline-block;
     text-decoration: none;
     color: #Fff;
@@ -116,7 +116,7 @@ pre {
 .button {
     z-index: 100;
     width: 16px;
-    height: 16px;
+    height: 14px;
 }
 
 #input {

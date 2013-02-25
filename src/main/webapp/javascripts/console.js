@@ -224,7 +224,7 @@ function infoImage(data) {
    for (var title in data) {
        if (data.hasOwnProperty(title)) text+="<h4>"+title+"</h4>"+data[title]+"\n";
    }
-   return $('<img src="/img/info.png"/>').attr('title',text).click(
+   return $('<button class="btn_pretty">Result Details</button>').attr('title',text).click(
             function(){ $('#stats-output').html(text); $('#stats').show(); });
 }
 function showResults(data) {
