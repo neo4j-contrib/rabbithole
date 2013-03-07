@@ -5,6 +5,7 @@ import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IteratorUtil;
@@ -24,8 +25,9 @@ public class CypherQueryExecutor {
     private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
     private ExecutionEngine executionEngine;
     private final Index index;
-
+	private final GraphDatabaseService gdb;
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
+	    this.gdb = gdb;
         this.index = index;
         executionEngine = new ExecutionEngine(gdb, StringLogger.SYSTEM);
     }
@@ -163,10 +165,17 @@ public class CypherQueryExecutor {
         }
         query = removeSemicolon( query );
         long time=System.currentTimeMillis();
-        final ExecutionResult result = executionEngine.profile(query);
-        final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
-        time=System.currentTimeMillis()-time;
-        return new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription());
+        Transaction tx = gdb.beginTx();
+        try {
+            final ExecutionResult result = executionEngine.profile(query);
+            final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
+            time=System.currentTimeMillis()-time;
+            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription());
+    		tx.success();
+            return cypherResult;
+    	} finally {
+			tx.finish();
+		}
     }
 
     private String removeSemicolon( String query )
