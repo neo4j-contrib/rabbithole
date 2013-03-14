@@ -124,6 +124,11 @@ pre {
 #input {
 }
 
+#stats, #info, #shareUrl {
+    position:absolute;
+    z-index: 200;
+}
+
 .btn_close {
     z-index: 100;
     position: absolute;
