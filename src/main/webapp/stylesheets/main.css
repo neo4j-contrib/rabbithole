@@ -91,6 +91,7 @@ pre {
 }
 
 .btn_pretty {
+    z-index: 100;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -124,6 +125,7 @@ pre {
 }
 
 .btn_close {
+    z-index: 100;
     position: absolute;
     right: 5px; 
     top:5px;
