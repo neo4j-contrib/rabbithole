@@ -42,6 +42,10 @@ a:link, a:visited {
     word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
+#form, #query_button, #form .CodeMirror {
+	z-index: 100;
+}
+
 #graph {
     /* display:none; */
     width: 50%;
