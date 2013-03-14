@@ -47,7 +47,7 @@ function visualize(id,w,h,data) {
         .attr("id", "graph")
         .attr("width", w/2)
         .attr("height", h)
-        .attr("style","pointer-events:auto; margin-left:"+w/2);
+        .attr("style","pointer-events:fill; margin-left:"+w/2);
 
 
     var force = self.force = d3.layout.force()

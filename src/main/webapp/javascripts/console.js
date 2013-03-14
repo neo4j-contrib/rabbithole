@@ -76,7 +76,8 @@ function viz(data) {
   var output = $("#output");
   output.children('#graph').remove();
   if (data) {
-    visualize("output", output.width(), output.height(),data)
+	var h=output.height();
+    visualize("output", output.width(), h,data)
   } else {
     var query = getQuery();
     if (!isCypher(query)) {
