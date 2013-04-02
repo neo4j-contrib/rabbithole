@@ -154,7 +154,7 @@ public class CypherQueryExecutor {
     }
 
     public CypherResult cypherQuery(String query, String version) {
-        query = replaceIndex(query);
+        // query = replaceIndex(query);
         if (version==null || version.isEmpty()) return cypherQuery(query);
         return cypherQuery("CYPHER "+version+" "+query);
     }
