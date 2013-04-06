@@ -1,6 +1,7 @@
 package org.neo4j.community.console;
 
 import com.google.gson.Gson;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Ignore;
@@ -31,6 +32,11 @@ public class CypherQueryExecutorTest {
     public void setUp() throws Exception {
         gdb = new ImpermanentGraphDatabase();
         cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        gdb.shutdown();
     }
 
     @Test

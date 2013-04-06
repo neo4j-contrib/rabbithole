@@ -6,12 +6,12 @@ CodeMirror.defineMode("cypher", function(config) {
   var indentUnit = config.indentUnit;
   var curPunc;
 
-  var funcs = wordRegexp(["str", "min", "max", "type", "lower", "upper", "length", "type", "id",
+  var funcs = wordRegexp(["str", "min", "labels", "max", "type", "lower", "upper", "length", "type", "id",
     "coalesce", "head", "last", "nodes", "relationships", "extract", "filter", "tail", "range",
     "reduce", "abs", "round", "sqrt", "sign", "replace", "substring", "left", "right", "ltrim", 
     "rtrim", "trim", "collect", "distinct"]);
   var preds = wordRegexp(["all", "any", "none", "single", "not", "in", "has", "and", "or"]);
-  var keywords = wordRegexp(["start", "match", "where", "with", "limit", "skip", "order", "by",
+  var keywords = wordRegexp(["start", "match", "index on","drop","where", "with", "limit", "skip", "order", "by",
     "return", "create", "delete", "set", "unique"]);
   var operatorChars = /[*+\-<>=&|~]/;
 

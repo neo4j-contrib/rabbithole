@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -21,6 +22,11 @@ public class QueryStatisticsTest {
     public void setUp() throws Exception {
         gdb = new ImpermanentGraphDatabase();
         cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        gdb.shutdown();
     }
 
     @Test

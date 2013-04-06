@@ -1,11 +1,13 @@
 package org.neo4j.community.console;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.rest.graphdb.entity.RestNode;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
 import static java.util.Arrays.asList;
+import static org.neo4j.graphdb.DynamicLabel.label;
 
 /**
  * @author mh
@@ -38,7 +40,19 @@ public class SubGraph {
     private Map<String, Object> toMap(Node node) {
         final Map<String, Object> data = toMap((PropertyContainer) node);
         data.put("id", node.getId());
+        final List<String> labelNames = getLabelNames(node);
+        if (!labelNames.isEmpty()) data.put("labels",labelNames);
         return data;
+    }
+
+    public static List<String> getLabelNames(Node node) {
+        List<String> labelNames = new ArrayList<String>();
+        if (!(node instanceof RestNode)) {
+            for (Label label : node.getLabels()) {
+                labelNames.add(label.name());
+            }
+        }
+        return labelNames;
     }
 
     public Map<String, Object> add(Relationship rel) {
@@ -285,7 +299,7 @@ public class SubGraph {
     }
 
     private void importRels(GraphDatabaseService gdb, Map<Long, Long> nodeMapping) {
-        final HashSet<String> relSkipProps = new HashSet<String>(asList("id", "start", "end", "type"));
+        final HashSet<String> relSkipProps = new HashSet<String>(asList("id", "start", "end", "type","labels"));
         for (Map<String, Object> relData : getRelationships().values()) {
             Long start = (Long) relData.get("start");
             final Node startNode = gdb.getNodeById(nodeMapping.get(start));
@@ -300,15 +314,25 @@ public class SubGraph {
     private Map<Long, Long> importNodes(GraphDatabaseService gdb, boolean hasReferenceNode) {
         Map<Long,Long> nodeMapping=new HashMap<Long, Long>();
         if (hasReferenceNode) nodeMapping.put(0L,0L);
-        final Set<String> nodeSkipProps = Collections.singleton("id");
+        final List<String> nodeSkipProps = Arrays.asList("id", "labels");
         for (Map.Entry<Long, Map<String, Object>> nodeData : getNodes().entrySet()) {
             final Long nodeDataId = nodeData.getKey();
             if (!nodeMapping.containsKey(nodeDataId)) {
                 nodeMapping.put(nodeDataId, gdb.createNode().getId());
             }
-            setProperties(gdb.getNodeById(nodeMapping.get(nodeDataId)), nodeData.getValue(), nodeSkipProps);
+            final Node node = gdb.getNodeById(nodeMapping.get(nodeDataId));
+            final Map<String, Object> data = nodeData.getValue();
+            setProperties(node, data, nodeSkipProps);
+            setLabels(node, (Collection<String>) data.get("labels"));
         }
         return nodeMapping;
+    }
+
+    private void setLabels(Node node, final Collection<String> labels) {
+        if (labels==null || labels.isEmpty()) return;
+        for (String label : labels) {
+            node.addLabel(label(label));
+        }
     }
 
     private void setProperties(PropertyContainer pc, Map<String, Object> props, final Collection<String> skipProps) {

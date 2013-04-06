@@ -43,7 +43,11 @@ function convertCell(cell) {
         if (cell["_type"]) {
             return "("+cell["_start"]+")-["+cell["_id"]+":" + cell["_type"] + props(cell)+"]->("+cell["_end"]+")";
         } else {
-            return "(" + cell["_id"] + props(cell)+")";
+            var labels="";
+            if (cell["_labels"]) {
+                labels=":"+cell["_labels"].join(":");
+            }
+            return "(" + cell["_id"] + labels + props(cell)+")";
         }
     }
     return cell;

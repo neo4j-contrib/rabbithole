@@ -36,7 +36,7 @@ public class CypherQueryExecutor {
         return query.matches("(?is).*\\b(create|relate|delete|set)\\b.*");
     }
     public boolean isCypherQuery(String query) {
-        return query.matches("(?is).*\\b(start|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
+        return query.matches("(?is).*\\b(drop|start|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
     }
 
     public static class CypherResult implements Iterable<Map<String, Object>> {
@@ -127,6 +127,9 @@ public class CypherQueryExecutor {
                 final Node node = (Node) value;
                 final Map<String, Object> result = SubGraph.toMap(node);
                 result.put("_id",node.getId());
+
+                final List<String> labelNames = SubGraph.getLabelNames(node);
+                if (!labelNames.isEmpty()) result.put("_labels", labelNames);
                 return result;
             }
             if (value instanceof Relationship) {

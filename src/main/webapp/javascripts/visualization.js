@@ -31,16 +31,24 @@ function toString(ob) {
 	return ret+"id: "+ob.id;
 }
 
+function labels(ob) {
+    if (!ob.labels || ob.labels.length==0) return "";
+    return ":"+ ob.labels.join(":")+" ";
+}
+
 function title(ob) {
-	if (ob.name) return ob.name;
-	if (ob.title) return ob.title;
-	for (var prop in ob) {
-		if (ignore.hasOwnProperty(prop)) continue;
-		if (ob.hasOwnProperty(prop)) {
-			return ob[prop];
-		}
-	}
-	return ob.id;
+    function _title(ob) {
+        if (ob.name) return ob.name;
+       	if (ob.title) return ob.title;
+       	for (var prop in ob) {
+       		if (ignore.hasOwnProperty(prop) || prop == "labels") continue;
+       		if (ob.hasOwnProperty(prop)) {
+       			return ob[prop];
+       		}
+       	}
+       	return ob.id;
+    }
+    return labels(ob)+ _title(ob);
 }
 function visualize(id,w,h,data) {
     var vis = d3.select("#"+id).append("svg")

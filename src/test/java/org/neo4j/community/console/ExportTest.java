@@ -1,5 +1,7 @@
 package org.neo4j.community.console;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -12,15 +14,26 @@ import static org.junit.Assert.assertEquals;
  * @since 27.05.12
  */
 public class ExportTest {
+
+    private ImpermanentGraphDatabase gdb;
+
+    @Before
+    public void setUp() throws Exception {
+        gdb = new ImpermanentGraphDatabase();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        gdb.shutdown();
+    }
+
     @Test
     public void testSimpleToYuml() throws Exception {
-        final ImpermanentGraphDatabase gdb = new ImpermanentGraphDatabase();
         final String res = new YumlExport().toYuml(SubGraph.from(gdb));
         assertEquals("[0],", res);
     }
     @Test
     public void testPropsToYuml() throws Exception {
-        final ImpermanentGraphDatabase gdb = new ImpermanentGraphDatabase();
         gdb.beginTx();
         gdb.getReferenceNode().setProperty("name","root");
         final String res = new YumlExport().toYuml(SubGraph.from(gdb));
@@ -29,7 +42,6 @@ public class ExportTest {
     }
     @Test
     public void testNamedGraphToYuml() throws Exception {
-        final ImpermanentGraphDatabase gdb = new ImpermanentGraphDatabase();
         gdb.beginTx();
         gdb.getReferenceNode().setProperty("name","root");
         final Node n1 = gdb.createNode();
@@ -50,7 +62,6 @@ public class ExportTest {
     }
     @Test
     public void testIdPropsToYuml() throws Exception {
-        final ImpermanentGraphDatabase gdb = new ImpermanentGraphDatabase();
         gdb.beginTx();
         gdb.getReferenceNode().setProperty("name","root");
         final String res = new YumlExport().toYuml(SubGraph.from(gdb), "name");
@@ -59,7 +70,6 @@ public class ExportTest {
     }
     @Test
     public void testGraphToYuml() throws Exception {
-        final ImpermanentGraphDatabase gdb = new ImpermanentGraphDatabase();
         gdb.beginTx();
         final Node n1 = gdb.createNode();
         gdb.getReferenceNode().createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));

@@ -76,9 +76,16 @@ class CypherExportService {
     private void appendNode(StringBuilder sb, Node node) {
         sb.append("(");
         formatNode(sb, node);
+        formatLabels(sb, node);
         sb.append(" ");
         formatProperties(sb, node);
         sb.append(")");
+    }
+
+    private void formatLabels(StringBuilder sb, Node node) {
+        for (Label label : node.getLabels()) {
+            sb.append(":").append(label.name());
+        }
     }
 
     private boolean isReferenceNode(Node node) {

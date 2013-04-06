@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphalgo.impl.util.PathImpl;
@@ -31,6 +32,11 @@ public class SubGraphTest {
     public void setUp() throws Exception {
         gdb = new ImpermanentGraphDatabase();
         gdb.beginTx();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        gdb.shutdown();
     }
 
     @Test
@@ -100,6 +106,7 @@ public class SubGraphTest {
         final Node node1 = mock(Node.class);
         when(node1.getId()).thenReturn(id);
         when(node1.getPropertyKeys()).thenReturn(Collections.EMPTY_LIST);
+        when(node1.getLabels()).thenReturn(Collections.EMPTY_LIST);
         return node1;
     }
 
