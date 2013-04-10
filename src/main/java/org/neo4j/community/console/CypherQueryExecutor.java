@@ -4,10 +4,7 @@ import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.StringLogger;
@@ -125,7 +122,7 @@ public class CypherQueryExecutor {
         private Object toJsonCompatible(Object value) {
             if (value instanceof Node) {
                 final Node node = (Node) value;
-                final Map<String, Object> result = SubGraph.toMap(node);
+                final Map<String, Object> result = SubGraph.toMap((PropertyContainer)node);
                 result.put("_id",node.getId());
 
                 final List<String> labelNames = SubGraph.getLabelNames(node);
@@ -134,7 +131,7 @@ public class CypherQueryExecutor {
             }
             if (value instanceof Relationship) {
                 final Relationship relationship = (Relationship) value;
-                final Map<String, Object> result = SubGraph.toMap(relationship);
+                final Map<String, Object> result = SubGraph.toMap((PropertyContainer) relationship);
                 result.put("_id",relationship.getId());
                 result.put("_start",relationship.getStartNode().getId());
                 result.put("_end",relationship.getEndNode().getId());

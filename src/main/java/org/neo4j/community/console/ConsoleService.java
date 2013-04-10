@@ -6,6 +6,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;
@@ -111,7 +112,9 @@ public class ConsoleService {
                     service.initCypherQuery(init);
                     data.put("graph",service.exportToGeoff());
                 } else {
-                    data.put("graph", service.mergeGeoff(init));
+                    final Map<String,Object> graph = service.mergeGeoff(init);
+
+                    data.put("graph", service.exportToJson(graph));
                 }
                 service.setInitialized();
             }

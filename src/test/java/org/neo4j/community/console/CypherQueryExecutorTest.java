@@ -86,7 +86,7 @@ public class CypherQueryExecutorTest {
     }
     @Test
     public void testAdhereToNoCypherVersion() throws Exception {
-        cypherQueryExecutor.cypherQuery("create (n {})",null);
+        cypherQueryExecutor.cypherQuery("create (n:Foo {})",null);
     }
 
     @Test

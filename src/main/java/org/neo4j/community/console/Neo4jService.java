@@ -1,14 +1,9 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.kernel.lifecycle.LifecycleException;
+import org.neo4j.graphdb.*;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.net.MalformedURLException;
@@ -16,6 +11,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
@@ -87,7 +83,7 @@ class Neo4jService {
         return cypherExportService.export();
     }
 
-    public Map mergeGeoff(String geoff) {
+    public Map<String,Object> mergeGeoff(String geoff) {
         try {
             final Map<String,Object> result = new LinkedHashMap<String, Object>();
             for (Map.Entry<String, PropertyContainer> entry : geoffService.mergeGeoff(geoff).entrySet()) {
@@ -214,5 +210,23 @@ class Neo4jService {
 
     public void setInitialized() {
         this.initialized = true;
+    }
+
+    public Map exportToJson(Map<String, Object> graph) {
+        Map<String,Map<String,Object>> result=new HashMap<String, Map<String, Object>>(graph.size());
+        for (Map.Entry<String, Object> entry : graph.entrySet()) {
+            Map<String, Object> data = null;
+            if (entry.getValue() instanceof Map) {
+                //noinspection unchecked
+                data = (Map<String, Object>) entry.getValue();
+            }
+            if (entry.getValue() instanceof PropertyContainer) {
+                final PropertyContainer value = (PropertyContainer) entry.getValue();
+                if (value instanceof Node) data=SubGraph.toMap((Node)value);
+                if (value instanceof Relationship) data=SubGraph.toMap((Relationship)value);
+            }
+            if (data!=null) result.put(entry.getKey(),data);
+        }
+        return result;
     }
 }

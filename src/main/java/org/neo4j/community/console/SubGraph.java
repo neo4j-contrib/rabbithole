@@ -37,7 +37,7 @@ public class SubGraph {
         nodes.put(id, data);
     }
 
-    private Map<String, Object> toMap(Node node) {
+    public static Map<String, Object> toMap(Node node) {
         final Map<String, Object> data = toMap((PropertyContainer) node);
         data.put("id", node.getId());
         final List<String> labelNames = getLabelNames(node);
@@ -61,7 +61,7 @@ public class SubGraph {
             return relationships.get(id);
         }
         final Map<String, Object> data = toMap(rel);
-
+        addResolvedNodeIndexes(data,rel);
         addRel(id, data);
 
         add(rel.getStartNode());
@@ -69,17 +69,21 @@ public class SubGraph {
         return data;
     }
 
-    private Map<String, Object> toMap(Relationship rel) {
+    private Map<String, Object> addResolvedNodeIndexes(Map<String, Object> data, Relationship rel) {
+        data.put("source", nodeIndex(rel.getStartNode().getId()));
+        data.put("target", nodeIndex(rel.getEndNode().getId()));
+        return data;
+    }
+
+    public static Map<String, Object> toMap(Relationship rel) {
         final Map<String, Object> data = toMap((PropertyContainer) rel);
         data.put("id", rel.getId());
         data.put("start", rel.getStartNode().getId());
         data.put("end", rel.getEndNode().getId());
-        data.put("source", nodeIndex(rel.getStartNode().getId()));
-        data.put("target", nodeIndex(rel.getEndNode().getId()));
         data.put("type", rel.getType().name());
         return data;
     }
-    
+
     private Map<String, Object> relWithIndexEnds(Map<String, Object> rel) {
         if (rel.containsKey("type") && rel.containsKey("start") && rel.containsKey("end")) {
             final Map<String, Object> result = new TreeMap<String, Object>(rel);
@@ -341,5 +345,4 @@ public class SubGraph {
             pc.setProperty(prop.getKey(), prop.getValue());
         }
     }
-
 }
