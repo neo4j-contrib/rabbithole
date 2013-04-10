@@ -36,29 +36,42 @@ public class ConsoleService {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConsoleService.class);
 
-    private static final String DEFAULT_GRAPH_GEOFF = "(Neo) {\"name\": \"Neo\"} (Morpheus) {\"name\": \"Morpheus\"} " +
-            "(Trinity) {\"name\": \"Trinity\"} (Cypher) {\"name\": \"Cypher\"} (Smith) {\"name\": \"Agent Smith\"} " +
-            "(Architect) {\"name\":\"The Architect\"} (0)-[:ROOT]->(Neo) (Neo)-[:KNOWS]->(Morpheus) " +
-            "(Neo)-[:LOVES]->(Trinity) (Morpheus)-[:KNOWS]->(Trinity) (Morpheus)-[:KNOWS]->(Cypher) " +
-            "(Cypher)-[:KNOWS]->(Smith) (Smith)-[:CODED_BY]->(Architect)";
-    static final String DEFAULT_GRAPH_CYPHER = 
+//    static final String DEFAULT_GRAPH_CYPHER =
+//        "start root=node(0)\n" +
+//        "create " +
+//        "(Neo:Crew {name:'Neo'}), " +
+//        "(Morpheus:Crew {name: 'Morpheus'}), " +
+//        "(Trinity:Crew {name: 'Trinity'}), " +
+//        "(Cypher:Crew:Matrix {name: 'Cypher'}), " +
+//        "(Smith:Matrix {name: 'Agent Smith'}), " +
+//        "(Architect:Matrix {name:'The Architect'}),\n" +
+//        "root-[:ROOT]->Neo, " +
+//        "Neo-[:KNOWS]->Morpheus, " +
+//        "Neo-[:LOVES]->Trinity, " +
+//        "Morpheus-[:KNOWS]->Trinity,\n" +
+//        "Morpheus-[:KNOWS]->Cypher, " +
+//        "Cypher-[:KNOWS]->Smith, " +
+//        "Smith-[:CODED_BY]->Architect";
+
+    static final String DEFAULT_GRAPH_CYPHER =
         "start root=node(0)\n" +
         "create " +
-        "(Neo:Crew {name:'Neo'}), " +
-        "(Morpheus:Crew {name: 'Morpheus'}), " +
-        "(Trinity:Crew {name: 'Trinity'}), " +
-        "(Cypher:Crew:Matrix {name: 'Cypher'}), " +
-        "(Smith:Matrix {name: 'Agent Smith'}), " +
-        "(Architect:Matrix {name:'The Architect'}),\n" +
-        "root-[:ROOT]->Neo, " + 
+        "(Neo {name:'Neo'}), " +
+        "(Morpheus {name: 'Morpheus'}), " +
+        "(Trinity {name: 'Trinity'}), " +
+        "(Cypher {name: 'Cypher'}), " +
+        "(Smith {name: 'Agent Smith'}), " +
+        "(Architect {name:'The Architect'}),\n" +
+        "root-[:ROOT]->Neo, " +
         "Neo-[:KNOWS]->Morpheus, " +
-        "Neo-[:LOVES]->Trinity, " + 
+        "Neo-[:LOVES]->Trinity, " +
         "Morpheus-[:KNOWS]->Trinity,\n" +
         "Morpheus-[:KNOWS]->Cypher, " +
-        "Cypher-[:KNOWS]->Smith, " + 
+        "Cypher-[:KNOWS]->Smith, " +
         "Smith-[:CODED_BY]->Architect";
-            
-    static final String DEFAULT_QUERY = "match n:Crew-[r:KNOWS*]-m where n.name='Neo' return n as Neo,r,m";
+
+    static final String DEFAULT_QUERY = "start n=node:node_auto_index(name='Neo') match n-[r:KNOWS*]-m return n as Neo,r,m";
+    //static final String DEFAULT_QUERY = "match n:Crew-[r:KNOWS*]-m where n.name='Neo' return n as Neo,r,m";
 
     private GraphStorage storage;
 
