@@ -8,6 +8,8 @@ import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
@@ -106,7 +108,11 @@ public class SubGraphTest {
         final Node node1 = mock(Node.class);
         when(node1.getId()).thenReturn(id);
         when(node1.getPropertyKeys()).thenReturn(Collections.EMPTY_LIST);
-        when(node1.getLabels()).thenReturn(Collections.EMPTY_LIST);
+        final ResourceIterable resourceIterable = mock(ResourceIterable.class);
+        final ResourceIterator resourceIterator = mock(ResourceIterator.class);
+        when(resourceIterator.hasNext()).thenReturn(false);
+        when(resourceIterable.iterator()).thenReturn(resourceIterator);
+        when(node1.getLabels()).thenReturn(resourceIterable);
         return node1;
     }
 
