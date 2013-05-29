@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphalgo.impl.util.PathImpl;
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
@@ -108,11 +109,7 @@ public class SubGraphTest {
         final Node node1 = mock(Node.class);
         when(node1.getId()).thenReturn(id);
         when(node1.getPropertyKeys()).thenReturn(Collections.EMPTY_LIST);
-        final ResourceIterable resourceIterable = mock(ResourceIterable.class);
-        final ResourceIterator resourceIterator = mock(ResourceIterator.class);
-        when(resourceIterator.hasNext()).thenReturn(false);
-        when(resourceIterable.iterator()).thenReturn(resourceIterator);
-        when(node1.getLabels()).thenReturn(resourceIterable);
+        when(node1.getLabels()).thenReturn(new EmptyResourceIterable<Label>());
         return node1;
     }
 
