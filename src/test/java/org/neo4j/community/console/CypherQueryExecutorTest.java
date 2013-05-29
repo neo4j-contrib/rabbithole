@@ -18,6 +18,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItems;
+import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh
@@ -86,6 +87,14 @@ public class CypherQueryExecutorTest {
     @Test
     public void testAdhereToNoCypherVersion() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})",null);
+    }
+
+    @Test
+    public void testWorksWithMerge() throws Exception {
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("merge (n {name:'foobar'}) return n.name", null);
+        assertEquals(1,result.getRowCount());
+        final Object value = result.getRows().iterator().next().get("n.name");
+        assertEquals("foobar", value);
     }
 
     @Test
