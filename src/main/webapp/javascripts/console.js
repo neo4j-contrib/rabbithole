@@ -275,8 +275,10 @@ function welcome_msg() {
 
 function showWelcome(json) {
   var output = $("#output");
+  console.log("showWelcome",json);
+
   if (json['message']) {
-      output.append( $(json['message']) );
+      if (json['message'] != "none") output.append( json['message'] );
   } else {
     output.append( welcome_msg() );
   }
