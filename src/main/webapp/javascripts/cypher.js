@@ -11,7 +11,7 @@ CodeMirror.defineMode("cypher", function(config) {
     "reduce", "abs", "round", "sqrt", "sign", "replace", "substring", "left", "right", "ltrim", 
     "rtrim", "trim", "collect", "distinct"]);
   var preds = wordRegexp(["all", "any", "none", "single", "not", "in", "has", "and", "or"]);
-  var keywords = wordRegexp(["start", "match", "index on","drop","where", "with", "limit", "skip", "order", "by",
+  var keywords = wordRegexp(["start", "merge","using","on create","on match","match", "index on","drop","where", "with", "limit", "skip", "order", "by",
     "return", "create", "delete", "set", "unique"]);
   var operatorChars = /[*+\-<>=&|~]/;
 

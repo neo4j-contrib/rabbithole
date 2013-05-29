@@ -33,10 +33,10 @@ public class CypherQueryExecutor {
     }
 
     public boolean isMutatingQuery(String query) {
-        return query.matches("(?is).*\\b(create|relate|delete|set)\\b.*");
+        return query.matches("(?is).*\\b(create|relate|merge|delete|set)\\b.*");
     }
     public boolean isCypherQuery(String query) {
-        return query.matches("(?is).*\\b(drop|start|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
+        return query.matches("(?is).*\\b(drop|start|merge|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
     }
 
     public static class CypherResult implements Iterable<Map<String, Object>> {

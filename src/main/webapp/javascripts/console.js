@@ -66,7 +66,7 @@ function share(fn) {
 }
 
 function isCypher(query) {
-  return query && query.match(/\b(start|match|foreach|drop|create|delete|relate)\b/i);
+  return query && query.match(/\b(start|merge|match|foreach|drop|create|delete|relate)\b/i);
 }
 
 function viz(data) {
