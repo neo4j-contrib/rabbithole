@@ -48,7 +48,7 @@ public class CypherQueryExecutor {
         private final long time;
 
         public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan) {
-            this.columns = columns;
+            this.columns = new ArrayList<String>(columns);
             this.queryStatistics = queryStatistics;
             this.time = time;
             this.rows = rows;

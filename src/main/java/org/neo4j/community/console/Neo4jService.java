@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.neo4j.graphdb.PropertyContainer;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -13,10 +14,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
+import static org.neo4j.helpers.collection.MapUtil.toMap;
 
 /**
 * @author mh
@@ -74,7 +77,11 @@ class Neo4jService {
 
     public Map mergeGeoff(String geoff) {
         try {
-            return geoffService.mergeGeoff(geoff);
+            final Map<String,Object> result = new LinkedHashMap<String, Object>();
+            for (Map.Entry<String, PropertyContainer> entry : geoffService.mergeGeoff(geoff).entrySet()) {
+                result.put(entry.getKey(),geoffExportService.toMap(entry.getValue()));
+            }
+            return result;
         } catch (SubgraphError subgraphError) {
             throw new RuntimeException("Error merging:\n"+geoff,subgraphError);
         } catch (SyntaxError syntaxError) {
