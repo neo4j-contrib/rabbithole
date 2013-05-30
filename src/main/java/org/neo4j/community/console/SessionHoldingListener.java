@@ -46,19 +46,21 @@ public class SessionHoldingListener implements HttpSessionListener {
     }
 
     static void cleanSessions() {
-        WeakReference[] clone;
-        synchronized (sessions) {
-            clone = sessions.toArray(new WeakReference[sessions.size()]);
-        }
-        LOG.warn("Cleaning sessions " + sessions.size());
-        for (WeakReference reference : clone) {
-            final HttpSession session = (HttpSession) reference.get();
-            if (session != null) {
-                LOG.warn("Cleaning session: " + session);
-                SessionService.cleanSession(session, true);
-            }
-        }
-        System.gc();
-        LOG.warn("Cleaned sessions " + sessions.size());
+        LOG.error("Hard error (OOM), shutting down app to have it restarted by the infrastructure.");
+        System.exit(0); // Heroku restarts the service
+//        WeakReference[] clone;
+//        synchronized (sessions) {
+//            clone = sessions.toArray(new WeakReference[sessions.size()]);
+//        }
+//        LOG.warn("Cleaning sessions " + sessions.size());
+//        for (WeakReference reference : clone) {
+//            final HttpSession session = (HttpSession) reference.get();
+//            if (session != null) {
+//                LOG.warn("Cleaning session: " + session);
+//                SessionService.cleanSession(session, true);
+//            }
+//        }
+//        System.gc();
+//        LOG.warn("Cleaned sessions " + sessions.size());
     }
 }

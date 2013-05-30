@@ -60,6 +60,9 @@ class SessionService {
             reset(request);
             SessionHoldingListener.cleanSessions();
             throw new RuntimeException(oom);
+        } catch (Throwable t) {
+            reset(request);
+            throw new RuntimeException(t);
         }
     }
 

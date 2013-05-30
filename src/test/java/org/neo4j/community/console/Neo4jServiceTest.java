@@ -17,7 +17,7 @@ public class Neo4jServiceTest {
     private ImpermanentGraphDatabase gdb;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Throwable {
         gdb = new ImpermanentGraphDatabase();
         neo4jService = new Neo4jService(gdb);
     }

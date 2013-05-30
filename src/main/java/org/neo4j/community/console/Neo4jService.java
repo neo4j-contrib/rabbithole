@@ -1,6 +1,7 @@
 package org.neo4j.community.console;
 
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -39,11 +40,22 @@ class Neo4jService {
     private String version;
     private boolean initialized;
 
-    Neo4jService() {
-        this(new ImpermanentGraphDatabase(stringMap("execution_guard_enabled","true")),true);
+    Neo4jService() throws Throwable {
+        this(createInMemoryDatabase(),true);
     }
 
-    Neo4jService(GraphDatabaseService gdb) {
+    private static ImpermanentGraphDatabase createInMemoryDatabase() throws Throwable {
+        try {
+            return new ImpermanentGraphDatabase(stringMap("execution_guard_enabled","true"));
+        } catch(RuntimeException re) {
+            Throwable t=re.getCause();
+            if (t instanceof RuntimeException) throw (RuntimeException)t;
+            if (t instanceof Error) throw (Error)t;
+            throw t;
+        }
+    }
+
+    Neo4jService(GraphDatabaseService gdb) throws Throwable {
         this(gdb,false);
     }
 

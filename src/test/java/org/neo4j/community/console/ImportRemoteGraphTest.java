@@ -88,7 +88,7 @@ public class ImportRemoteGraphTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Throwable {
         serverGraphDatabase.cleanContent(true);
         final Transaction tx = serverGraphDatabase.beginTx();
         final Node remoteRefNode = serverGraphDatabase.getReferenceNode();
