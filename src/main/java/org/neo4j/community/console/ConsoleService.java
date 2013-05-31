@@ -83,7 +83,8 @@ public class ConsoleService {
 
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {
         if (version!=null) service.setVersion(version);
-        if (dontInitialize(service)) init=null;
+        if (dontInitialize(service) || init==null || init.equalsIgnoreCase("none")) init=null;
+        if (query.equalsIgnoreCase("none")) query=null;
         final Map<String, Object> data = map("init", init, "query", query,"version",service.getVersion());
         long start = System.currentTimeMillis(), time = start;
         try {

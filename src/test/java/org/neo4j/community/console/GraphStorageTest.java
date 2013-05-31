@@ -61,6 +61,25 @@ public class GraphStorageTest {
         assertNull(storage.find(info.getId()));
     }
     @Test
+    public void testCreateWithVersion() throws Exception {
+        final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version"));
+        final Node node = index.get("id", info.getId()).getSingle();
+        assertNotNull(node);
+        assertEquals(info.getId(), node.getProperty("id"));
+        assertEquals(info.getVersion(),node.getProperty("version"));
+    }
+
+    @Test
+    public void testCreateWithNoRoot() throws Exception {
+        final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version",true));
+        final Node node = index.get("id", info.getId()).getSingle();
+        assertNotNull(node);
+        assertEquals(info.getId(), node.getProperty("id"));
+        assertEquals(info.getVersion(),node.getProperty("version"));
+        assertEquals(!info.hasRoot(),(Boolean)node.getProperty("no_root"));
+    }
+
+    @Test
     public void testCreateWithNullId() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(null, "init", "query", "message"));
         assertNotNull(info.getId());
