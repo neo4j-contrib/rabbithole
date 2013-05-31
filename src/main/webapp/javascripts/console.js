@@ -335,6 +335,12 @@ $(document).ready(function () {
       }
     }
   });
+
+  window.addEventListener("message",function(e) {
+      console.log(e);
+      inputeditor.setValue(e.data);
+      query();
+  });
   
   post( "/console/init", JSON.stringify( getParameters() ), function ( json ) {
       // viz(json["visualization"]);

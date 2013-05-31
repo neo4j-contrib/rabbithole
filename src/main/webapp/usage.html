@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <link rel="icon" href="http://neo4j.org/favicon.ico" />
@@ -17,6 +18,10 @@
 			$.ajax("/console/shorten?url="+encodeURIComponent(url), { type: "GET", success: function(data) { $('#short').val(data);}});
 			return false;
 		}
+        function query() {
+           var iframe=document.getElementsByTagName("iframe")[0];
+           iframe.contentWindow.postMessage($("#cypher").val(),base);
+        }
 	</script>
 </head>
 <body>
@@ -36,9 +41,10 @@
 (Cypher)-[:KNOWS]->(Smith)
 (Smith)-[:CODED_BY]->(Architect)</textarea><br/>
         <h3>Initial Query (Cypher)</h3>
-		<textarea rows="10" cols="80" id="cypher">
+		<textarea rows="2" cols="80" id="cypher">
 start neo=node(1) match neo-[r?]-other return neo,type(r), other
 </textarea><br/>
+        <button id="query" onclick="query();return false;">Test Run Query</button><br/>
         <input type="checkbox" id="no_root"/> remove root node<br/>
         Version: <select id="version">
             <option selected="selected" value="">current</option>
