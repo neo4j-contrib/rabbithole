@@ -337,7 +337,8 @@ $(document).ready(function () {
   });
 
   window.addEventListener("message",function(e) {
-      console.log(e);
+      if (e.origin.match(/addthis/)) return;
+      console.log("postMessage",e);
       inputeditor.setValue(e.data);
       query();
   });
