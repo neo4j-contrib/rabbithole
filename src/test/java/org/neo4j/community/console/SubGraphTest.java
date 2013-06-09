@@ -9,8 +9,6 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
@@ -44,9 +42,9 @@ public class SubGraphTest {
 
     @Test
     public void testToMap() throws Exception {
-        final Node node = gdb.getReferenceNode();
+        final Node node = gdb.createNode();
         final Map<String, Object> data = SubGraph.toMap(node);
-        assertEquals(0, data.size());
+        assertEquals(map("id",node.getId()), data);
     }
 
     @Test
@@ -81,7 +79,7 @@ public class SubGraphTest {
 
     private CypherQueryExecutor.CypherResult result(String column, Object value) {
         final Map<String, Object> row = Collections.singletonMap(column, value);
-        return new CypherQueryExecutor.CypherResult(asList(column), asList(row), null, 0, null);
+        return new CypherQueryExecutor.CypherResult(asList(column), asList(row), null, 0, null, null);
     }
 
     @Test

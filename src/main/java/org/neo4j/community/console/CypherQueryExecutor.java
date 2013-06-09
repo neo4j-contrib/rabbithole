@@ -38,13 +38,15 @@ public class CypherQueryExecutor {
 
     public static class CypherResult implements Iterable<Map<String, Object>> {
         private final List<String> columns;
+        private final String query;
         private String text;
         private final Collection<Map<String, Object>> rows;
         private QueryStatistics queryStatistics;
         private final PlanDescription plan;
         private final long time;
 
-        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan) {
+        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan, String query) {
+            this.query = query;
             this.columns = new ArrayList<String>(columns);
             this.queryStatistics = queryStatistics;
             this.time = time;
@@ -54,6 +56,10 @@ public class CypherQueryExecutor {
 
         public List<String> getColumns() {
             return columns;
+        }
+
+        public String getQuery() {
+            return query;
         }
 
         public int getRowCount() {
@@ -153,6 +159,9 @@ public class CypherQueryExecutor {
         }
     }
 
+    public String prettify(String query) {
+        return executionEngine.prettify(query).replaceAll("\n","\n ");
+    }
     public CypherResult cypherQuery(String query, String version) {
         // query = replaceIndex(query);
         if (version==null || version.isEmpty()) return cypherQuery(query);
@@ -170,7 +179,7 @@ public class CypherQueryExecutor {
             final ExecutionResult result = executionEngine.profile(query);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time=System.currentTimeMillis()-time;
-            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription());
+            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription(), prettify(query));
     		tx.success();
             return cypherResult;
     	} finally {

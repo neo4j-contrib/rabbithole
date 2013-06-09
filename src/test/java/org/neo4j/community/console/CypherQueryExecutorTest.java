@@ -76,7 +76,7 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery("create (n {})","1.7");
     }
 
-    @Test
+    @Test @Ignore("only 1.9 and 2.0")
     public void testAdhereToCypherVersion18() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
@@ -95,6 +95,14 @@ public class CypherQueryExecutorTest {
         assertEquals(1,result.getRowCount());
         final Object value = result.getRows().iterator().next().get("n.name");
         assertEquals("foobar", value);
+    }
+
+    @Test
+    public void testPrettifyQuery() throws Exception {
+        final String pretty = cypherQueryExecutor.prettify("start n=node(1) match n--> () return n");
+        assertEquals("START n=node(1) \n" +
+                "MATCH n-->() \n" +
+                "RETURN n",pretty);
     }
 
     @Test

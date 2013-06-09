@@ -109,7 +109,8 @@ public class ConsoleService {
                     initFromUrl(service, url, "start n=node(*) match n-[r?]->() return n,r");
                     data.put("graph",service.exportToGeoff());
                 } else if (service.isMutatingQuery(init)) {
-                    service.initCypherQuery(init);
+                    final CypherQueryExecutor.CypherResult result = service.initCypherQuery(init);
+                    if (result.getQuery()!=null) data.put("init",result.getQuery());
                     data.put("graph",service.exportToGeoff());
                 } else {
                     final Map<String,Object> graph = service.mergeGeoff(init);
@@ -127,6 +128,7 @@ public class ConsoleService {
                 data.put("plan", result.getPlan().toString());
                 data.put("columns", result.getColumns());
                 data.put("stats", result.getQueryStatistics());
+                if (result.getQuery()!=null) data.put("query",result.getQuery());
             }
             time = trace("cypher", time);
             data.put("visualization", service.cypherQueryViz(result));
