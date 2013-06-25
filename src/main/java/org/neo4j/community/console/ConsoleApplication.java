@@ -43,6 +43,7 @@ public class ConsoleApplication implements SparkApplication {
                 if (query!=null && !query.isEmpty()) {
                     LOG.warn( "cypher: "+query );
                 }
+                response.header("Access-Control-Allow-Origin", "*");
                 return new Gson().toJson(consoleService.execute(service, null, query, null));
             }
         });
