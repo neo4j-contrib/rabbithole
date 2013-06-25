@@ -100,9 +100,9 @@ public class CypherQueryExecutorTest {
     @Test
     public void testPrettifyQuery() throws Exception {
         final String pretty = cypherQueryExecutor.prettify("start n=node(1) match n--> () return n");
-        assertEquals("START n=node(1) \n" +
-                "MATCH n-->() \n" +
-                "RETURN n",pretty);
+        assertEquals("START n=node(1)\n" +
+                " MATCH n-->()\n" +
+                " RETURN n",pretty);
     }
 
     @Test
