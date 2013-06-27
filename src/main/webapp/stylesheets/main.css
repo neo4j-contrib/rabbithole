@@ -133,6 +133,13 @@ pre {
 
 #query_button {
     position: absolute;
+    right: 4.8%;
+    bottom: 1px;
+    width: 4.7%;
+    margin: 0px;
+}
+#clear_button {
+    position: absolute;
     right: 1px;
     bottom: 1px;
     width: 4.7%;
@@ -156,7 +163,7 @@ h3 {
 .CodeMirror {
     border: 1px solid #eee;
     position: absolute;
-    width: 95%;
+    width: 90%;
     bottom: 0px;
 }
 
