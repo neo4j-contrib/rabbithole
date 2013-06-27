@@ -292,7 +292,6 @@ function resizeOutput() {
     $("#output").css({'height': ($(window).height() - $(".CodeMirror-scroll").height() - 15) + 'px'});
     $("#output").animate({ scrollTop: $("#output").prop("scrollHeight") }, 10);
     $("#query_button").css({'height': $(".CodeMirror-scroll").height() + 'px'});
-    $("#clear_button").css({'height': $(".CodeMirror-scroll").height() + 'px'});
 }
 
 function getSelectedRange(editor) {

@@ -51,6 +51,7 @@
 <div id="main">
     <div style="position: absolute;top: 5px;right: 5px;z-index:100;">
 
+        <button id="clear_button" class="btn_pretty" onclick="cleanDb();return false;">Clear DB</button>
         <button type="button" onclick="$('#info').toggle();" class="btn_pretty">Help</button>
         <button onclick="toggleShare();" class="btn_pretty">Share</button>
         <button onclick="toggleGraph();" class="btn_pretty">Toggle Viz</button>
@@ -68,8 +69,6 @@
     </div>
     <form id="form" action="#">
         <textarea id="input">start n=node(*) return n;</textarea>
-        <button id="clear_button" class="btn_pretty" onclick="cleanDb();return false;">Clear</button>
-        <button id="query_button" class="btn_pretty" onclick="query();return false;">Run</button>
     </form>
     <!--div id="graph">
     </div-->
@@ -168,6 +167,7 @@
         <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/><br/>
         If you nee a fresh, blank console, <a target="_blank" class="btn_pretty" href="http://console.neo4j.org/?init=&amp;no_root=true">click here</a>. 
     </div>
+    <div id="query_button" class="btn_pretty" onclick="query();return false;">Run</div>
 </div>
 </body>
 </html>
