@@ -347,7 +347,7 @@ $(document).ready(function () {
     });
 
     window.addEventListener("message", function (e) {
-        if (e.origin.match(/addthis/)) return;
+        if (e.origin.match(/addthis|cloudfront.net/)) return;
         console.log("postMessage", e);
         inputeditor.setValue(e.data);
         query();
