@@ -51,6 +51,7 @@ public class ConsoleApplication implements SparkApplication {
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
+                response.header("Access-Control-Allow-Origin", "*");
                 final String version = request.body();
                 service.setVersion( version );
                 return new Gson().toJson( map("version", service.getVersion()) );
@@ -58,8 +59,9 @@ public class ConsoleApplication implements SparkApplication {
         } );
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
+                response.header("Access-Control-Allow-Origin", "*");
                 String query = param(request, "query", "");
-                return service.cypherQueryResults(query).toString();
+                    return service.cypherQueryResults(query).toString();
             }
         });
         post(new Route("/console/init") {
@@ -77,6 +79,7 @@ public class ConsoleApplication implements SparkApplication {
                 } else {
                     result = consoleService.init(service, input);
                 }
+                response.header("Access-Control-Allow-Origin", "*");
                 return new Gson().toJson(result);
             }
 
@@ -84,11 +87,13 @@ public class ConsoleApplication implements SparkApplication {
         get(new Route("/console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
+                response.header("Access-Control-Allow-Origin", "*");
                 return new Gson().toJson(service.cypherQueryViz(query));
             }
         });
         get(new Route("/console/to_geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
+                response.header("Access-Control-Allow-Origin", "*");
                 return service.exportToGeoff();
             }
         });
@@ -106,6 +111,7 @@ public class ConsoleApplication implements SparkApplication {
                     graph = SubGraph.from(result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
+                response.header("Access-Control-Allow-Origin", "*");
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);
             }
         });
@@ -113,6 +119,7 @@ public class ConsoleApplication implements SparkApplication {
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
+                response.header("Access-Control-Allow-Origin", "*");
                 return service.exportToCypher();
             }
         } );
@@ -120,12 +127,14 @@ public class ConsoleApplication implements SparkApplication {
         {
             protected Object doHandle( Request request, Response response, Neo4jService service ) throws IOException
             {
+                response.header("Access-Control-Allow-Origin", "*");
                 final String uri = baseUri( request.raw(), "init=" + URLEncoder.encode( service.exportToGeoff(), "UTF-8" ) + hasRootNodeParam( service ), null);
                 return consoleService.shortenUrl( uri );
             }
         } );
         get(new Route("/console/shorten") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
+                response.header("Access-Control-Allow-Origin", "*");
                 return consoleService.shortenUrl(request.queryParams("url"));
             }
         });
@@ -133,6 +142,7 @@ public class ConsoleApplication implements SparkApplication {
         delete(new Route("/console") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 reset(request);
+                response.header("Access-Control-Allow-Origin", "*");
                 return "deleted";
             }
         });
@@ -144,6 +154,7 @@ public class ConsoleApplication implements SparkApplication {
                     LOG.warn( "geoff: "+geoff );
                 }
                 Map res = service.mergeGeoff( geoff );
+                response.header("Access-Control-Allow-Origin", "*");
                 return new Gson().toJson(res);
             }
         });
