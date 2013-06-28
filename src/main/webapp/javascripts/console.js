@@ -56,7 +56,7 @@ function getParameters() {
     var result = {};
     for (var i = 0; i < pairs.length; ++i) {
         var pair = pairs[i].split('=');
-        // console.log(pair);
+        console.log(pair);
         if (pair.length != 2) continue;
         result[pair[0]] = decodeURIComponent(pair[1].replace(/\+/g, " "));
     }
@@ -353,14 +353,25 @@ $(document).ready(function () {
         query();
     });
 
-    post("/console/init", JSON.stringify(getParameters()), function (json) {
-        // viz(json["visualization"]);
-        // inputQuery(json["query"]);
-        // resizeOutput();
-        showResults(json);
-        showVersion(json);
-        showWelcome(json)
-    }, "json");
+    var session=null;
+    if (window.location.pathname.match(/JSESSIONID/i)) {
+        session=window.location.pathname.split(/=/)[1];
+        document.cookie="JSESSIONID="+session+";path=/";
+        console.log(document.cookie);
+    }
+    if (!session) {
+        post("/console/init", JSON.stringify(getParameters()), function (json) {
+            // viz(json["visualization"]);
+            // inputQuery(json["query"]);
+            // resizeOutput();
+            showResults(json);
+            showVersion(json);
+            showWelcome(json)
+        }, "json");
+    }
+    else {
+        query();
+    }
 
     $('#version').change(function () {
         post("/console/version", $('#version').val(), showVersion, "json");
