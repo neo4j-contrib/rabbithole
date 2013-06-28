@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -18,6 +19,8 @@ import spark.Response;
 import spark.servlet.SparkApplication;
 
 import com.google.gson.Gson;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class ConsoleApplication implements SparkApplication {
 
@@ -71,6 +74,8 @@ public class ConsoleApplication implements SparkApplication {
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
+                response.header("Access-Control-Allow-Origin", "*");
+                response.header("Access-Control-Allow-Methods","POST, GET, OPTIONS");
                 final Map input = requestBodyToMap(request);
                 final String id = param(input, "id", null);
                 final Map<String, Object> result;
@@ -79,8 +84,10 @@ public class ConsoleApplication implements SparkApplication {
                 } else {
                     result = consoleService.init(service, input);
                 }
-                response.header("Access-Control-Allow-Origin", "*");
-                return new Gson().toJson(result);
+                //pass the session id in case the client is not capable of reading headers, like XHR requests
+                result.put("sessionId", request.raw().getSession().getId().toString());
+                String res = new Gson().toJson(result);
+                return res;
             }
 
         });
