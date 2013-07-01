@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -19,8 +18,6 @@ import spark.Response;
 import spark.servlet.SparkApplication;
 
 import com.google.gson.Gson;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class ConsoleApplication implements SparkApplication {
 

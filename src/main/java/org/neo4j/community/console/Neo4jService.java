@@ -16,7 +16,6 @@ import java.util.Map;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
-import static org.neo4j.helpers.collection.MapUtil.toMap;
 
 /**
 * @author mh

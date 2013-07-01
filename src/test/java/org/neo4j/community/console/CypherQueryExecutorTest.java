@@ -18,7 +18,6 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItems;
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh

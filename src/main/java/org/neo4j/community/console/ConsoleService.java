@@ -6,7 +6,6 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;

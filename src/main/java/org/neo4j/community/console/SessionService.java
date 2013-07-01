@@ -1,8 +1,6 @@
 package org.neo4j.community.console;
 
 import org.neo4j.kernel.lifecycle.LifecycleException;
-import spark.HaltException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 

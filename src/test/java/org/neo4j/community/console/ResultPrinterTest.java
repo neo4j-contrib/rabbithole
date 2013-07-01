@@ -2,7 +2,6 @@ package org.neo4j.community.console;
 
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
