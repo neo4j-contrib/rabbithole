@@ -180,4 +180,18 @@ public class CypherQueryExecutorTest {
         assertEquals(queryRelAuto,cypherQueryExecutor.replaceIndex(queryRels));
 
     }
+
+    @Test
+    public void testDontProfileUnionCheck() throws Exception {
+        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n UNION start n=node(*) return n"));
+        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n \nUNION\n start n=node(*) return n"));
+        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n \nunion\n start n=node(*) return n"));
+        assertTrue(cypherQueryExecutor.canProfileQuery("start n=node(*) return n"));
+    }
+
+    @Test
+    public void testDontProfileUnion() throws Exception {
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(*) return n UNION start n=node(*) return n", null);
+        assertEquals(1,result.getRowCount());
+    }
 }

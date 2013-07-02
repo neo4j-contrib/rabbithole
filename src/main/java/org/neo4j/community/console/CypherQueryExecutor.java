@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 public class CypherQueryExecutor {
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
     private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
+    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\bUNION\\b", Pattern.CASE_INSENSITIVE);
     private ExecutionEngine executionEngine;
     private final Index index;
 	private final GraphDatabaseService gdb;
@@ -176,7 +177,7 @@ public class CypherQueryExecutor {
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
         try {
-            final ExecutionResult result = executionEngine.profile(query);
+            final ExecutionResult result = canProfileQuery(query) ? executionEngine.profile(query) : executionEngine.execute(query);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time=System.currentTimeMillis()-time;
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription(), prettify(query));
@@ -185,6 +186,11 @@ public class CypherQueryExecutor {
     	} finally {
 			tx.finish();
 		}
+    }
+
+    boolean canProfileQuery(String query) {
+        Matcher matcher = CANNOT_PROFILE_PATTERN.matcher(query);
+        return !matcher.find();
     }
 
     private String removeSemicolon( String query )
