@@ -78,7 +78,7 @@ public class Console
     private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {
         if (limit == null) return;
         GuardingRequestFilter requestTimeLimitFilter = new GuardingRequestFilter(limit, maxOps);
-        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/*", FilterMapping.REQUEST);
+        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/console/*", FilterMapping.REQUEST);
     }
 
     public void join() throws InterruptedException {

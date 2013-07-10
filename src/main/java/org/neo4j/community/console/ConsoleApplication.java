@@ -64,7 +64,10 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("/console/init") {
             @Override
             protected void doBefore(Request request, Response response) {
-                reset(request);
+                Neo4jService service = SessionService.getService(request.raw());
+                if (service.isInitialized()) {
+                    reset(request);
+                }
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
@@ -77,7 +80,7 @@ public class ConsoleApplication implements SparkApplication {
                     result = consoleService.init(service, input);
                 }
                 //pass the session id in case the client is not capable of reading headers, like XHR requests
-                result.put("sessionId", request.raw().getSession().getId().toString());
+                result.put("sessionId", request.raw().getSession(false).getId().toString());
                 String res = new Gson().toJson(result);
                 return res;
             }

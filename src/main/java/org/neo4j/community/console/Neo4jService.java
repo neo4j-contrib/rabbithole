@@ -125,7 +125,7 @@ class Neo4jService {
     }
 
     public void deleteReferenceNode() {
-        if (rootNodeRemovalNotAllowed()) return;
+        if (rootNodeRemovalNotAllowed() || !hasReferenceNode()) return;
         final Node root = gdb.getReferenceNode();
         if (root!=null) {
             final Transaction tx = gdb.beginTx();
