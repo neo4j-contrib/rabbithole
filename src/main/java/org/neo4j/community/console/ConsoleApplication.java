@@ -43,7 +43,6 @@ public class ConsoleApplication implements SparkApplication {
                 if (query!=null && !query.isEmpty()) {
                     LOG.warn( "cypher: "+query );
                 }
-                response.header("Access-Control-Allow-Origin", "*");
                 return new Gson().toJson(consoleService.execute(service, null, query, null));
             }
         });
@@ -51,7 +50,6 @@ public class ConsoleApplication implements SparkApplication {
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
-                response.header("Access-Control-Allow-Origin", "*");
                 final String version = request.body();
                 service.setVersion( version );
                 return new Gson().toJson( map("version", service.getVersion()) );
@@ -59,7 +57,6 @@ public class ConsoleApplication implements SparkApplication {
         } );
         get(new Route("/console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                response.header("Access-Control-Allow-Origin", "*");
                 String query = param(request, "query", "");
                     return service.cypherQueryResults(query).toString();
             }
