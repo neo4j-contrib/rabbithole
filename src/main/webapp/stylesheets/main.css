@@ -1,9 +1,5 @@
 body {
-    top: 1px;
-    left: 1px;
-    bottom: 1px;
-    right: 1px;
-    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
 }
 
 body, html, div, form, input {
@@ -21,7 +17,7 @@ body {
     right: 0;
     color: #EEE;
     background-color: black;
-    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
     margin: 0;
     border: none;
     padding: 5px;
@@ -68,11 +64,11 @@ a:link, a:visited {
 }
 
 pre {
-  font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+  font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
 }
 
 .popup {
-  	font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+  	font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
     background-color: #202020;
     color: #EEE;
     border: 2px solid #a9a9a9;
@@ -141,12 +137,12 @@ pre {
 
 
 code {
-    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
     background-color: #3d3d3d;
 }
 
 .welcome {
-    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
     font-size: 1.2em;
 }
 
