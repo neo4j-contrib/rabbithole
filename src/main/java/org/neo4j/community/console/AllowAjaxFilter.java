@@ -11,9 +11,10 @@ import java.util.Enumeration;
  * @since 25.11.12
  */
 public class AllowAjaxFilter implements Filter {
-    private static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
-    private static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
-    private static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
+    private static final String ACCESS_CONTROL_ALLOW_ORIGIN      = "Access-Control-Allow-Origin";
+    private static final String ACCESS_CONTROL_ALLOW_METHODS     = "Access-Control-Allow-Methods";
+    private static final String ACCESS_CONTROL_ALLOW_HEADERS     = "Access-Control-Allow-Headers";
+    private static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
     private static final String ACCESS_CONTROL_REQUEST_METHOD = "access-control-request-method";
     private static final String ACCESS_CONTROL_REQUEST_HEADERS = "access-control-request-headers";
 
@@ -25,7 +26,10 @@ public class AllowAjaxFilter implements Filter {
         HttpServletRequest request= (HttpServletRequest) servletRequest;
         HttpServletResponse response= (HttpServletResponse) servletResponse;
 
-        response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        String origin=request.getHeader("origin");
+        if (origin!=null) response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+        else response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+        response.addHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
 
         // Allow all forms of requests
         final Enumeration aclMethods = request.getHeaders(ACCESS_CONTROL_REQUEST_METHOD);

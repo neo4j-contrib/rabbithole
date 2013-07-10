@@ -30,15 +30,16 @@
       <param-value>org.neo4j.community.console.ShareGraphApplication</param-value>
     </init-param>
   </filter>
-  <filter-mapping>
-    <filter-name>ConsoleApplication</filter-name>
-    <url-pattern>/console/*</url-pattern>
-  </filter-mapping>
+    <filter-mapping>
+        <filter-name>AllowAjaxFilter</filter-name>
+        <url-pattern>*</url-pattern>
+    </filter-mapping>
 
-  <filter-mapping>
-    <filter-name>AllowAjaxFilter</filter-name>
-    <url-pattern>*</url-pattern>
-  </filter-mapping>
+      <filter-mapping>
+        <filter-name>ConsoleApplication</filter-name>
+        <url-pattern>/console/*</url-pattern>
+      </filter-mapping>
+
 
     <filter-mapping>
         <filter-name>ShareGraphApplication</filter-name>
