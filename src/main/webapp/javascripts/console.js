@@ -294,11 +294,12 @@ function computeInfo( data )
 
 function inputQuery( query )
 {
-  inputeditor.setValue( query.replace( /\n/g, '' ).trim() );
-  CodeMirror.commands["selectAll"]( inputeditor );
-  autoFormatSelection( inputeditor );
-
+    inputeditor.setValue( query.replace( /\n/g, ' ' ).trim() );
+    CodeMirror.commands["selectAll"]( inputeditor );
+    autoFormatSelection( inputeditor );
+    resizeOutput();
 }
+
 function infoImage( data )
 {
   var text = "";
@@ -427,10 +428,7 @@ function getQuery()
 
 function query()
 {
-  inputeditor.setValue( getQuery().replace( /\n/g, ' ' ).trim() );
-  CodeMirror.commands["selectAll"]( inputeditor );
-  autoFormatSelection( inputeditor );
-  resizeOutput();
+  inputQuery(getQuery());
   send( getQuery() );
 }
 
@@ -440,9 +438,52 @@ function cleanDb()
   send( "START n=node(*)  MATCH n-[r?]-m WITH n, r DELETE n, r" );
 }
 
+function parseMessage( data ) {
+    var first = data.trim().charAt(0);
+    if (first=='{' || first == '[') {
+        var result = JSON.parse(data);
+        if (result.data && typeof(result.data)=="string") result.data=[result.data];
+        return  result;
+    }
+    return {data:[data],action:"query"};
+}
+
+function handleMessage( msg ) {
+    console.log("msg",msg);
+    if (msg.action=="init") {
+        sendInit(msg.data);
+        // send init with data
+        return;
+    }
+    if (msg.action=="query" || msg.action=="input") {
+        var sendNext = function(data) {
+            if (data.length==0) return;
+            var _query = data.shift();
+            if (data.length==0 && msg.action=="input") {
+                inputQuery(_query)
+                return;
+            }
+            post( "/console/cypher", _query, function(res) {
+                showResults(res);
+                sendNext(data);
+            }, "json" );
+        }
+        sendNext(msg.data);
+    }
+}
+
 function close( id )
 {
   $( id ).hide().children( "iframe" ).removeAttr( "src" );
+}
+
+function sendInit(params, cb) {
+    post("/console/init", JSON.stringify(params), function (json) {
+        showResults(json);
+        showVersion(json);
+        showWelcome(json);
+        if (cb) cb();
+    }, "json");
 }
 
 $( document ).ready(
@@ -478,9 +519,9 @@ $( document ).ready(
         {
           return;
         }
-        console.log( "postMessage", e );
-        inputeditor.setValue( e.data );
-        query();
+          console.log( "postMessage", e );
+          var msg = parseMessage(e.data);
+          handleMessage(msg);
       } );
 
       var session = null;
@@ -492,15 +533,8 @@ $( document ).ready(
       }
       if ( !session )
       {
-        post( "/console/init", JSON.stringify( getParameters() ), function( json )
-        {
-          // viz(json["visualization"]);
-          // inputQuery(json["query"]);
-          // resizeOutput();
-          showResults( json );
-          showVersion( json );
-          showWelcome( json );
-        }, "json" );
+          var params=getParameters();
+          sendInit(params);
       }
       else
       {
@@ -530,7 +564,7 @@ $( document ).ready(
           function()
           {
             close( "#info" );
-            url = $( this ).attr( "video" ) + "?badge=0&title=0&portrait=0&autoplay=1&rel=0&byline=0";
+            var url = $( this ).attr( "video" ) + "?badge=0&title=0&portrait=0&autoplay=1&rel=0&byline=0";
             $( "#player" ).show();
             $( "#player iframe" ).attr( "width", $( "#player" ).width() ).attr( "height", $( "#player" ).height() )
                 .attr( "src", url );
