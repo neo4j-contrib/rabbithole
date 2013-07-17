@@ -2,6 +2,7 @@
 
 var inputeditor;
 var visualizer = new GraphVisualization();
+var graphgistWindow;
 
 function append( element, text, doHighlight )
 {
@@ -80,7 +81,7 @@ function getParameters()
   for ( var i = 0; i < pairs.length; ++i )
   {
     var pair = pairs[i].split( '=' );
-    console.log( pair );
+    //console.log( pair );
     if ( pair.length != 2 )
     {
       continue;
@@ -449,27 +450,34 @@ function parseMessage( data ) {
 }
 
 function handleMessage( msg ) {
-    console.log("msg",msg);
+    //console.log("msg",msg);
     if (msg.action=="init") {
-        sendInit(msg.data);
+        sendInit(msg.data, msg.call_id);
         // send init with data
         return;
     }
     if (msg.action=="query" || msg.action=="input") {
-        var sendNext = function(data) {
-            if (data.length==0) return;
-            var _query = data.shift();
-            if (data.length==0 && msg.action=="input") {
-                inputQuery(_query)
-                return;
-            }
-            post( "/console/cypher", _query, function(res) {
-                showResults(res);
-                sendNext(data);
-            }, "json" );
-        }
-        sendNext(msg.data);
+        sendNext(msg);
     }
+}
+
+function sendNext(msg) {
+  if (msg.data.length==0) return;
+  var _query = msg.data.shift();
+  if (msg.data.length==0 && msg.action=="input") {
+      inputQuery(_query)
+      return;
+  }
+  post( "/console/cypher", _query, function(res) {
+      if (msg.action==="query" && msg.call_id && graphgistWindow) {
+        res.call_id = msg.call_id;
+        graphgistWindow.postMessage(res, "*");
+      }
+      else {
+        showResults(res);
+      }
+      sendNext(msg);
+  }, "json" );
 }
 
 function close( id )
@@ -477,13 +485,16 @@ function close( id )
   $( id ).hide().children( "iframe" ).removeAttr( "src" );
 }
 
-function sendInit(params, cb) {
+function sendInit(params, callId) {
     post("/console/init", JSON.stringify(params), function (json) {
         showResults(json);
         showVersion(json);
         showWelcome(json);
-        if (cb) cb();
-    }, "json");
+        if (callId && graphgistWindow) {
+          json.call_id = callId;
+          graphgistWindow.postMessage(json, "*");
+        }
+    }, "json", callId);
 }
 
 $( document ).ready(
@@ -519,7 +530,8 @@ $( document ).ready(
         {
           return;
         }
-          console.log( "postMessage", e );
+          //console.log( "postMessage", e );
+          graphgistWindow = e.source;
           var msg = parseMessage(e.data);
           handleMessage(msg);
       } );
@@ -529,7 +541,7 @@ $( document ).ready(
       {
         session = window.location.pathname.split( /=/ )[1];
         document.cookie = "JSESSIONID=" + session + ";path=/";
-        console.log( document.cookie );
+        //console.log( document.cookie );
       }
       if ( !session )
       {
