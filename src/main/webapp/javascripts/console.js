@@ -397,7 +397,7 @@ function sendNext(msg) {
     post("/console/cypher", _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
-            graphgistWindow.postMessage(res, "*");
+            graphgistWindow.postMessage(JSON.stringify(res), "*");
         }
         else {
             showResults(res);
@@ -417,7 +417,7 @@ function sendInit(params, callId) {
         showWelcome(json);
         if (callId && graphgistWindow) {
             json.call_id = callId;
-            graphgistWindow.postMessage(json, "*");
+            graphgistWindow.postMessage(JSON.stringify(json), "*");
         }
     }, "json", callId);
 }
