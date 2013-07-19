@@ -184,12 +184,11 @@ public class CypherQueryExecutor {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }
-        query = removeSemicolon( prettify(query) );
-        System.out.println("Executing:>>>"+query+"<<<");
+        query = removeSemicolon( query );
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
         try {
-            final ExecutionResult result = canProfileQuery(query) ? executionEngine.profile(query) : executionEngine.execute(query);
+            final ExecutionResult result = canProfileQuery(query) ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time=System.currentTimeMillis()-time;
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription(), prettify(query));
