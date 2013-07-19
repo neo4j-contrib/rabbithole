@@ -184,7 +184,8 @@ public class CypherQueryExecutor {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }
-        query = removeSemicolon( query );
+        query = removeSemicolon( prettify(query) );
+        System.out.println("Executing:>>>"+query+"<<<");
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
         try {

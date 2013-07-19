@@ -390,7 +390,7 @@ function parseMessage(data) {
 }
 
 function handleMessage(msg) {
-    //console.log("msg",msg);
+    console.log("msg",msg);
     if (msg.action == "init") {
         sendInit(msg.data, msg.call_id);
         // send init with data
@@ -411,6 +411,7 @@ function sendNext(msg) {
     post("/console/cypher", _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
+            console.log("res",res);
             graphgistWindow.postMessage(JSON.stringify(res), "*");
         }
         else {
