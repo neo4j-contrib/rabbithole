@@ -24,6 +24,8 @@ public class CypherQueryExecutor {
     private ExecutionEngine executionEngine;
     private final Index index;
 	private final GraphDatabaseService gdb;
+    public static final int CYPHER_LENGTH = "CYPHER".length();
+
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
 	    this.gdb = gdb;
         this.index = index;
@@ -165,8 +167,13 @@ public class CypherQueryExecutor {
     }
     public CypherResult cypherQuery(String query, String version) {
         // query = replaceIndex(query);
-        if (version==null || version.isEmpty()) return cypherQuery(query);
+        if (version==null || version.isEmpty() || startsWithCypher(query)) return cypherQuery(query);
         return cypherQuery("CYPHER "+version+" "+query);
+    }
+
+    private boolean startsWithCypher(String query) {
+        String q = query.trim();
+        return q.length() > CYPHER_LENGTH && q.substring(0, CYPHER_LENGTH).equalsIgnoreCase("cypher");
     }
 
     private CypherResult cypherQuery(String query) {

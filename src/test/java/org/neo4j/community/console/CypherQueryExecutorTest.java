@@ -97,6 +97,13 @@ public class CypherQueryExecutorTest {
     }
 
     @Test
+    public void testWorksWithCypherPrefix() throws Exception {
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.0 start n=node(*) return count(*) as cnt", "cypher 2.0");
+        assertEquals(asList("cnt"),result.getColumns());
+        assertEquals(1, result.getRowCount());
+    }
+
+    @Test
     public void testPrettifyQuery() throws Exception {
         final String pretty = cypherQueryExecutor.prettify("start n=node(1) match n--> () return n");
         assertEquals("START n=node(1)\n" +
