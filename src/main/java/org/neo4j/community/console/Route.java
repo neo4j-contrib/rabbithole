@@ -35,14 +35,14 @@ abstract class Route extends spark.Route {
         try {
             doBefore(request,response);
             return doHandle(request, response, service(request));
-        } catch (LifecycleException lce) {
+        } catch (LifecycleException e) {
             reset(request);
-            SessionHoldingListener.cleanSessions();
-            return handleException(lce);
-        } catch (OutOfMemoryError oom) {
+            SessionService.cleanSessions();
+            return handleException(e);
+        } catch (OutOfMemoryError e) {
             reset(request);
-            SessionHoldingListener.cleanSessions();
-            return handleException(oom);
+            SessionService.cleanSessions();
+            return handleException(e);
         } catch (HaltException he) {
             throw he;
         } catch (Exception e) {
@@ -91,7 +91,7 @@ abstract class Route extends spark.Route {
     }
 
     protected Neo4jService service(Request request) {
-        return SessionService.getService(request.raw());
+        return SessionService.getService(request.raw(),true);
     }
 
     protected String baseUri(HttpServletRequest request, String query, final String path) {

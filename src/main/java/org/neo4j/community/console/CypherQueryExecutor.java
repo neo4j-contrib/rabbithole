@@ -42,19 +42,22 @@ public class CypherQueryExecutor {
     public static class CypherResult implements Iterable<Map<String, Object>> {
         private final List<String> columns;
         private final String query;
-        private String text;
+        private final String text;
         private final Collection<Map<String, Object>> rows;
+        private final List<Map<String, Object>> json;
         private QueryStatistics queryStatistics;
         private final PlanDescription plan;
         private final long time;
 
         public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan, String query) {
             this.query = query;
-            this.columns = new ArrayList<String>(columns);
+            this.columns = new ArrayList<>(columns);
             this.queryStatistics = queryStatistics;
             this.time = time;
             this.rows = rows;
             this.plan = plan;
+            this.text = generateText();
+            this.json = createJson();
         }
 
         public List<String> getColumns() {
@@ -87,9 +90,6 @@ public class CypherQueryExecutor {
         }
         
         public String getText() {
-            if (text==null) {
-                text = generateText();
-            }
             return text;
         }
 
@@ -116,6 +116,10 @@ public class CypherQueryExecutor {
         }
 
         public List<Map<String,Object>> getJson() {
+            return json;
+        }
+
+        private List<Map<String, Object>> createJson() {
             final List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
             for (Map<String, Object> row : this) {
                 final LinkedHashMap<String, Object> newRow = new LinkedHashMap<String, Object>();

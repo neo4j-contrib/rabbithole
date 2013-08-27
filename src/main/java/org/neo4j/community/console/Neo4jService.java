@@ -70,29 +70,56 @@ class Neo4jService {
         return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
     }
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
-        final SubGraph subGraph = SubGraph.from(gdb).markSelection(result);
-        return map("nodes", subGraph.getNodes().values(), "links", subGraph.getRelationshipsWithIndexedEnds().values());
+        Transaction tx = gdb.beginTx();
+        try {
+            final SubGraph subGraph = SubGraph.from(gdb).markSelection(result);
+            Map<String, Object> viz = map("nodes", subGraph.getNodes().values(), "links", subGraph.getRelationshipsWithIndexedEnds().values());
+            tx.success();
+            return viz;
+        } finally {
+            tx.finish();
+        }
     }
 
     public String exportToGeoff() {
-        return geoffExportService.export();
+        Transaction tx = gdb.beginTx();
+        try {
+            String result = geoffExportService.export();
+            tx.success();
+            return result;
+        } finally {
+            tx.finish();
+        }
     }
     
     public String exportToCypher() {
-        return cypherExportService.export();
+        Transaction tx = gdb.beginTx();
+        try {
+            String cypher = cypherExportService.export();
+            tx.success();
+            return cypher;
+        } finally {
+            tx.finish();
+        }
     }
 
     public Map<String,Object> mergeGeoff(String geoff) {
+        Transaction tx = gdb.beginTx();
         try {
             final Map<String,Object> result = new LinkedHashMap<String, Object>();
             for (Map.Entry<String, PropertyContainer> entry : geoffService.mergeGeoff(geoff).entrySet()) {
                 result.put(entry.getKey(),geoffExportService.toMap(entry.getValue()));
             }
+            tx.success();
             return result;
         } catch (SubgraphError subgraphError) {
+            tx.failure();
             throw new RuntimeException("Error merging:\n"+geoff,subgraphError);
         } catch (SyntaxError syntaxError) {
+            tx.failure();
             throw new RuntimeException("Syntax error merging:\n"+geoff,syntaxError);
+        } finally {
+            tx.finish();
         }
     }
 
@@ -125,16 +152,16 @@ class Neo4jService {
     }
 
     public void deleteReferenceNode() {
-        if (rootNodeRemovalNotAllowed() || !hasReferenceNode()) return;
-        final Node root = gdb.getReferenceNode();
-        if (root!=null) {
-            final Transaction tx = gdb.beginTx();
-            try {
+        final Transaction tx = gdb.beginTx();
+        try {
+            if (rootNodeRemovalNotAllowed() || !hasReferenceNode()) return;
+            final Node root = gdb.getReferenceNode();
+            if (root != null) {
                 root.delete();
-                tx.success();
-            } finally {
-                tx.finish();
             }
+            tx.success();
+        } finally {
+            tx.finish();
         }
     }
 

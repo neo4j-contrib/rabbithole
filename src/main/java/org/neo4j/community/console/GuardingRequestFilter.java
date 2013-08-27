@@ -26,11 +26,12 @@ public class GuardingRequestFilter implements Filter {
     }
 
     private Guard getGuard(ServletRequest request) {
-        Neo4jService service = SessionService.getService((HttpServletRequest) request);
+        Neo4jService service = SessionService.getService((HttpServletRequest) request,true);
         return ((GraphDatabaseAPI)service.getGraphDatabase()).getGuard();
     }
     private void rollback(ServletRequest request) {
-        Neo4jService service = SessionService.getService((HttpServletRequest) request);
+        Neo4jService service = SessionService.getService((HttpServletRequest) request,false);
+        if (service==null) return;
         GraphDatabaseAPI graphDatabase = (GraphDatabaseAPI) service.getGraphDatabase();
         try {
             Transaction tx = graphDatabase.getTxManager().getTransaction();

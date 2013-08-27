@@ -43,6 +43,7 @@ function post(uri, data, done, dataType) {
         type: "POST",
         data: data,
         dataType: dataType || "text",
+        beforeSend: setSessionHeader,
         success: function (data) {
             if (dataType == "text") {
                 append($("#output"), data);
@@ -106,8 +107,12 @@ function viz(data) {
     // graph.show();
 }
 
+function setSessionHeader(request) {
+    request.setRequestHeader("X-Session", session_id)
+}
 function reset(done) {
     $.ajax("/console", {
+        beforeSend: setSessionHeader,
         type: "DELETE",
         success: done
     });
@@ -120,6 +125,7 @@ function share_yuml(query) {
     }
     $.ajax("/console/to_yuml?query=" + encodeURIComponent(query), {
         type: "GET",
+        beforeSend: setSessionHeader,
         dataType: "text",
         success: function (data) {
             $('#share_yuml').attr("href", data);
@@ -182,6 +188,7 @@ function toggleGraph() {
 function toggleShare() {
     $.ajax("console/to_cypher", {
         type: "GET",
+        beforeSend: setSessionHeader,
         dataType: "text",
         success: function (data) {
             $('#share_init').val(data);
@@ -201,6 +208,7 @@ function export_graph(format) {
     $.ajax("console/to_" + format, {
         type: "GET",
         dataType: "text",
+        beforeSend: setSessionHeader,
         success: function (data) {
             $('#share_init').val(data);
         },
@@ -422,6 +430,20 @@ function sendInit(params, callId) {
     }, "json", callId);
 }
 
+
+function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+};
+
+function guid() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
+var session_id=guid();
+
 $(document).ready(
     function () {
         inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
@@ -455,19 +477,13 @@ $(document).ready(
             handleMessage(msg);
         });
 
-        var session = null;
-        if (window.location.pathname.match(/JSESSIONID/i)) {
-            session = window.location.pathname.split(/=/)[1];
-            document.cookie = "JSESSIONID=" + session + ";path=/";
-            //console.log( document.cookie );
-        }
-        if (!session) {
+//        if (!session) {
             var params = getParameters();
             sendInit(params);
-        }
-        else {
-            query();
-        }
+//        }
+//        else {
+//            query();
+//        }
 
         $('#version').change(function () {
             post("/console/version", $('#version').val(), showVersion, "json");

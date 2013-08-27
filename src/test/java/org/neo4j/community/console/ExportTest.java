@@ -20,6 +20,7 @@ public class ExportTest {
     @Before
     public void setUp() throws Exception {
         gdb = new ImpermanentGraphDatabase();
+        gdb.beginTx();
     }
 
     @After

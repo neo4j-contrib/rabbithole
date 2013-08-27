@@ -9,6 +9,7 @@ import org.neo4j.cypher.SyntaxException;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.util.List;
@@ -27,15 +28,18 @@ public class CypherQueryExecutorTest {
 
     private ImpermanentGraphDatabase gdb;
     private CypherQueryExecutor cypherQueryExecutor;
+    private Transaction tx;
 
     @Before
     public void setUp() throws Exception {
         gdb = new ImpermanentGraphDatabase();
+        tx = gdb.beginTx();
         cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
     }
 
     @After
     public void tearDown() throws Exception {
+        tx.failure();tx.finish();
         gdb.shutdown();
     }
 

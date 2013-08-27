@@ -1,5 +1,6 @@
 package org.neo4j.community.console;
 
+import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -20,12 +21,17 @@ public class Index {
     private final RelationshipAutoIndexer relationshipAutoIndexer;
 
     public Index(GraphDatabaseService gdb) {
+        Transaction tx = gdb.beginTx();
+        // force initialize the indexes
+        gdb.index().forNodes("node_auto_index");
+        gdb.index().forNodes("relationship_auto_index");
         nodeAutoIndexer = gdb.index().getNodeAutoIndexer();
         relationshipAutoIndexer = gdb.index().getRelationshipAutoIndexer();
         enableAutoIndex(nodeAutoIndexer);
         enableAutoIndex(relationshipAutoIndexer);
         autoIndexedProperties.addAll(nodeAutoIndexer.getAutoIndexedProperties());
         autoIndexedProperties.addAll(relationshipAutoIndexer.getAutoIndexedProperties());
+        tx.success();tx.finish();
     }
 
     private void enableAutoIndex(AutoIndexer<? extends PropertyContainer> autoIndexer) {

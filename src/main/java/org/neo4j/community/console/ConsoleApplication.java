@@ -32,7 +32,7 @@ public class ConsoleApplication implements SparkApplication {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable throwable) {
-                SessionHoldingListener.cleanSessions();
+                SessionService.cleanSessions();
                 System.gc();
             }
         });
@@ -64,7 +64,7 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("/console/init") {
             @Override
             protected void doBefore(Request request, Response response) {
-                Neo4jService service = SessionService.getService(request.raw());
+                Neo4jService service = SessionService.getService(request.raw(),true);
                 if (service.isInitialized()) {
                     reset(request);
                 }
@@ -79,10 +79,7 @@ public class ConsoleApplication implements SparkApplication {
                 } else {
                     result = consoleService.init(service, input);
                 }
-                //pass the session id in case the client is not capable of reading headers, like XHR requests
-                result.put("sessionId", request.raw().getSession(false).getId().toString());
-                String res = new Gson().toJson(result);
-                return res;
+                return new Gson().toJson(result);
             }
 
         });

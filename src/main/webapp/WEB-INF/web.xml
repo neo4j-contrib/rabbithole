@@ -55,7 +55,7 @@
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
   <session-config>
-      <session-timeout>20</session-timeout>
+      <session-timeout>1</session-timeout>
   </session-config>
   <listener>
       <listener-class>org.neo4j.community.console.SessionHoldingListener</listener-class>
