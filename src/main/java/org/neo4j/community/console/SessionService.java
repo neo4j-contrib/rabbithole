@@ -90,10 +90,11 @@ class SessionService {
             }
             sessions.put(sessionId, service);
             return service;
-        } catch (LifecycleException | OutOfMemoryError lce) {
-            reset(request);
+        } catch (IllegalStateException ise) {
+            throw ise;
+        } catch (LifecycleException | OutOfMemoryError e) {
             cleanSessions();
-            throw new RuntimeException(lce);
+            throw e;
         } catch (Throwable t) {
             reset(request);
             throw new RuntimeException(t);
