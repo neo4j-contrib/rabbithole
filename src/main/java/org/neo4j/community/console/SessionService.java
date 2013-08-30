@@ -102,18 +102,20 @@ class SessionService {
     }
 
     public static void cleanSessions() {
-        Iterator<Map.Entry<String,Neo4jService>> it = sessions.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Neo4jService> entry = it.next();
-            Neo4jService service = entry.getValue();
-            if (service !=null) {
-                try {
-                    service.stop();
-                } catch (Exception e) {
-                    // ignore
+        synchronized(sessions) {
+            Iterator<Map.Entry<String,Neo4jService>> it = sessions.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Neo4jService> entry = it.next();
+                Neo4jService service = entry.getValue();
+                if (service !=null) {
+                    try {
+                        service.stop();
+                    } catch (Exception e) {
+                        // ignore
+                    }
                 }
+                it.remove();
             }
-            it.remove();
         }
         lastUsage.clear();
     }
