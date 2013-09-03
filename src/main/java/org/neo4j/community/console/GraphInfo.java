@@ -95,7 +95,7 @@ public class GraphInfo {
     }
 
     public static GraphInfo from(Map input) {
-        boolean noRoot = input.containsKey("no_root") && input.get("no_root").toString().equals("true");
+        boolean noRoot = input.containsKey("no_root") && input.get("no_root").toString().equalsIgnoreCase("true");
         return new GraphInfo(
                 (String)input.get("id"),(String)input.get("init"),
                 (String)input.get("query"),(String)input.get("message"),
