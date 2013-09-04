@@ -33,7 +33,7 @@ public class GraphStorage {
     }
 
     public GraphInfo find(String id) {
-        return cypher.query("CYPHER 1.9 start n=node:graphs(id={id}) set n.count = coalesce(n.count?,0)+1, n.time={time} return n", map("id", id,"time",System.currentTimeMillis())).to(GraphInfo.class, new ResultConverter<Map<String, Object>, GraphInfo>() {
+        return cypher.query("CYPHER 1.8 start n=node:graphs(id={id}) set n.count = coalesce(n.count?,0)+1, n.time={time} return n", map("id", id,"time",System.currentTimeMillis())).to(GraphInfo.class, new ResultConverter<Map<String, Object>, GraphInfo>() {
             @Override
             public GraphInfo convert(Map<String, Object> row, Class<GraphInfo> type) {
                 if (row==null || row.get("n")==null) return null;
