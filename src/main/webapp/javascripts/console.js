@@ -101,8 +101,14 @@ function viz(data) {
         if (!isCypher(query)) {
             query = "";
         }
-        visualizer.render("output", output.width(), output.height(), "/console/visualization?query="
-            + encodeURIComponent(query));
+        $.ajax("/console/visualization?query=" + encodeURIComponent(query), {
+            type: "GET",
+            beforeSend: setSessionHeader,
+            dataType: "json",
+            success: function (data) {
+                visualizer.visualize("output", output.width(), output.height(),data)
+            }
+        });
     }
     // graph.show();
 }
