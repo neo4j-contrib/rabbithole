@@ -171,6 +171,7 @@ function GraphVisualization() {
             path_text.attr("transform", function (d) {
                 var dx = ( d.target.x - d.source.x ), dy = ( d.target.y - d.source.y );
                 var dr = Math.sqrt(dx * dx + dy * dy);
+                if (dr == 0) dr = 0.1;
                 var sinus = dy / dr;
                 var cosinus = dx / dr;
                 var l = d.type.length * 6;
