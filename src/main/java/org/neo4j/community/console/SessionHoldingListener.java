@@ -5,10 +5,6 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.lang.ref.WeakReference;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * @author mh
