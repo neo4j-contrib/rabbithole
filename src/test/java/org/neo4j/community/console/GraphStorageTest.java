@@ -50,16 +50,21 @@ public class GraphStorageTest {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message"));
         final GraphInfo info2 = info.newQuery("query2");
         storage.update(info2);
-        Transaction tx = gdb.beginTx();
-        final Node node = index.get("id", info.getId()).getSingle();
-        assertNotNull(node);
-        assertEquals("query2", node.getProperty("query"));
-        assertEquals(info.getId(), node.getProperty("id"));
-        assertEquals(info.getInit(), node.getProperty("init"));
-        assertEquals(info.getMessage(),node.getProperty("message"));
-        delete(node);
-        assertNull(storage.find(info.getId()));
-        tx.success();tx.finish();
+        try (Transaction tx = gdb.beginTx()) {
+            final Node node = index.get("id", info.getId()).getSingle();
+            assertNotNull(node);
+            assertEquals("query2", node.getProperty("query"));
+            assertEquals(info.getId(), node.getProperty("id"));
+            assertEquals(info.getInit(), node.getProperty("init"));
+            assertEquals(info.getMessage(),node.getProperty("message"));
+            delete(node);
+            tx.success();
+        }
+
+        try (Transaction tx2 = gdb.beginTx()) {
+            assertNull(storage.find(info.getId()));
+            tx2.success();
+        }
     }
     @Test
     public void testCreateWithVersion() throws Exception {
@@ -134,19 +139,23 @@ public class GraphStorageTest {
     @Test
     public void testCreate() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
-        Transaction tx = gdb.beginTx();
-        assertNotNull(info);
-        final Node node = index.get("id", info.getId()).getSingle();
-        assertNotNull(node);
-        assertEquals("query", node.getProperty("query"));
-        tx.success();tx.finish();
-        delete(node);
+        try (Transaction tx2 = gdb.beginTx()) {
+            assertNotNull(info);
+            final Node node = index.get("id", info.getId()).getSingle();
+            assertNotNull(node);
+            assertEquals("query", node.getProperty("query"));
+            tx2.success();
+            delete(node);
+        }
     }
     @Test
     public void testDelete() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
         storage.delete(info.getId());
-        final Node node = index.get("id", info.getId()).getSingle();
-        assertNull(node);
+        try (Transaction tx = gdb.beginTx()) {
+            final Node node = index.get("id", info.getId()).getSingle();
+            assertNull(node);
+            tx.success();
+        }
     }
 }

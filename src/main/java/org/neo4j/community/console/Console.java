@@ -11,6 +11,9 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.slf4j.Logger;
 
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
+
 public class Console
 {
 
@@ -77,7 +80,7 @@ public class Console
     private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {
         if (limit == null) return;
         GuardingRequestFilter requestTimeLimitFilter = new GuardingRequestFilter(limit, maxOps);
-        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/console/*", FilterMapping.REQUEST);
+        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/console/*", EnumSet.of(DispatcherType.REQUEST));
     }
 
     public void join() throws InterruptedException {
