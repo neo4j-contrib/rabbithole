@@ -19,10 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -80,10 +77,27 @@ public class ConsoleService {
     }
 
     private void createGraphStorage() {
-        final String restUrl = System.getenv("NEO4J_REST_URL");
-        final String login = System.getenv("NEO4J_LOGIN");
-        final String password = System.getenv("NEO4J_PASSWORD");
+        String restUrlVar = System.getenv("NEO4J_REST_URL_VAR");
+        if (restUrlVar == null ) restUrlVar = "NEO4J_URL";
+        final String restUrl = System.getenv(restUrlVar);
+
+        String login = null, password = null;
         if (restUrl!=null) {
+            login = System.getenv("NEO4J_LOGIN");
+            password = System.getenv("NEO4J_PASSWORD");
+            if (login == null) {
+                try {
+                    URL url = new URL(restUrl);
+                    String userInfo = url.getUserInfo();
+                    if (userInfo != null) {
+                        login = userInfo.split(":")[0];
+                        password = userInfo.split(":")[1];
+                    }
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException("Invalid Neo4j-Server-URL " + restUrl);
+                }
+            }
+
             final RestAPI api = new RestAPIFacade(restUrl, login, password);
             storage = new GraphStorage(api);
         }
