@@ -79,7 +79,7 @@ public class ConsoleService {
     private void createGraphStorage() {
         String restUrlVar = System.getenv("NEO4J_REST_URL_VAR");
         if (restUrlVar == null ) restUrlVar = "NEO4J_URL";
-        final String restUrl = System.getenv(restUrlVar);
+        String restUrl = System.getenv(restUrlVar);
 
         String login = null, password = null;
         if (restUrl!=null) {
@@ -98,6 +98,7 @@ public class ConsoleService {
                 }
             }
 
+            if (!restUrl.contains("/db/data")) restUrl += "/db/data";
             final RestAPI api = new RestAPIFacade(restUrl, login, password);
             storage = new GraphStorage(api);
         }
