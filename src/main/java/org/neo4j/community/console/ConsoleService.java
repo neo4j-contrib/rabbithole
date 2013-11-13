@@ -113,7 +113,7 @@ public class ConsoleService {
         if (version!=null) service.setVersion(version);
         boolean initial = init != null;
         if (dontInitialize(service) || init==null || init.equalsIgnoreCase("none")) init=null;
-        if (query.equalsIgnoreCase("none")) query=null;
+        if (query == null || query.equalsIgnoreCase("none")) query=null;
         final Map<String, Object> data = map("init", init, "query", query,"version",service.getVersion());
         long start = System.currentTimeMillis(), time = start;
         try {
