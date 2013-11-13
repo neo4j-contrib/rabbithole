@@ -13,10 +13,6 @@
 
   <repositories>
     <repository>
-      <id>Spark repository</id>
-      <url>http://www.sparkjava.com/nexus/content/repositories/spark/</url>
-    </repository>
-    <repository>
       <id>Neo4j releases</id>
       <url>http://m2.neo4j.org/content/repositories/releases</url>
     </repository>
@@ -48,7 +44,7 @@
       <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j-rest-graphdb</artifactId>
-        <version>1.9</version>
+        <version>2.0.0-M06</version>
           <exclusions>
             <exclusion>
                 <groupId>org.neo4j</groupId>
@@ -204,9 +200,9 @@
     </dependency>
 
     <dependency>
-      <groupId>spark</groupId>
-      <artifactId>spark</artifactId>
-      <version>0.9.9.3-SNAPSHOT</version>
+      <groupId>com.sparkjava</groupId>
+      <artifactId>spark-core</artifactId>
+      <version>1.1.1</version>
       <exclusions>
           <exclusion>
               <groupId>org.eclipse.jetty.aggregate</groupId>
