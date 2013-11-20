@@ -61,19 +61,8 @@ public class Console
         root.setParentLoaderPriority(true);
         root.setAttribute(ConsoleFilter.DATABASE_ATTRIBUTE, databaseInfo);
         setupRequestLimits(root, REQUEST_TIME_LIMIT, MAX_OPS_LIMIT);
-        final HandlerList handlers = new HandlerList();
-        final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
-        handlers.setHandlers(new Handler[]{resourceHandler,root});
-        server.setHandler(handlers);
+        server.setHandler(root);
         server.start();
-    }
-
-    private Handler createResourceHandler(String context, String resourceBase) {
-        WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(context);
-        ctx.setResourceBase(resourceBase);
-        ctx.setParentLoaderPriority(true);
-        return ctx;
     }
 
     private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {
