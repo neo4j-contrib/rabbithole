@@ -3,9 +3,11 @@ package org.neo4j.community.console;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.slf4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Console
 {
@@ -31,8 +33,14 @@ public class Console
     }
 
     private static GraphDatabaseService embeddedGraphDatabase(String path, boolean expose) {
-        if (expose) return new EmbeddedGraphDatabase(path);
-        return new EmbeddedReadOnlyGraphDatabase(path);
+        Map<String, String> config = new HashMap<>();
+        if (!expose) {
+            config.put("read_only", "true");
+        }
+        return new GraphDatabaseFactory().
+                newEmbeddedDatabaseBuilder(path).
+                setConfig(config).
+                newGraphDatabase();
     }
 
     public static Console sandbox(GraphDatabaseService database) {
