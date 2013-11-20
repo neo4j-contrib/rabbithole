@@ -17,13 +17,8 @@ public class GuardingRequestFilter implements Filter {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(GuardingRequestFilter.class);
 
-    private final int timeout;
-    private final int maxOps;
-
-    public GuardingRequestFilter(final int timeout, int maxOps) {
-        this.timeout = timeout;
-        this.maxOps = maxOps;
-    }
+    private int timeout;
+    private int maxOps;
 
     private Guard getGuard(ServletRequest request) {
         Neo4jService service = SessionService.getService((HttpServletRequest) request,true);
@@ -43,6 +38,8 @@ public class GuardingRequestFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        maxOps = Integer.parseInt(filterConfig.getInitParameter("maxOps"));
+        timeout = Integer.parseInt(filterConfig.getInitParameter("timeout"));
     }
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
