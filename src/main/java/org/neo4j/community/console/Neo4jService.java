@@ -1,6 +1,8 @@
 package org.neo4j.community.console;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.Settings;
+import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -8,11 +10,7 @@ import org.neo4j.test.ImpermanentGraphDatabase;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
@@ -39,9 +37,10 @@ class Neo4jService {
         this(createInMemoryDatabase(),true);
     }
 
-    private static ImpermanentGraphDatabase createInMemoryDatabase() throws Throwable {
+    private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
         try {
-            return new ImpermanentGraphDatabase(stringMap("execution_guard_enabled","true"));
+            Map<String,String> config = Collections.singletonMap("execution_guard_enabled","true");
+            return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
         } catch(RuntimeException re) {
             Throwable t=re.getCause();
             if (t instanceof RuntimeException) throw (RuntimeException)t;
