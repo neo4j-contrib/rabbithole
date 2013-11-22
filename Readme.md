@@ -33,6 +33,15 @@ to embed in iframes, see [usage.html](http://rabbithole.herokuapp.com/usage.html
 * open application in browser [http://localhost:8080](http://localhost:8080)
 
 
+### building a war file
+
+* use `mvn install war:war` to build a `war` file. This can be deployed to any web container (tomcat, jetty, ...)
+
+### running locally via jetty
+
+* use `mvn install jetty:run`
+
+
 ### Endpoints:
 
 * post /console/cypher
