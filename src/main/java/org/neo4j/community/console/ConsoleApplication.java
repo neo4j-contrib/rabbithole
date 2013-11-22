@@ -105,7 +105,7 @@ public class ConsoleApplication implements SparkApplication {
                     graph = SubGraph.from(service.getGraphDatabase());
                 } else {
                     final CypherQueryExecutor.CypherResult result = service.cypherQuery(query);
-                    graph = SubGraph.from(result);
+                    graph = SubGraph.from(service.getGraphDatabase(),result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);

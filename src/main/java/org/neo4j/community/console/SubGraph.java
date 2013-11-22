@@ -120,16 +120,19 @@ public class SubGraph {
         return graph;
     }
 
-    public static SubGraph from(CypherQueryExecutor.CypherResult result) {
-        final SubGraph graph = new SubGraph();
-        final List<String> columns = result.getColumns();
-        for (Map<String, Object> row : result) {
-            for (String column : columns) {
-                final Object value = row.get(column);
-                addToGraph(graph, value);
+    public static SubGraph from(GraphDatabaseService db, CypherQueryExecutor.CypherResult result) {
+        try (Transaction tx = db.beginTx()) {
+            final SubGraph graph = new SubGraph();
+            final List<String> columns = result.getColumns();
+            for (Map<String, Object> row : result) {
+                for (String column : columns) {
+                    final Object value = row.get(column);
+                    addToGraph(graph, value);
+                }
             }
+            tx.success();
+            return graph;
         }
-        return graph;
     }
 
     private static void addToGraph(SubGraph graph, Object value) {

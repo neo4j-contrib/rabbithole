@@ -4,13 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphalgo.impl.util.PathImpl;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IteratorUtil;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,12 +23,14 @@ import static org.neo4j.helpers.collection.MapUtil.map;
  */
 public class SubGraphTest {
 
-    private ImpermanentGraphDatabase gdb;
+    private GraphDatabaseService gdb;
+    private Node aNode;
 
     @Before
     public void setUp() throws Exception {
-        gdb = new ImpermanentGraphDatabase();
+        gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
         gdb.beginTx();
+        aNode = gdb.createNode();
     }
 
     @After
@@ -49,16 +47,16 @@ public class SubGraphTest {
 
     @Test
     public void testFromSimpleCypherResult() throws Exception {
-        final CypherQueryExecutor.CypherResult result = result("node", gdb.getReferenceNode());
-        final SubGraph graph = SubGraph.from(result);
+        final CypherQueryExecutor.CypherResult result = result("node", aNode);
+        final SubGraph graph = SubGraph.from(gdb, result);
         assertRefNodeGraph(graph);
     }
 
     @Test
     public void testFromRelCypherResult() throws Exception {
-        final Relationship rel = gdb.getReferenceNode().createRelationshipTo(gdb.getReferenceNode(), DynamicRelationshipType.withName("REL"));
+        final Relationship rel = aNode.createRelationshipTo(aNode, DynamicRelationshipType.withName("REL"));
         final CypherQueryExecutor.CypherResult result = result("rel", rel);
-        final SubGraph graph = SubGraph.from(result);
+        final SubGraph graph = SubGraph.from(gdb, result);
         assertEquals(1, graph.getNodes().size());
         final Map<Long, Map<String, Object>> rels = graph.getRelationships();
         assertEquals(1, rels.size());
@@ -67,10 +65,10 @@ public class SubGraphTest {
 
     @Test
     public void testFromPathCypherResult() throws Exception {
-        final Relationship rel = gdb.getReferenceNode().createRelationshipTo(gdb.getReferenceNode(), DynamicRelationshipType.withName("REL"));
-        final Path path = new PathImpl.Builder(gdb.getReferenceNode()).push(rel).build();
+        final Relationship rel = aNode.createRelationshipTo(aNode, DynamicRelationshipType.withName("REL"));
+        final Path path = new PathImpl.Builder(aNode).push(rel).build();
         final CypherQueryExecutor.CypherResult result = result("path", path);
-        final SubGraph graph = SubGraph.from(result);
+        final SubGraph graph = SubGraph.from(gdb, result);
         assertEquals(1, graph.getNodes().size());
         final Map<Long, Map<String, Object>> rels = graph.getRelationships();
         assertEquals(1, rels.size());
@@ -169,7 +167,7 @@ public class SubGraphTest {
     @Test
     public void testMarkRelationshipsFromVariableLength() throws Exception {
         final Node n1 = gdb.createNode();
-        final Node n0 = gdb.getReferenceNode();
+        final Node n0 = aNode;
         final Relationship relationship = n0.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         final SubGraph graph = SubGraph.from(gdb);
         final CypherQueryExecutor executor = new CypherQueryExecutor(gdb, null);
@@ -187,7 +185,7 @@ public class SubGraphTest {
     public void testFromSimpleGraph() throws Exception {
         final Node n1 = gdb.createNode();
         n1.setProperty("name", "Node1");
-        final Node n0 = gdb.getReferenceNode();
+        final Node n0 = aNode;
         final Relationship relationship = n0.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         relationship.setProperty("related", true);
         final SubGraph graph = SubGraph.from(gdb);
