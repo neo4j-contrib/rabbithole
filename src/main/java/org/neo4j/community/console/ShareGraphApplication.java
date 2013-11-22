@@ -20,13 +20,13 @@ public class ShareGraphApplication implements SparkApplication {
     public void init() {
         SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
-        post(new spark.Route("/r/share") {
+        post(new spark.Route("r/share") {
             public Object handle(Request request, Response response) {
                 final Map input = new Gson().fromJson(request.body(), Map.class);
                 return consoleService.share(request, input);
             }
         });
-        get(new spark.Route("/r/*") {
+        get(new spark.Route("r/*") {
             public Object handle(Request request, Response response) {
                 final String path = request.raw().getRequestURI();
                 final Matcher matcher = PATTERN.matcher(path);

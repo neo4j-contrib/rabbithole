@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 import java.io.IOException;
 
 import static javax.servlet.http.HttpServletResponse.SC_REQUEST_TIMEOUT;
@@ -17,24 +18,20 @@ public class GuardingRequestFilter implements Filter {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(GuardingRequestFilter.class);
 
-    private final int timeout;
-    private final int maxOps;
-
-    public GuardingRequestFilter(final int timeout, int maxOps) {
-        this.timeout = timeout;
-        this.maxOps = maxOps;
-    }
+    private int timeout;
+    private int maxOps;
 
     private Guard getGuard(ServletRequest request) {
         Neo4jService service = SessionService.getService((HttpServletRequest) request,true);
-        return ((GraphDatabaseAPI)service.getGraphDatabase()).getGuard();
+        return ((GraphDatabaseAPI)service.getGraphDatabase()).getDependencyResolver().resolveDependency(Guard.class);
     }
+
     private void rollback(ServletRequest request) {
         Neo4jService service = SessionService.getService((HttpServletRequest) request,false);
         if (service==null) return;
         GraphDatabaseAPI graphDatabase = (GraphDatabaseAPI) service.getGraphDatabase();
         try {
-            Transaction tx = graphDatabase.getTxManager().getTransaction();
+            Transaction tx = graphDatabase.getDependencyResolver().resolveDependency(TransactionManager.class).getTransaction();
             if (tx!=null) tx.rollback();
         } catch(Exception e) {
             LOG.error("Error rolling back transaction ",e);
@@ -43,6 +40,8 @@ public class GuardingRequestFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        maxOps = Integer.parseInt(filterConfig.getInitParameter("maxOps"));
+        timeout = Integer.parseInt(filterConfig.getInitParameter("timeout"));
     }
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {

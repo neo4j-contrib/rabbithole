@@ -1,24 +1,18 @@
 package org.neo4j.community.console;
 
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.slf4j.Logger;
 
-import javax.servlet.DispatcherType;
-import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Console
 {
 
     private static final String WEBAPP_LOCATION = "src/main/webapp/";
-    public static final int REQUEST_TIME_LIMIT = 5 * 1000;
-    public static final int MAX_OPS_LIMIT = 10000;
     private Server server;
     private final DatabaseInfo databaseInfo;
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Console.class);
@@ -39,8 +33,14 @@ public class Console
     }
 
     private static GraphDatabaseService embeddedGraphDatabase(String path, boolean expose) {
-        if (expose) return new EmbeddedGraphDatabase(path);
-        return new EmbeddedReadOnlyGraphDatabase(path);
+        Map<String, String> config = new HashMap<>();
+        if (!expose) {
+            config.put("read_only", "true");
+        }
+        return new GraphDatabaseFactory().
+                newEmbeddedDatabaseBuilder(path).
+                setConfig(config).
+                newGraphDatabase();
     }
 
     public static Console sandbox(GraphDatabaseService database) {
@@ -60,26 +60,8 @@ public class Console
         root.setResourceBase(WEBAPP_LOCATION);
         root.setParentLoaderPriority(true);
         root.setAttribute(ConsoleFilter.DATABASE_ATTRIBUTE, databaseInfo);
-        setupRequestLimits(root, REQUEST_TIME_LIMIT, MAX_OPS_LIMIT);
-        final HandlerList handlers = new HandlerList();
-        final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
-        handlers.setHandlers(new Handler[]{resourceHandler,root});
-        server.setHandler(handlers);
+        server.setHandler(root);
         server.start();
-    }
-
-    private Handler createResourceHandler(String context, String resourceBase) {
-        WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(context);
-        ctx.setResourceBase(resourceBase);
-        ctx.setParentLoaderPriority(true);
-        return ctx;
-    }
-
-    private void setupRequestLimits(WebAppContext root, Integer limit, int maxOps) {
-        if (limit == null) return;
-        GuardingRequestFilter requestTimeLimitFilter = new GuardingRequestFilter(limit, maxOps);
-        root.addFilter(new FilterHolder(requestTimeLimitFilter), "/console/*", EnumSet.of(DispatcherType.REQUEST));
     }
 
     public void join() throws InterruptedException {

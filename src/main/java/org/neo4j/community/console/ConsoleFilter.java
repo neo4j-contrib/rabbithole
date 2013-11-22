@@ -26,7 +26,11 @@ public class ConsoleFilter extends SparkFilter {
     }
 
     public static DatabaseInfo getDatabase(final ServletContext context) {
-        if (context == null || context.getAttribute(DATABASE_ATTRIBUTE) == null) {
+        if (context==null) {
+            throw new IllegalArgumentException("null context not allowed here");
+        }
+        if (context.getAttribute(DATABASE_ATTRIBUTE) == null) {
+            context.setAttribute(DATABASE_ATTRIBUTE, DatabaseInfo.sandbox(null));
             return null;
         }
         return (DatabaseInfo) context.getAttribute(DATABASE_ATTRIBUTE);
