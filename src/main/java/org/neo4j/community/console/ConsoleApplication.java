@@ -37,7 +37,7 @@ public class ConsoleApplication implements SparkApplication {
             }
         });
 
-        post(new Route("/console/cypher") {
+        post(new Route("console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String query = request.body();
                 if (query!=null && !query.isEmpty()) {
@@ -46,7 +46,7 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson(consoleService.execute(service, null, query, null));
             }
         });
-        post( new Route( "/console/version" )
+        post( new Route( "console/version" )
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
@@ -55,13 +55,13 @@ public class ConsoleApplication implements SparkApplication {
                 return new Gson().toJson( map("version", service.getVersion()) );
             }
         } );
-        get(new Route("/console/cypher") {
+        get(new Route("console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param(request, "query", "");
                     return service.cypherQueryResults(query).toString();
             }
         });
-        post(new Route("/console/init") {
+        post(new Route("console/init") {
             @Override
             protected void doBefore(Request request, Response response) {
                 Neo4jService service = SessionService.getService(request.raw(),true);
@@ -83,18 +83,18 @@ public class ConsoleApplication implements SparkApplication {
             }
 
         });
-        get(new Route("/console/visualization") {
+        get(new Route("console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
                 return new Gson().toJson(service.cypherQueryViz(query));
             }
         });
-        get(new Route("/console/to_geoff") {
+        get(new Route("console/to_geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.exportToGeoff();
             }
         });
-        get(new Route("/console/to_yuml") {
+        get(new Route("console/to_yuml") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param( request,"query", "");
                 String[] props = param( request,"props", "name").split(",");
@@ -111,14 +111,14 @@ public class ConsoleApplication implements SparkApplication {
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);
             }
         });
-        get( new Route( "/console/to_cypher" )
+        get( new Route( "console/to_cypher" )
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
                 return service.exportToCypher();
             }
         } );
-        get( new Route( "/console/url" )
+        get( new Route( "console/url" )
         {
             protected Object doHandle( Request request, Response response, Neo4jService service ) throws IOException
             {
@@ -126,20 +126,20 @@ public class ConsoleApplication implements SparkApplication {
                 return consoleService.shortenUrl( uri );
             }
         } );
-        get(new Route("/console/shorten") {
+        get(new Route("console/shorten") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
                 return consoleService.shortenUrl(request.queryParams("url"));
             }
         });
 
-        delete(new Route("/console") {
+        delete(new Route("console") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 reset(request);
                 return "deleted";
             }
         });
 
-        post(new Route("/console/geoff") {
+        post(new Route("console/geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws SyntaxError, SubgraphError {
                 String geoff = request.body();
                 if (geoff!=null && !geoff.isEmpty()) {

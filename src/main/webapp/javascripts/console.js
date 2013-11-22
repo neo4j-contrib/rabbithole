@@ -76,7 +76,7 @@ function getParameters() {
 }
 
 function share(fn) {
-    $.ajax("/console/url", {
+    $.ajax("console/url", {
         type: "GET",
         success: fn
     });
@@ -101,7 +101,7 @@ function viz(data) {
         if (!isCypher(query)) {
             query = "";
         }
-        $.ajax("/console/visualization?query=" + encodeURIComponent(query), {
+        $.ajax("console/visualization?query=" + encodeURIComponent(query), {
             type: "GET",
             beforeSend: setSessionHeader,
             dataType: "json",
@@ -117,7 +117,7 @@ function setSessionHeader(request) {
     request.setRequestHeader("X-Session", session_id)
 }
 function reset(done) {
-    $.ajax("/console", {
+    $.ajax("console", {
         beforeSend: setSessionHeader,
         type: "DELETE",
         success: done
@@ -129,7 +129,7 @@ function share_yuml(query) {
     if (!query) {
         return;
     }
-    $.ajax("/console/to_yuml?query=" + encodeURIComponent(query), {
+    $.ajax("console/to_yuml?query=" + encodeURIComponent(query), {
         type: "GET",
         beforeSend: setSessionHeader,
         dataType: "text",
@@ -310,10 +310,10 @@ function showResults(data) {
 
 function send(query) {
     if (isCypher(query)) {
-        post("/console/cypher", query, showResults, "json");
+        post("console/cypher", query, showResults, "json");
     }
     else {
-        post("/console/geoff", query, function () {
+        post("console/geoff", query, function () {
             viz();
         });
     }
@@ -408,7 +408,7 @@ function sendNext(msg) {
         inputQuery(_query)
         return;
     }
-    post("/console/cypher", _query, function (res) {
+    post("console/cypher", _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
             console.log("res",res);
@@ -426,7 +426,7 @@ function close(id) {
 }
 
 function sendInit(params, callId) {
-    post("/console/init", JSON.stringify(params), function (json) {
+    post("console/init", JSON.stringify(params), function (json) {
         showResults(json);
         showVersion(json);
         showWelcome(json);
@@ -493,7 +493,7 @@ $(document).ready(
 //        }
 
         $('#version').change(function () {
-            post("/console/version", $('#version').val(), showVersion, "json");
+            post("console/version", $('#version').val(), showVersion, "json");
             $(this).hide();
         });
         var isInIFrame = window.location != window.parent.location;
