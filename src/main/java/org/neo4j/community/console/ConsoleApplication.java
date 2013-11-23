@@ -71,7 +71,7 @@ public class ConsoleApplication implements SparkApplication {
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                final Map input = requestBodyToMap(request);
+                @SuppressWarnings("unchecked") final Map<String,Object> input = requestBodyToMap(request);
                 final String id = param(input, "id", null);
                 final Map<String, Object> result;
                 if (id != null) {
@@ -122,7 +122,7 @@ public class ConsoleApplication implements SparkApplication {
         {
             protected Object doHandle( Request request, Response response, Neo4jService service ) throws IOException
             {
-                final String uri = baseUri( request.raw(), "init=" + URLEncoder.encode( service.exportToGeoff(), "UTF-8" ) + hasRootNodeParam( service ), null);
+                final String uri = baseUri( request.raw(), "init=" + URLEncoder.encode( service.exportToGeoff(), "UTF-8" ), null);
                 return consoleService.shortenUrl( uri );
             }
         } );
@@ -154,9 +154,5 @@ public class ConsoleApplication implements SparkApplication {
     private Map requestBodyToMap(Request request) {
         Map result = new Gson().fromJson(request.body(), Map.class);
         return result!=null ? result : map();
-    }
-
-    private String hasRootNodeParam(Neo4jService service) {
-        return service.hasReferenceNode() ? "" : "&no_root=true";
     }
 }

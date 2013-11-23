@@ -11,7 +11,7 @@ import javax.servlet.ServletException;
  * @since 05.06.12
  */
 public class ConsoleFilter extends SparkFilter {
-    private final static ThreadLocal<ServletContext> ctx=new ThreadLocal<ServletContext>();
+    private final static ThreadLocal<ServletContext> ctx=new ThreadLocal<>();
     public static final String DATABASE_ATTRIBUTE = "database";
 
     @Override

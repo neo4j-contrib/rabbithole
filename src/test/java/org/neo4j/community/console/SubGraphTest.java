@@ -25,16 +25,20 @@ public class SubGraphTest {
 
     private GraphDatabaseService gdb;
     private Node aNode;
+    private Transaction tx;
 
     @Before
     public void setUp() throws Exception {
         gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        gdb.beginTx();
+        tx = gdb.beginTx();
         aNode = gdb.createNode();
     }
 
     @After
     public void tearDown() throws Exception {
+        try {
+            tx.success();tx.close();
+        } catch(Exception e) {}
         gdb.shutdown();
     }
 
@@ -141,15 +145,17 @@ public class SubGraphTest {
     @Test
     public void testImportSubGraph() throws Exception {
         final SubGraph graph = new SubGraph();
+        graph.addNode(0L, map("name", "node0"));
         graph.addNode(10L, map("name", "node10"));
         graph.addRel(0L, map("name", "rel0", "start", 0L, "end", 10L, "type", "REL"));
-        graph.importTo(gdb, true);
-        assertEquals("node10", gdb.getNodeById(1).getProperty("name"));
+        graph.importTo(gdb);
+        assertEquals("node0", gdb.getNodeById(1).getProperty("name"));
+        assertEquals("node10", gdb.getNodeById(2).getProperty("name"));
         final Relationship rel = gdb.getRelationshipById(0);
         assertEquals("rel0", rel.getProperty("name"));
         assertEquals("REL", rel.getType().name());
-        assertEquals(1L, rel.getEndNode().getId());
-        assertEquals(0L, rel.getStartNode().getId());
+        assertEquals(2L, rel.getEndNode().getId());
+        assertEquals(1L, rel.getStartNode().getId());
     }
 
     private Map rel(int id, int from, int to, final String type) {

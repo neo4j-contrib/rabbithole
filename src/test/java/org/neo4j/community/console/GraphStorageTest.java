@@ -12,6 +12,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.server.NeoServer;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 /**
  * @author mh
@@ -27,16 +28,18 @@ public class GraphStorageTest {
 
     @BeforeClass
     public static void startup() {
-        gdb = new ImpermanentGraphDatabase();
+        gdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
         webServer = ImportRemoteGraphTest.startWebServer(gdb, PORT);
     }
     @Before
     public void setUp() throws Exception {
-        gdb.cleanContent(true);
+        gdb.cleanContent();
         storage = new GraphStorage("http://localhost:"+PORT+"/db/data");
-        Transaction tx = gdb.beginTx();
-        index = gdb.index().forNodes("graphs");
-        tx.success(); tx.finish();
+
+        try (Transaction tx = gdb.beginTx()) {
+            index = gdb.index().forNodes("graphs");
+            tx.success();
+        }
     }
 
     @AfterClass
@@ -74,7 +77,7 @@ public class GraphStorageTest {
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         assertEquals(info.getVersion(),node.getProperty("version"));
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     @Test
@@ -86,7 +89,7 @@ public class GraphStorageTest {
         assertEquals(info.getId(), node.getProperty("id"));
         assertEquals(info.getVersion(),node.getProperty("version"));
         assertEquals(!info.hasRoot(),(Boolean)node.getProperty("no_root"));
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     @Test
@@ -97,7 +100,7 @@ public class GraphStorageTest {
         final Node node = index.get("id", info.getId()).getSingle();
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     @Test
@@ -112,7 +115,7 @@ public class GraphStorageTest {
         assertNull(index.get("id", id).getSingle());
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     @Test
@@ -127,13 +130,13 @@ public class GraphStorageTest {
         assertNull(index.get("id", id).getSingle());
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     private void delete(Node node) {
         final Transaction tx = gdb.beginTx();
         node.delete();
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     @Test

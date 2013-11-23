@@ -66,7 +66,7 @@ class GeoffExportService {
     }
 
     Map<String, Object> toMap(PropertyContainer pc) {
-        Map<String, Object> result = new TreeMap<String, Object>();
+        Map<String, Object> result = new TreeMap<>();
         for (String prop : pc.getPropertyKeys()) {
             result.put(prop, pc.getProperty(prop));
         }

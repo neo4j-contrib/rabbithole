@@ -3,7 +3,10 @@ package org.neo4j.community.console;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Map;
 
@@ -15,23 +18,28 @@ import static org.junit.Assert.assertTrue;
  * @since 06.12.12
  */
 public class QueryStatisticsTest {
-    private ImpermanentGraphDatabase gdb;
+    private GraphDatabaseService gdb;
     private CypherQueryExecutor cypherQueryExecutor;
+    private Node aNode;
+    private Transaction tx;
 
     @Before
     public void setUp() throws Exception {
-        gdb = new ImpermanentGraphDatabase();
+        gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
         cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
+        tx = gdb.beginTx();
+        aNode = gdb.createNode();
     }
 
     @After
     public void tearDown() throws Exception {
+        tx.success();tx.close();
         gdb.shutdown();
     }
 
     @Test
     public void testNoUpdate() throws Exception {
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(0) return n", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node("+aNode.getId()+") return n", null);
         final int rowCount = result.getRowCount();
         assertEquals(1, rowCount);
         final long time = result.getTime();
@@ -46,7 +54,7 @@ public class QueryStatisticsTest {
     @Test
     public void testCreate() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("start n=node(0) create n-[:FOO]->m", null);
+                cypherQueryExecutor.cypherQuery("start n=node("+aNode.getId()+") create n-[:FOO]->m", null);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
@@ -65,7 +73,7 @@ public class QueryStatisticsTest {
     @Test
     public void testSet() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("start n=node(0) set n.foo='bar'", null);
+                cypherQueryExecutor.cypherQuery("start n=node("+aNode.getId()+") set n.foo='bar'", null);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
@@ -84,7 +92,7 @@ public class QueryStatisticsTest {
     @Test
     public void testDelete() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("start n=node(0) create n-[r:FOO]->m delete r,m", null);
+                cypherQueryExecutor.cypherQuery("start n=node("+aNode.getId()+") create n-[r:FOO]->m delete r,m", null);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();

@@ -1,9 +1,5 @@
 package org.neo4j.community.console;
 
-import static org.junit.Assert.assertEquals;
-
-import java.net.URL;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -11,6 +7,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.rest.graphdb.ExecutingRestRequest;
 import org.neo4j.rest.graphdb.RequestResult;
 import org.neo4j.server.NeoServer;
@@ -18,6 +15,12 @@ import org.neo4j.server.WrappingNeoServer;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
+
+import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author mh
@@ -25,7 +28,8 @@ import org.neo4j.test.ImpermanentGraphDatabase;
  */
 public class ImportRemoteGraphTest {
 
-    private Node referenceNode;
+    public static final String VALUE = "root";
+    public static final String NAME = "name";
     private Neo4jService service;
     private ConsoleService consoleService;
     private static ImpermanentGraphDatabase serverGraphDatabase;
@@ -33,24 +37,34 @@ public class ImportRemoteGraphTest {
     private static final int PORT = 7475;
     private static final String SERVER_ROOT_URI = "http://localhost:" + PORT;
     private static final String CYPHER_URL = SERVER_ROOT_URI + "/db/data/cypher";
+    private Node remoteNode;
 
 
     @Test
     public void testInitFromUrl() throws Exception {
-        consoleService.initFromUrl(service, new URL(CYPHER_URL), "start n=node(0) return n");
-        assertEquals("root", referenceNode.getProperty("name"));
+        consoleService.initFromUrl(service, new URL(CYPHER_URL), "start n=node(" + remoteNode.getId() + ") return n");
+        checkImportedNode(NAME, VALUE);
+    }
+
+    private void checkImportedNode(String prop, String value) {
+        GraphDatabaseService gdb = service.getGraphDatabase();
+        try (Transaction tx = gdb.beginTx()) {
+            Node imported = IteratorUtil.single(GlobalGraphOperations.at(gdb).getAllNodes());
+            assertEquals(value, imported.getProperty(prop));
+            tx.success();
+        }
     }
 
     @Test
     public void testInitFromUrl2() throws Exception {
-        consoleService.initFromUrl2(service,new URL(CYPHER_URL), "start n=node(0) return n");
-        assertEquals("root", referenceNode.getProperty("name"));
+        consoleService.initFromUrl2(service,new URL(CYPHER_URL), "start n=node("+ remoteNode.getId()+") return n");
+        checkImportedNode(NAME, VALUE);
     }
 
 
     @BeforeClass
     public static void startup() {
-        serverGraphDatabase = new ImpermanentGraphDatabase();
+        serverGraphDatabase = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
         webServer = startWebServer(serverGraphDatabase, PORT);
     }
 
@@ -89,18 +103,13 @@ public class ImportRemoteGraphTest {
 
     @Before
     public void setUp() throws Throwable {
-        serverGraphDatabase.cleanContent(true);
+        serverGraphDatabase.cleanContent();
         final Transaction tx = serverGraphDatabase.beginTx();
-        final Node remoteRefNode = serverGraphDatabase.getReferenceNode();
-        remoteRefNode.setProperty("name", "root");
-        tx.success();tx.finish();
+        remoteNode = serverGraphDatabase.createNode();
+        remoteNode.setProperty(NAME, VALUE);
+        tx.success();tx.close();
 
         consoleService = new ConsoleService();
         service = new Neo4jService();
-
-        final GraphDatabaseService localGraphDatabase = service.getGraphDatabase();
-        localGraphDatabase.beginTx();
-        referenceNode = localGraphDatabase.getReferenceNode();
-        referenceNode.removeProperty("name");
     }
 }

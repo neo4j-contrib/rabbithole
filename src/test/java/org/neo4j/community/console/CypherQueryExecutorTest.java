@@ -3,14 +3,11 @@ package org.neo4j.community.console;
 import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.neo4j.cypher.SyntaxException;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.graphdb.*;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -26,20 +23,22 @@ import static org.junit.internal.matchers.IsCollectionContaining.hasItems;
  */
 public class CypherQueryExecutorTest {
 
-    private ImpermanentGraphDatabase gdb;
+    private GraphDatabaseService gdb;
     private CypherQueryExecutor cypherQueryExecutor;
     private Transaction tx;
+    private Node rootNode;
 
     @Before
     public void setUp() throws Exception {
-        gdb = new ImpermanentGraphDatabase();
+        gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
         tx = gdb.beginTx();
+        rootNode = gdb.createNode();
         cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
     }
 
     @After
     public void tearDown() throws Exception {
-        tx.failure();tx.finish();
+        tx.failure();tx.close();
         gdb.shutdown();
     }
 
@@ -117,13 +116,13 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testCypherQuery() throws Exception {
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node(0) return n",null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node("+rootNode.getId()+") return n",null);
         assertEquals(asList("n"), result.getColumns());
         assertTrue(result.getText(),result.getText().contains("Node[0]"));
         for (Map<String, Object> row : result) {
             assertEquals(1,row.size());
             assertEquals(true,row.containsKey("n"));
-            assertEquals(gdb.getReferenceNode(),row.get("n"));
+            assertEquals(rootNode,row.get("n"));
         }
     }
 
@@ -133,9 +132,9 @@ public class CypherQueryExecutorTest {
         final Node n1 = gdb.createNode();
         n1.setProperty("name","n1");
         n1.setProperty("age",10);
-        final Relationship rel = gdb.getReferenceNode().createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
+        final Relationship rel = rootNode.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         rel.setProperty("name","rel1");
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(0) match p=n-[r]->m return p,n,r,m", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node("+rootNode.getId()+") match p=n-[r]->m return p,n,r,m", null);
         System.out.println(result);
         final List<Map<String,Object>> json = result.getJson();
         System.out.println(new Gson().toJson(json));

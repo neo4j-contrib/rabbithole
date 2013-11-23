@@ -120,9 +120,9 @@ public class CypherQueryExecutor {
         }
 
         private List<Map<String, Object>> createJson() {
-            final List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+            final List<Map<String, Object>> rows = new ArrayList<>();
             for (Map<String, Object> row : this) {
-                final LinkedHashMap<String, Object> newRow = new LinkedHashMap<String, Object>();
+                final LinkedHashMap<String, Object> newRow = new LinkedHashMap<>();
                 for (String column : columns) {
                     final Object value = row.get(column);
                     newRow.put(column, toJsonCompatible(value));
@@ -152,7 +152,7 @@ public class CypherQueryExecutor {
                 return result;
             }
             if (value instanceof Iterable) {
-                final List<Object> result = new ArrayList<Object>();
+                final List<Object> result = new ArrayList<>();
                 for (Object inner : (Iterable)value) {
                     result.add(toJsonCompatible(inner));
                 }
@@ -186,17 +186,14 @@ public class CypherQueryExecutor {
         }
         query = removeSemicolon( query );
         long time=System.currentTimeMillis();
-        Transaction tx = gdb.beginTx();
-        try {
+        try (Transaction tx = gdb.beginTx()) {
             final ExecutionResult result = canProfileQuery(query) ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
-            time=System.currentTimeMillis()-time;
-            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(),time, result.executionPlanDescription(), prettify(query));
-    		tx.success();
+            time = System.currentTimeMillis() - time;
+            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, result.executionPlanDescription(), prettify(query));
+            tx.success();
             return cypherResult;
-    	} finally {
-			tx.finish();
-		}
+        }
     }
 
     boolean canProfileQuery(String query) {
@@ -230,7 +227,7 @@ public class CypherQueryExecutor {
     // does not take care of quoted, non-identifier properties
     Set<String> extractProperties(String query) {
         final Matcher matcher = PROPERTY_PATTERN.matcher(query);
-        final Set<String> properties = new HashSet<String>();
+        final Set<String> properties = new HashSet<>();
         while (matcher.find()) {
             if (matcher.group(2)!=null) properties.add(matcher.group(2));
             if (matcher.group(3)!=null) properties.add(matcher.group(3));

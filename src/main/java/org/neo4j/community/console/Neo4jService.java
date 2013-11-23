@@ -1,19 +1,16 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.*;
-import org.neo4j.helpers.Settings;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.graphdb.*;
+import org.neo4j.test.TestGraphDatabaseFactory;
+import org.slf4j.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
 import static org.neo4j.helpers.collection.MapUtil.map;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 /**
 * @author mh
@@ -69,61 +66,47 @@ class Neo4jService {
         return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
     }
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
-        Transaction tx = gdb.beginTx();
-        try {
+        try (Transaction tx = gdb.beginTx()) {
             final SubGraph subGraph = SubGraph.from(gdb).markSelection(result);
             Map<String, Object> viz = map("nodes", subGraph.getNodes().values(), "links", subGraph.getRelationshipsWithIndexedEnds().values());
             tx.success();
             return viz;
-        } finally {
-            tx.finish();
         }
     }
 
     public String exportToGeoff() {
-        Transaction tx = gdb.beginTx();
-        try {
+        try (Transaction tx = gdb.beginTx()) {
             String result = geoffExportService.export();
             tx.success();
             return result;
-        } finally {
-            tx.finish();
         }
     }
     
     public String exportToCypher() {
-        Transaction tx = gdb.beginTx();
-        try {
+        try (Transaction tx = gdb.beginTx()) {
             String cypher = cypherExportService.export();
             tx.success();
             return cypher;
-        } finally {
-            tx.finish();
         }
     }
 
     public Map<String,Object> mergeGeoff(String geoff) {
-        Transaction tx = gdb.beginTx();
-        try {
-            final Map<String,Object> result = new LinkedHashMap<String, Object>();
+        try (Transaction tx = gdb.beginTx()) {
+            final Map<String,Object> result = new LinkedHashMap<>();
             for (Map.Entry<String, PropertyContainer> entry : geoffService.mergeGeoff(geoff).entrySet()) {
                 result.put(entry.getKey(),geoffExportService.toMap(entry.getValue()));
             }
             tx.success();
             return result;
         } catch (SubgraphError subgraphError) {
-            tx.failure();
             throw new RuntimeException("Error merging:\n"+geoff,subgraphError);
         } catch (SyntaxError syntaxError) {
-            tx.failure();
             throw new RuntimeException("Syntax error merging:\n"+geoff,syntaxError);
-        } finally {
-            tx.finish();
         }
     }
 
     public Collection<Map<String,Object>> cypherQueryResults(String query) {
-        Collection<Map<String,Object>> result=new ArrayList<Map<String, Object>>();
+        Collection<Map<String,Object>> result=new ArrayList<>();
         for (Map<String, Object> row : cypherQuery(query)) {
             result.add(row);
         }
@@ -150,24 +133,6 @@ class Neo4jService {
         }
     }
 
-    public void deleteReferenceNode() {
-        final Transaction tx = gdb.beginTx();
-        try {
-            if (rootNodeRemovalNotAllowed() || !hasReferenceNode()) return;
-            final Node root = gdb.getReferenceNode();
-            if (root != null) {
-                root.delete();
-            }
-            tx.success();
-        } finally {
-            tx.finish();
-        }
-    }
-
-    private boolean rootNodeRemovalNotAllowed() {
-        return !ownsDatabase || isInitialized();
-    }
-
     public String getVersion() {
         return version;
     }
@@ -178,14 +143,6 @@ class Neo4jService {
             version = version.replaceAll("^(\\d+\\.\\d+).*","$1");
             if (!version.matches("\\d+\\.\\d+")) throw new IllegalArgumentException("Incorrect version string "+version);
             this.version = version;
-        }
-    }
-
-    public boolean hasReferenceNode() {
-        try {
-            return gdb.getReferenceNode() != null;
-        } catch (NotFoundException nfe) {
-            return false;
         }
     }
 
@@ -201,12 +158,9 @@ class Neo4jService {
     }
 
     public void importGraph(SubGraph graph) {
-        final Transaction tx = gdb.beginTx();
-        try {
-            graph.importTo(gdb, hasReferenceNode());
+        try (Transaction tx = gdb.beginTx()) {
+            graph.importTo(gdb);
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -238,7 +192,7 @@ class Neo4jService {
     }
 
     public Map exportToJson(Map<String, Object> graph) {
-        Map<String,Map<String,Object>> result=new HashMap<String, Map<String, Object>>(graph.size());
+        Map<String,Map<String,Object>> result=new HashMap<>(graph.size());
         for (Map.Entry<String, Object> entry : graph.entrySet()) {
             Map<String, Object> data = null;
             if (entry.getValue() instanceof Map) {

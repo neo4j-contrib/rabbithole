@@ -43,7 +43,7 @@ public class GraphInfo {
     }
 
     public Map<String,Object> toMap() {
-        final HashMap<String, Object> result = new HashMap<String, Object>();
+        final HashMap<String, Object> result = new HashMap<>();
         map(result, "id", id);
         map(result, "init", init);
         map(result, "query", query);

@@ -28,19 +28,7 @@ class CypherExportService {
     }
 
     private void init(StringBuilder sb) {
-        final Node refNode = getReferenceNode();
-        if (refNode !=null && refNode.hasRelationship()) {
-            sb.append("start _0 = node(0) with _0 \n");
-        }
         sb.append("create \n");
-    }
-
-    private Node getReferenceNode() {
-        try {
-            return gdb.getReferenceNode();
-        } catch(NotFoundException nfe) {
-            return null;
-        }
     }
 
     private int appendRelationships(StringBuilder sb, int count) {
@@ -65,7 +53,6 @@ class CypherExportService {
     private int appendNodes(StringBuilder sb) {
         int count = 0;
         for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
-            if (isReferenceNode(node)) continue;
             if (count > 0) { sb.append(",\n"); }
             count++;
             appendNode(sb, node);
@@ -88,10 +75,6 @@ class CypherExportService {
         }
     }
 
-    private boolean isReferenceNode(Node node) {
-        return node.getId() == 0;
-    }
-
     private void formatNode(StringBuilder sb, Node n) {
         sb.append("_").append(n.getId());
     }
@@ -109,7 +92,7 @@ class CypherExportService {
     }
 
     Map<String, Object> toMap(PropertyContainer pc) {
-        Map<String, Object> result = new TreeMap<String, Object>();
+        Map<String, Object> result = new TreeMap<>();
         for (String prop : pc.getPropertyKeys()) {
             result.put(prop, pc.getProperty(prop));
         }

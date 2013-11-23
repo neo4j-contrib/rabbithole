@@ -98,7 +98,7 @@ public class ResultPrinter {
     }
 
     private Map<String, Integer> calculateColumnSizes(List<String> columns, Collection<Map<String, Object>> rows) {
-        Map<String, Integer> sizes = new HashMap<String, Integer>();
+        Map<String, Integer> sizes = new HashMap<>();
         for (String column : columns) {
             sizes.put(column, column.length() + 2);
         }

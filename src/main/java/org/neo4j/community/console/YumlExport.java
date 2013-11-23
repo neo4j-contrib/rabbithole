@@ -38,7 +38,7 @@ public class YumlExport {
     }
 
     private List<String> nodeProps(Map.Entry<Long, Map<String, Object>> node, List<String> idPropsList) {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
         if (node.getValue().size()>1) {
             for (Map.Entry<String, Object> props : node.getValue().entrySet()) {
                 if (props.getKey().equals("id") || idPropsList.contains(props.getKey())) continue;

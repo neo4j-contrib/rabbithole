@@ -33,42 +33,22 @@ public class ConsoleService {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConsoleService.class);
 
-//    static final String DEFAULT_GRAPH_CYPHER =
-//        "start root=node(0)\n" +
-//        "create " +
-//        "(Neo:Crew {name:'Neo'}), " +
-//        "(Morpheus:Crew {name: 'Morpheus'}), " +
-//        "(Trinity:Crew {name: 'Trinity'}), " +
-//        "(Cypher:Crew:Matrix {name: 'Cypher'}), " +
-//        "(Smith:Matrix {name: 'Agent Smith'}), " +
-//        "(Architect:Matrix {name:'The Architect'}),\n" +
-//        "root-[:ROOT]->Neo, " +
-//        "Neo-[:KNOWS]->Morpheus, " +
-//        "Neo-[:LOVES]->Trinity, " +
-//        "Morpheus-[:KNOWS]->Trinity,\n" +
-//        "Morpheus-[:KNOWS]->Cypher, " +
-//        "Cypher-[:KNOWS]->Smith, " +
-//        "Smith-[:CODED_BY]->Architect";
-
     static final String DEFAULT_GRAPH_CYPHER =
-        "start root=node(0)\n" +
         "create " +
-        "(Neo {name:'Neo'}), " +
-        "(Morpheus {name: 'Morpheus'}), " +
-        "(Trinity {name: 'Trinity'}), " +
-        "(Cypher {name: 'Cypher'}), " +
-        "(Smith {name: 'Agent Smith'}), " +
-        "(Architect {name:'The Architect'}),\n" +
-        "root-[:ROOT]->Neo, " +
-        "Neo-[:KNOWS]->Morpheus, " +
-        "Neo-[:LOVES]->Trinity, " +
-        "Morpheus-[:KNOWS]->Trinity,\n" +
-        "Morpheus-[:KNOWS]->Cypher, " +
-        "Cypher-[:KNOWS]->Smith, " +
-        "Smith-[:CODED_BY]->Architect";
+        "(Neo:Crew {name:'Neo'}), " +
+        "(Morpheus:Crew {name: 'Morpheus'}), " +
+        "(Trinity:Crew {name: 'Trinity'}), " +
+        "(Cypher:Crew:Matrix {name: 'Cypher'}), " +
+        "(Smith:Matrix {name: 'Agent Smith'}), " +
+        "(Architect:Matrix {name:'The Architect'}),\n" +
+        "(Neo)-[:KNOWS]->(Morpheus), " +
+        "(Neo)-[:LOVES]->(Trinity), " +
+        "(Morpheus)-[:KNOWS]->(Trinity),\n" +
+        "(Morpheus)-[:KNOWS]->(Cypher), " +
+        "(Cypher)-[:KNOWS]->(Smith), " +
+        "(Smith)-[:CODED_BY]->(Architect)";
 
-    static final String DEFAULT_QUERY = "start n=node:node_auto_index(name='Neo') match n-[r:KNOWS*]-m return n as Neo,r,m";
-    //static final String DEFAULT_QUERY = "match n:Crew-[r:KNOWS*]-m where n.name='Neo' return n as Neo,r,m";
+    static final String DEFAULT_QUERY = "match (n:Crew)-[r:KNOWS*]-m where n.name='Neo' return n as Neo,r,m";
 
     private GraphStorage storage;
 
@@ -182,9 +162,6 @@ public class ConsoleService {
     }
 
     public Map<String, Object> execute(Neo4jService service, GraphInfo info) {
-        if (!info.hasRoot()) {
-            service.deleteReferenceNode();
-        }
         final Map<String, Object> result = this.execute(service, info.getInit(), info.getQuery(), info.getVersion());
         result.put("message",info.getMessage());
         return result;

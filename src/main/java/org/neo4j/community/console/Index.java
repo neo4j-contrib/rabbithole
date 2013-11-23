@@ -16,7 +16,7 @@ public class Index {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Index.class);
 
-    private final Set<String> autoIndexedProperties = new HashSet<String>();
+    private final Set<String> autoIndexedProperties = new HashSet<>();
     private final AutoIndexer<Node> nodeAutoIndexer;
     private final RelationshipAutoIndexer relationshipAutoIndexer;
 
@@ -31,7 +31,7 @@ public class Index {
         enableAutoIndex(relationshipAutoIndexer);
         autoIndexedProperties.addAll(nodeAutoIndexer.getAutoIndexedProperties());
         autoIndexedProperties.addAll(relationshipAutoIndexer.getAutoIndexedProperties());
-        tx.success();tx.finish();
+        tx.success();tx.close();
     }
 
     private void enableAutoIndex(AutoIndexer<? extends PropertyContainer> autoIndexer) {

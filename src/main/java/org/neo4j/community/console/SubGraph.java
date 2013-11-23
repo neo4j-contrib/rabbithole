@@ -14,8 +14,8 @@ import static org.neo4j.graphdb.DynamicLabel.label;
  * @since 27.05.12
  */
 public class SubGraph {
-    SortedMap<Long,Map<String,Object>> nodes=new TreeMap<Long, Map<String, Object>>();
-    SortedMap<Long,Map<String,Object>> relationships=new TreeMap<Long, Map<String, Object>>();
+    SortedMap<Long,Map<String,Object>> nodes=new TreeMap<>();
+    SortedMap<Long,Map<String,Object>> relationships=new TreeMap<>();
 
     Object uniqueId(Long nodeId, List<String> uniqueProperties) {
         final Map<String, Object> data = nodes.get(nodeId);
@@ -46,7 +46,7 @@ public class SubGraph {
     }
 
     public static List<String> getLabelNames(Node node) {
-        List<String> labelNames = new ArrayList<String>();
+        List<String> labelNames = new ArrayList<>();
         if (!(node instanceof RestNode)) {
             for (Label label : node.getLabels()) {
                 labelNames.add(label.name());
@@ -86,7 +86,7 @@ public class SubGraph {
 
     private Map<String, Object> relWithIndexEnds(Map<String, Object> rel) {
         if (rel.containsKey("type") && rel.containsKey("start") && rel.containsKey("end")) {
-            final Map<String, Object> result = new TreeMap<String, Object>(rel);
+            final Map<String, Object> result = new TreeMap<>(rel);
             result.put("source", nodeIndex((Long)rel.get("start")));
             result.put("target", nodeIndex((Long)rel.get("end")));
             return result;
@@ -101,7 +101,7 @@ public class SubGraph {
     }
 
     public static Map<String, Object> toMap(PropertyContainer pc) {
-        Map<String, Object> result = new TreeMap<String, Object>();
+        Map<String, Object> result = new TreeMap<>();
         for (String prop : pc.getPropertyKeys()) {
             result.put(prop, pc.getProperty(prop));
         }
@@ -161,7 +161,7 @@ public class SubGraph {
     }
 
     public Map<Long, Map<String, Object>> getRelationshipsWithIndexedEnds() {
-        SortedMap<Long,Map<String,Object>> result=new TreeMap<Long, Map<String, Object>>();
+        SortedMap<Long,Map<String,Object>> result=new TreeMap<>();
 
         for (Map.Entry<Long, Map<String, Object>> entry : relationships.entrySet()) {
             result.put(entry.getKey(),relWithIndexEnds(entry.getValue()));
@@ -300,13 +300,16 @@ public class SubGraph {
         return null;
     }
 
-    void importTo(GraphDatabaseService gdb, final boolean hasReferenceNode) {
-        Map<Long, Long> nodeMapping = importNodes(gdb, hasReferenceNode);
-        importRels(gdb, nodeMapping);
+    void importTo(GraphDatabaseService gdb) {
+        try (Transaction tx = gdb.beginTx()) {
+            Map<Long, Long> nodeMapping = importNodes(gdb);
+            importRels(gdb, nodeMapping);
+            tx.success();
+        }
     }
 
     private void importRels(GraphDatabaseService gdb, Map<Long, Long> nodeMapping) {
-        final HashSet<String> relSkipProps = new HashSet<String>(asList("id", "start", "end", "type","labels"));
+        final HashSet<String> relSkipProps = new HashSet<>(asList("id", "start", "end", "type","labels"));
         for (Map<String, Object> relData : getRelationships().values()) {
             Long start = (Long) relData.get("start");
             final Node startNode = gdb.getNodeById(nodeMapping.get(start));
@@ -318,9 +321,8 @@ public class SubGraph {
         }
     }
 
-    private Map<Long, Long> importNodes(GraphDatabaseService gdb, boolean hasReferenceNode) {
-        Map<Long,Long> nodeMapping=new HashMap<Long, Long>();
-        if (hasReferenceNode) nodeMapping.put(0L,0L);
+    private Map<Long, Long> importNodes(GraphDatabaseService gdb) {
+        Map<Long,Long> nodeMapping=new HashMap<>();
         final List<String> nodeSkipProps = Arrays.asList("id", "labels");
         for (Map.Entry<Long, Map<String, Object>> nodeData : getNodes().entrySet()) {
             final Long nodeDataId = nodeData.getKey();
@@ -330,6 +332,7 @@ public class SubGraph {
             final Node node = gdb.getNodeById(nodeMapping.get(nodeDataId));
             final Map<String, Object> data = nodeData.getValue();
             setProperties(node, data, nodeSkipProps);
+            //noinspection unchecked
             setLabels(node, (Collection<String>) data.get("labels"));
         }
         return nodeMapping;

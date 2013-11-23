@@ -24,7 +24,7 @@ class GeoffImportService {
     }
 
     private Map<String, Node> geoffNodeParams() {
-        Map<String, Node> result = new HashMap<String, Node>();
+        Map<String, Node> result = new HashMap<>();
         for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
             result.put("(" + node.getId() + ")", node);
         }
