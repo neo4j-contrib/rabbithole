@@ -375,8 +375,7 @@ function query() {
 }
 
 function cleanDb() {
-
-    send("START n=node(*)  MATCH n-[r?]-m WITH n, r DELETE n, r");
+    send("MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n, r");
 }
 
 function parseMessage(data) {
