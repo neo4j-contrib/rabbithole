@@ -1,6 +1,8 @@
 package org.neo4j.community.console;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -56,8 +58,21 @@ public class Console
         root.setResourceBase(WEBAPP_LOCATION);
         root.setParentLoaderPriority(true);
         root.setAttribute(ConsoleFilter.DATABASE_ATTRIBUTE, databaseInfo);
-        server.setHandler(root);
+        final HandlerList handlers = new HandlerList();
+        // don't remove, needed for neo4j.org proxy
+        final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
+        handlers.setHandlers(new Handler[]{resourceHandler,root});
+        server.setHandler(handlers);
         server.start();
+    }
+
+
+    private Handler createResourceHandler(String context, String resourceBase) {
+        WebAppContext ctx = new WebAppContext();
+        ctx.setContextPath(context);
+        ctx.setResourceBase(resourceBase);
+        ctx.setParentLoaderPriority(true);
+        return ctx;
     }
 
     public void join() throws InterruptedException {
