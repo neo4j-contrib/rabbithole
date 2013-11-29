@@ -375,7 +375,10 @@ function query() {
 }
 
 function cleanDb() {
-    send("MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n, r");
+    if ($('#version').val()=="1.9")
+        send("START n=node(*) MATCH (n)-[r?]-() DELETE n, r");
+    else
+        send("MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n, r");
 }
 
 function parseMessage(data) {
