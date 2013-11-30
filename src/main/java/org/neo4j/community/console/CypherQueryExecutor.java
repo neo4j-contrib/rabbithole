@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class CypherQueryExecutor {
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
     private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
-    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\bUNION|OPTIONAL\\b", Pattern.CASE_INSENSITIVE);
+    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(UNION|OPTIONAL)\\b|(\\bMERGE\\b.+){2,}", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
     private ExecutionEngine executionEngine;
     private final Index index;
 	private final GraphDatabaseService gdb;
