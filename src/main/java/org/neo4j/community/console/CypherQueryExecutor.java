@@ -187,10 +187,11 @@ public class CypherQueryExecutor {
         query = removeSemicolon( query );
         long time=System.currentTimeMillis();
         try (Transaction tx = gdb.beginTx()) {
-            final ExecutionResult result = canProfileQuery(query) ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
+            boolean canProfile = canProfileQuery(query);
+            final ExecutionResult result = canProfile ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
-            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, result.executionPlanDescription(), prettify(query));
+            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
             tx.success();
             return cypherResult;
         }
