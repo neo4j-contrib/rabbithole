@@ -34,7 +34,7 @@ public class GraphStorageTest {
     @Before
     public void setUp() throws Exception {
         gdb.cleanContent();
-        storage = new GraphStorage("http://localhost:"+PORT+"/db/data");
+        storage = new RestGraphStorage("http://localhost:"+PORT+"/db/data");
 
         try (Transaction tx = gdb.beginTx()) {
             index = gdb.index().forNodes("graphs");

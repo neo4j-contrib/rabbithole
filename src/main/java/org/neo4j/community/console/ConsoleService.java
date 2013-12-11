@@ -57,6 +57,7 @@ public class ConsoleService {
     }
 
     private void createGraphStorage() {
+        try {
         String restUrlVar = System.getenv("NEO4J_REST_URL_VAR");
         if (restUrlVar == null ) restUrlVar = "NEO4J_URL";
         String restUrl = System.getenv(restUrlVar);
@@ -80,9 +81,16 @@ public class ConsoleService {
 
             if (!restUrl.contains("/db/data")) restUrl += "/db/data";
             final RestAPI api = new RestAPIFacade(restUrl, login, password);
-            storage = new GraphStorage(api);
+            storage = new RestGraphStorage(api);
+            log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
         }
-        log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
+        } catch(Exception e) {
+            LOG.error("Error creating graph storage",e);
+        }
+        if (storage == null) {
+            storage = new MemoryGraphStorage();
+        }
+        log("Graph Storage " + storage);
     }
 
     private void log(String msg) {
