@@ -1,6 +1,7 @@
 package org.neo4j.community.console;
 
 import com.google.gson.Gson;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -109,8 +110,9 @@ public class CypherQueryExecutorTest {
     @Test
     public void testPrettifyQuery() throws Exception {
         final String pretty = cypherQueryExecutor.prettify("start n=node(1) match n--> () return n");
-        assertEquals("START n=node(1)\n" +
-                " MATCH n-->()\n" +
+        final String lineSeparator =(String)  System.getProperties().get("line.separator");
+        assertEquals("START n=node(1)" +lineSeparator+
+                " MATCH n-->()" +lineSeparator+
                 " RETURN n",pretty);
     }
 
