@@ -8,7 +8,10 @@
     <name>Neo4j Console Backend</name>
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
+
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <neo4j.version>2.0.0-RC1</neo4j.version>
     </properties>
 
@@ -26,6 +29,7 @@
             <url>http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -37,11 +41,6 @@
             <artifactId>jetty-webapp</artifactId>
             <version>9.0.5.v20130815</version>
         </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.mortbay.jetty</groupId>-->
-        <!--<artifactId>jetty</artifactId>-->
-        <!--<version>6.1.25</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-rest-graphdb</artifactId>
@@ -93,19 +92,6 @@
             <artifactId>jersey-client</artifactId>
             <version>1.9</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-udc</artifactId>
-            <version>${neo4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-shell</artifactId>
-            <version>${neo4j.version}</version>
-            <scope>test</scope>
-        </dependency-->
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -154,10 +140,6 @@
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>jersey-multipart</artifactId>
                 </exclusion>
-                <!--  exclusion>
-                    <groupId>org.rrd4j</groupId>
-                    <artifactId>rrd4j</artifactId>
-                </exclusion-->
                 <exclusion>
                     <groupId>bouncycastle</groupId>
                     <artifactId>bcprov-jdk16</artifactId>
@@ -290,15 +272,6 @@
                 </executions>
                 <configuration>
                     <mainClass>org.neo4j.community.console.Console</mainClass>
-                    <!--arguments>
-                      <argument>argument1</argument>
-                    </arguments>
-                    <systemProperties>
-                      <systemProperty>
-                        <key>myproperty</key>
-                        <value>myvalue</value>
-                      </systemProperty>
-                    </systemProperties-->
                 </configuration>
             </plugin>
             <plugin>
