@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -127,6 +128,7 @@ public class ConsoleService {
             time = trace("graph", time);
             CypherQueryExecutor.CypherResult result = null;
             if (query!=null) {
+                query = new String(query.getBytes(), Charset.forName("UTF-8"));
                 result = service.cypherQuery(query);
                 data.put("result", result.getText());
                 data.put("json", result.getJson());
