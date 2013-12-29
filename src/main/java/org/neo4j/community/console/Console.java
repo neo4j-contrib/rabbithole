@@ -24,7 +24,7 @@ public class Console
 
     public static void main(String[] args) throws Exception
     {
-//        System.setProperty(UdcSettings.udc_source.name(),"console");
+        System.setProperty("file.encoding","UTF-8");
         int port = (args.length>0) ? Integer.parseInt(args[0]): getPort();
         boolean expose = args.length>2 && args[2].equalsIgnoreCase("expose");
         GraphDatabaseService database = (args.length>1) ? embeddedGraphDatabase(args[1],expose) : null;
