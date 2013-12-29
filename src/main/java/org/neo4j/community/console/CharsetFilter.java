@@ -20,6 +20,7 @@ public class CharsetFilter implements Filter {
             if (servletResponse.getCharacterEncoding().equalsIgnoreCase("ISO-8859-1"))
                 servletResponse.setCharacterEncoding("UTF-8");
         }
+        System.err.println(servletRequest.getContentType()+" "+servletRequest.getCharacterEncoding());
         chain.doFilter(servletRequest,servletResponse);
     }
 
