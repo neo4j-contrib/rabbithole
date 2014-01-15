@@ -45,6 +45,9 @@ public class AllowAjaxFilter implements Filter {
             response.addHeader( ACCESS_CONTROL_ALLOW_HEADERS, value );
         }
 
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return;
+        }
         chain.doFilter(request,response);
     }
 

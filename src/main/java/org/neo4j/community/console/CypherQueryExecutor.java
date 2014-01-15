@@ -8,6 +8,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.StringLogger;
+import scala.NotImplementedError;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -187,8 +188,14 @@ public class CypherQueryExecutor {
         query = removeSemicolon( query );
         long time=System.currentTimeMillis();
         try (Transaction tx = gdb.beginTx()) {
+            ExecutionResult result;
             boolean canProfile = canProfileQuery(query);
-            final ExecutionResult result = canProfile ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
+            try {
+                result = canProfile ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
+            } catch (NotImplementedError nie) {
+                canProfile = false;
+                result = executionEngine.execute(prettify(query));
+            }
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
