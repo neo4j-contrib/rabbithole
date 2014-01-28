@@ -191,10 +191,10 @@ public class CypherQueryExecutor {
             ExecutionResult result;
             boolean canProfile = canProfileQuery(query);
             try {
-                result = canProfile ? executionEngine.profile(query) : executionEngine.execute(prettify(query));
-            } catch (NotImplementedError nie) {
+                result = canProfile ? executionEngine.profile(query) : executionEngine.execute(query);
+            } catch (NotImplementedError|AssertionError e) {
                 canProfile = false;
-                result = executionEngine.execute(prettify(query));
+                result = executionEngine.execute(query);
             }
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
