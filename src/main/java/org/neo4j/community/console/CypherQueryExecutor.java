@@ -185,17 +185,18 @@ public class CypherQueryExecutor {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }
-        query = removeSemicolon( query );
+        boolean canProfile = canProfileQuery(query);
+        try {
+            return doExecuteQuery(query, canProfile);
+        } catch (NotImplementedError |AssertionError e) {
+            return doExecuteQuery(query, false);
+        }
+    }
+
+    private CypherResult doExecuteQuery(String query, boolean canProfile) {
         long time=System.currentTimeMillis();
         try (Transaction tx = gdb.beginTx()) {
-            ExecutionResult result;
-            boolean canProfile = canProfileQuery(query);
-            try {
-                result = canProfile ? executionEngine.profile(query) : executionEngine.execute(query);
-            } catch (NotImplementedError|AssertionError e) {
-                canProfile = false;
-                result = executionEngine.execute(query);
-            }
+            ExecutionResult result = canProfile ? executionEngine.profile(query) : executionEngine.execute(query);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
@@ -208,12 +209,6 @@ public class CypherQueryExecutor {
         return false;
 //        Matcher matcher = CANNOT_PROFILE_PATTERN.matcher(query);
 //        return !matcher.find();
-    }
-
-    private String removeSemicolon( String query )
-    {
-        if (query.trim().endsWith( ";" )) return query.substring( 0,query.lastIndexOf( ";" ) );
-        return query;
     }
 
     private void registerProperties(String query) {
