@@ -205,8 +205,9 @@ public class CypherQueryExecutor {
     }
 
     boolean canProfileQuery(String query) {
-        Matcher matcher = CANNOT_PROFILE_PATTERN.matcher(query);
-        return !matcher.find();
+        return false;
+//        Matcher matcher = CANNOT_PROFILE_PATTERN.matcher(query);
+//        return !matcher.find();
     }
 
     private String removeSemicolon( String query )
