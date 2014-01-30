@@ -58,6 +58,8 @@ public class ConsoleService {
 
     private void createGraphStorage() {
         try {
+        System.setProperty("org.neo4j.rest.read_timeout","5");
+        System.setProperty("org.neo4j.rest.connect_timeout","10");
         String restUrlVar = System.getenv("NEO4J_REST_URL_VAR");
         if (restUrlVar == null ) restUrlVar = "NEO4J_URL";
         String restUrl = System.getenv(restUrlVar);
