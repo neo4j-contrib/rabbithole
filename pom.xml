@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.neo4j</groupId>
     <artifactId>rabbithole</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <packaging>jar</packaging>
     <name>Neo4j Console Backend</name>
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>2.0.0</neo4j.version>
+        <neo4j.version>2.0.1</neo4j.version>
     </properties>
 
     <repositories>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>2.0.0-M06</version>
+            <version>2.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.neo4j</groupId>
