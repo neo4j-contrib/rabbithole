@@ -522,4 +522,8 @@ $(document).ready(
         $(".popup .btn_close").click(function () {
             close($(this).parent());
         });
+        $("code[type=cypher]").each(function() {
+	       var text=highlight($(this).text());
+	       $(this).html(text);
+		});
     });
