@@ -459,7 +459,7 @@ $(document).ready(
             lineNumbers: false,
             readOnly: false,
             mode: "cypher",
-            theme: "cypher",
+            theme: "neo",
             onKeyEvent: function (inputeditor, e) {
                 if (e.type == 'keydown') {
                     // resize output while typing...
@@ -475,6 +475,8 @@ $(document).ready(
                 }
             }
         });
+        // set id to align with CSS from Neo4j Browser
+        $("#form > div.CodeMirror").first().attr("id", "editor");
 
         window.addEventListener("message", function (e) {
             if (e.origin.match(/addthis|cloudfront.net/)) {

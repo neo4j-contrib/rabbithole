@@ -42,6 +42,13 @@ a:link, a:visited {
 	z-index: 100;
 }
 
+#form {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 #graph {
     /* display:none; */
     width: 50%;
@@ -128,7 +135,7 @@ pre {
 }
 
 #query_button {
-    position: absolute;
+    position: fixed;
     right: 1px;
     bottom: 1px;
     width: 4.7%;
@@ -161,4 +168,20 @@ h3 {
     height: auto;
     overflow-y: hidden;
     overflow-x: auto;
+}
+
+.cm-s-cypher.CodeMirror-scroll {
+    background: #ffffff;
+}
+
+/*
+ * Cypher codemirror theme overrides.
+*/
+.cm-s-neo, #editor .cm-s-neo, .CodeMirror pre {
+    font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Monaco', Courier, monospace !important;
+    line-height: 1.3em;
+}
+
+#editor .cm-s-neo {
+    margin: 0;
 }
