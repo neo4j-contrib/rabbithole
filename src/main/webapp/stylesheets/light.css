@@ -1,7 +1,7 @@
 /* main */
 
 body {
-    background-color: #EEE;
+    background-color: #f5f5f5;
 }
 
 .console {
@@ -28,11 +28,13 @@ code {
 }
 
 .CodeMirror {
-    border-color: #111;
+    border: 0 none;
+    border-top: 1px solid rgba(0, 0, 0, 0.30);
+    background: #ffffff;
 }
 
 .cm-s-cypher .CodeMirror-gutter {
-    background: #EEE;
+    background: #f5f5f5;
     color: #111;
 }
 
@@ -44,7 +46,7 @@ code {
 
 .cm-s-cypher {
     text-shadow: none;
-    background: #EEE;
+    background: #f5f5f5;
     color: black;
 }
 
@@ -52,10 +54,6 @@ code {
 
 }
 
-.cm-s-cypher span.cm-keyword { color: #498a75; }
-.cm-s-cypher span.cm-atom { color: #615939; }
-.cm-s-cypher span.cm-variable { color:black; }
-.cm-s-cypher span.cm-string { color: #0dab05; }
 .cm-s-cypher .CodeMirror-cursor { border-left: 1px solid black !important; }
 
 .button.shareUrl {
