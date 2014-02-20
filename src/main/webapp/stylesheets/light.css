@@ -1,12 +1,11 @@
 /* main */
 
-body {
+body, .console, #output {
     background-color: #f5f5f5;
 }
 
 .console {
     color: #111;
-    background-color: #EEE;
 }
 
 a:link, a:visited {
