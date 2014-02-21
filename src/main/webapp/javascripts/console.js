@@ -342,14 +342,17 @@ function showWelcome(json) {
 }
 
 function resizeOutput() {
-    $("#output").css({
-        'height': ( $(window).height() - $(".CodeMirror-scroll").height() - 15 ) + 'px'
+    var $output = $("#output");
+    var editorHeight = $(".CodeMirror-scroll").height();
+    var windowHeight = $(window).height();
+    $output.css({
+        'height': ( windowHeight - editorHeight - 15 ) + 'px'
     });
-    $("#output").animate({
-        scrollTop: $("#output").prop("scrollHeight")
+    $output.animate({
+        scrollTop: $output.prop("scrollHeight")
     }, 10);
     $("#query_button").css({
-        'height': $(".CodeMirror-scroll").height() + 'px'
+        'height': editorHeight + 'px'
     });
 }
 
@@ -477,6 +480,8 @@ $(document).ready(
         });
         // set id to align with CSS from Neo4j Browser
         $("#form > div.CodeMirror").first().attr("id", "editor");
+        // resize output if window gets resized
+        $(window).resize(resizeOutput);
 
         window.addEventListener("message", function (e) {
             if (e.origin.match(/addthis|cloudfront.net/)) {
