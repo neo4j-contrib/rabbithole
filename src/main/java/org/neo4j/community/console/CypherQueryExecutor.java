@@ -152,6 +152,14 @@ public class CypherQueryExecutor {
                 result.put("_type",relationship.getType().name());
                 return result;
             }
+            if (value instanceof Map) {
+                @SuppressWarnings("unchecked") Map<String,Object> map = (Map<String,Object>) value;
+                final Map<String,Object> result = new LinkedHashMap<>(map.size());
+                for (Map.Entry<String,Object> entry : map.entrySet()) {
+                    result.put(entry.getKey(), toJsonCompatible(entry.getValue()));
+                }
+                return result;
+            }
             if (value instanceof Iterable) {
                 final List<Object> result = new ArrayList<>();
                 for (Object inner : (Iterable)value) {

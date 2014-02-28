@@ -39,22 +39,26 @@ public class ConsoleApplication implements SparkApplication {
 
         post(new Route("console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                final String query = request.body();
-                if (query!=null && !query.isEmpty()) {
-                    LOG.warn( "cypher: "+query );
+                Map<String, Object> result;
+                try {
+                    final String query = request.body();
+                    if (query != null && !query.isEmpty()) {
+                        LOG.warn("cypher: " + query);
+                    }
+                    result = consoleService.execute(service, null, query, null);
+                } catch (Exception e) {
+                    result = map("error",e.toString());
                 }
-                return new Gson().toJson(consoleService.execute(service, null, query, null));
+                return new Gson().toJson(result);
             }
         });
-        post( new Route( "console/version" )
-        {
-            protected Object doHandle( Request request, Response response, Neo4jService service )
-            {
+        post(new Route("console/version") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String version = request.body();
-                service.setVersion( version );
-                return new Gson().toJson( map("version", service.getVersion()) );
+                service.setVersion(version);
+                return new Gson().toJson(map("version", service.getVersion()));
             }
-        } );
+        });
         get(new Route("console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param(request, "query", "");
@@ -64,14 +68,14 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("console/init") {
             @Override
             protected void doBefore(Request request, Response response) {
-                Neo4jService service = SessionService.getService(request.raw(),true);
+                Neo4jService service = SessionService.getService(request.raw(), true);
                 if (service.isInitialized()) {
                     reset(request);
                 }
             }
 
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                @SuppressWarnings("unchecked") final Map<String,Object> input = requestBodyToMap(request);
+                @SuppressWarnings("unchecked") final Map<String, Object> input = requestBodyToMap(request);
                 final String id = param(input, "id", null);
                 final Map<String, Object> result;
                 if (id != null) {
@@ -108,24 +112,20 @@ public class ConsoleApplication implements SparkApplication {
                     graph = SubGraph.from(service.getGraphDatabase(),result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
-                return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s",scale,yuml,type);
+                return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s", scale, yuml, type);
             }
         });
-        get( new Route( "console/to_cypher" )
-        {
-            protected Object doHandle( Request request, Response response, Neo4jService service )
-            {
+        get(new Route("console/to_cypher") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.exportToCypher();
             }
-        } );
-        get( new Route( "console/url" )
-        {
-            protected Object doHandle( Request request, Response response, Neo4jService service ) throws IOException
-            {
-                final String uri = baseUri( request.raw(), "init=" + URLEncoder.encode( service.exportToGeoff(), "UTF-8" ), null);
-                return consoleService.shortenUrl( uri );
+        });
+        get(new Route("console/url") {
+            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
+                final String uri = baseUri(request.raw(), "init=" + URLEncoder.encode(service.exportToGeoff(), "UTF-8"), null);
+                return consoleService.shortenUrl(uri);
             }
-        } );
+        });
         get(new Route("console/shorten") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
                 return consoleService.shortenUrl(request.queryParams("url"));
