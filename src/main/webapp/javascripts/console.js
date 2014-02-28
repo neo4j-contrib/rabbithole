@@ -261,7 +261,7 @@ function computeInfo(data) {
 }
 
 function inputQuery(query) {
-    inputeditor.setValue(query.replace(/\n/g, ' ').trim());
+    inputeditor.setValue(query); // .replace(/\n/g, ' ').trim()
     CodeMirror.commands["selectAll"](inputeditor);
     autoFormatSelection(inputeditor);
     resizeOutput();

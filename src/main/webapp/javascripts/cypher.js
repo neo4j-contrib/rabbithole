@@ -147,6 +147,7 @@ CodeMirror.defineMode("cypher", function (config) {
 
 CodeMirror.modeExtensions["cypher"] = {
     autoFormatLineBreaks: function (text) {
+        if (text.indexOf("\n")!=-1) return text;
         var lines = text.split("\n");
         var reProcessedPortion = /\s+\b(return|where|order by|optional match|match|with|skip|limit|create|delete|set)\b\s/gi;
         for (var i = 0; i < lines.length; i++) {
