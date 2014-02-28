@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -49,14 +50,14 @@ public class ConsoleApplication implements SparkApplication {
                 } catch (Exception e) {
                     result = map("error",e.toString());
                 }
-                return new Gson().toJson(result);
+                return toJson(result);
             }
         });
         post(new Route("console/version") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String version = request.body();
                 service.setVersion(version);
-                return new Gson().toJson(map("version", service.getVersion()));
+                return toJson(map("version", service.getVersion()));
             }
         });
         get(new Route("console/cypher") {
@@ -83,14 +84,14 @@ public class ConsoleApplication implements SparkApplication {
                 } else {
                     result = consoleService.init(service, input);
                 }
-                return new Gson().toJson(result);
+                return toJson(result);
             }
 
         });
         get(new Route("console/visualization") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
-                return new Gson().toJson(service.cypherQueryViz(query));
+                return toJson(service.cypherQueryViz(query));
             }
         });
         get(new Route("console/to_geoff") {
@@ -146,9 +147,13 @@ public class ConsoleApplication implements SparkApplication {
                     LOG.warn( "geoff: "+geoff );
                 }
                 Map res = service.mergeGeoff( geoff );
-                return new Gson().toJson(res);
+                return toJson(res);
             }
         });
+    }
+
+    private String toJson(Object result) {
+        return new GsonBuilder().serializeNulls().create().toJson(result);
     }
 
     private Map requestBodyToMap(Request request) {
