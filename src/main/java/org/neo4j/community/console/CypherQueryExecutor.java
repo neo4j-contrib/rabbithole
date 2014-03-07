@@ -1,15 +1,18 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
+import org.neo4j.cypher.javacompat.internal.ServerExecutionEngine;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.util.StringLogger;
 import scala.NotImplementedError;
 
+import javax.transaction.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,16 +24,18 @@ import java.util.regex.Pattern;
 public class CypherQueryExecutor {
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
     private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
-    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(UNION|OPTIONAL)\\b|(\\bMERGE\\b.+){2,}", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
-    private ExecutionEngine executionEngine;
+    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(UNION|OPTIONAL|LOAD)\\b|(\\bMERGE\\b.+){2,}", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
+    private final TransactionManager transactionManager;
+    private ServerExecutionEngine executionEngine;
     private final Index index;
 	private final GraphDatabaseService gdb;
     public static final int CYPHER_LENGTH = "CYPHER".length();
 
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
 	    this.gdb = gdb;
+        transactionManager = ((GraphDatabaseAPI) gdb).getDependencyResolver().resolveDependency(TransactionManager.class);
         this.index = index;
-        executionEngine = new ExecutionEngine(gdb, StringLogger.SYSTEM);
+        executionEngine = new ServerExecutionEngine(gdb, StringLogger.SYSTEM);
     }
 
     public boolean isMutatingQuery(String query) {
@@ -203,13 +208,36 @@ public class CypherQueryExecutor {
 
     private CypherResult doExecuteQuery(String query, boolean canProfile) {
         long time=System.currentTimeMillis();
-        try (Transaction tx = gdb.beginTx()) {
+        Transaction tx = gdb.beginTx();
+        javax.transaction.Transaction resumeTx;
+        try {
+            resumeTx = suspendTx(query);
             ExecutionResult result = canProfile ? executionEngine.profile(query) : executionEngine.execute(query);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
+            resumeTransaction(resumeTx);
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
             tx.success();
             return cypherResult;
+        } finally {
+            tx.close();
+        }
+    }
+
+    private javax.transaction.Transaction suspendTx(String query) {
+        if (!executionEngine.isPeriodicCommitQuery(query)) return null;
+        try {
+            return transactionManager.suspend();
+        } catch (SystemException e) {
+            throw new RuntimeException("Error suspending Transaction",e);
+        }
+    }
+    private void resumeTransaction(javax.transaction.Transaction tx) {
+        if (tx == null) return;
+        try {
+            transactionManager.resume(tx);
+        } catch (SystemException | InvalidTransactionException e) {
+            throw new RuntimeException("Error resuming Transaction "+tx,e);
         }
     }
 
