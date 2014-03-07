@@ -206,4 +206,13 @@ public class CypherQueryExecutorTest {
         CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(*) return n UNION start n=node(*) return n", null);
         assertEquals(1,result.getRowCount());
     }
+    @Test
+    public void testHandlePeriodicCommit() throws Exception {
+        String query = "USING PERIODIC COMMIT\n" +
+                "LOAD CSV WITH HEADERS FROM 'http://docs.neo4j.org/chunked/2.1-SNAPSHOT/csv/import/roles.csv' AS csvLine\n" +
+                "CREATE (p:Person { id: csvLine.personId})\n" +
+                "RETURN p";
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery(query, null);
+        assertEquals(7,result.getRowCount());
+    }
 }
