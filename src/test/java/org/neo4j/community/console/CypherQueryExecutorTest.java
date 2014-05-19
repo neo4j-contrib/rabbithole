@@ -213,6 +213,6 @@ public class CypherQueryExecutorTest {
                 "CREATE (p:Person { id: csvLine.personId})\n" +
                 "RETURN p";
         CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery(query, null);
-        assertEquals(7,result.getRowCount());
+        assertEquals(6,result.getRowCount());
     }
 }

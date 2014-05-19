@@ -140,8 +140,8 @@ class Neo4jService {
     public void setVersion(String version) {
         if (version==null || version.trim().isEmpty()) this.version=null;
         else {
-            version = version.replaceAll("^(\\d+\\.\\d+).*","$1");
-            if (!version.matches("\\d+\\.\\d+")) throw new IllegalArgumentException("Incorrect version string "+version);
+            version = version.replaceAll("^(\\d+\\.\\d+(?:\\.experimental)?).*","$1");
+            if (!version.matches("\\d+\\.\\d+(?:\\.experimental)?")) throw new IllegalArgumentException("Incorrect version string "+version);
             this.version = version;
         }
     }
