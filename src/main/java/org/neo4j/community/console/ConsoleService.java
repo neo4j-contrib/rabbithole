@@ -99,6 +99,7 @@ public class ConsoleService {
         LOG.warn(msg);
     }
 
+    // split init and query on ";\n"
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version) {
         if (version!=null) service.setVersion(version);
         boolean initial = init != null;
@@ -114,8 +115,9 @@ public class ConsoleService {
                     initFromUrl(service, url, "start n=node(*) match n-[r?]->() return n,r");
                     data.put("graph",service.exportToGeoff());
                 } else if (service.isMutatingQuery(init)) {
-                    final CypherQueryExecutor.CypherResult result = service.initCypherQuery(init);
-                    if (result.getQuery()!=null) data.put("init",result.getQuery());
+                    for (String q : splitQuery(init)) {
+                        service.initCypherQuery(q);
+                    }
                     data.put("graph",service.exportToGeoff());
                 } else {
                     final Map<String,Object> graph = service.mergeGeoff(init);
@@ -147,6 +149,10 @@ public class ConsoleService {
         time = trace("all", start);
         data.put("time", time-start);
         return data;
+    }
+
+    private String[] splitQuery(String allQueries) {
+        return allQueries.split(";\n");
     }
 
     private boolean dontInitialize(Neo4jService service) {

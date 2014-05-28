@@ -14,6 +14,7 @@ import scala.NotImplementedError;
 
 import javax.transaction.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,9 @@ public class CypherQueryExecutor {
 
     public boolean isMutatingQuery(String query) {
         return query.matches("(?is).*\\b(create|relate|merge|delete|set)\\b.*");
+    }
+    public boolean isIndexQuery(String query) {
+        return query.matches("(?is).*\\bcreate (index|constraint)\\b.*");
     }
     public boolean isCypherQuery(String query) {
         return query.matches("(?is).*\\b(drop|start|merge|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
@@ -221,6 +225,15 @@ public class CypherQueryExecutor {
             return cypherResult;
         } finally {
             tx.close();
+            awaitIndexOnline(query);
+        }
+    }
+
+    private void awaitIndexOnline(String query) {
+        if (!isIndexQuery(query)) return;
+        try (Transaction tx = gdb.beginTx()) {
+            gdb.schema().awaitIndexesOnline(5, TimeUnit.SECONDS);
+            tx.success();
         }
     }
 
