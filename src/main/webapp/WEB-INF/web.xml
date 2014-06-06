@@ -25,7 +25,7 @@
         </init-param>
         <init-param>
             <param-name>maxOps</param-name>
-            <param-value>100000</param-value>
+            <param-value>1000000</param-value>
         </init-param>
     </filter>
 
