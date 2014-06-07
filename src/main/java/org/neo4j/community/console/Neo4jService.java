@@ -120,6 +120,10 @@ class Neo4jService {
         return cypherQueryExecutor.cypherQuery(query,version);
     }
 
+    public String prettify(String query) {
+        return cypherQueryExecutor.prettify(query);
+    }
+
     public void stop() {
         if (gdb!=null) {
             LOG.warn("Shutting down service "+this);

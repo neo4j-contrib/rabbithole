@@ -131,13 +131,16 @@ public class ConsoleService {
             time = trace("graph", time);
             CypherQueryExecutor.CypherResult result = null;
             if (query!=null) {
-                result = service.cypherQuery(query);
+                for (String q : splitQuery(query)) {
+                    result = service.cypherQuery(q);
+                }
                 data.put("result", result.getText());
                 data.put("json", result.getJson());
                 data.put("plan", result.getPlan().toString());
                 data.put("columns", result.getColumns());
                 data.put("stats", result.getQueryStatistics());
-                if (result.getQuery()!=null) data.put("query",result.getQuery());
+                String pretty = service.prettify(query);
+                if (pretty!=null) data.put("query",pretty);
             }
             time = trace("cypher", time);
             data.put("visualization", service.cypherQueryViz(result));
