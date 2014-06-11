@@ -7,6 +7,7 @@ import static spark.Spark.post;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;
@@ -46,7 +47,7 @@ public class ConsoleApplication implements SparkApplication {
                     if (query != null && !query.isEmpty()) {
                         LOG.warn("cypher: " + query);
                     }
-                    result = consoleService.execute(service, null, query, null);
+                    result = consoleService.execute(service, null, query, null,queryParamsMap(request));
                 } catch (Exception e) {
                     result = map("error",e.toString());
                 }
@@ -80,7 +81,7 @@ public class ConsoleApplication implements SparkApplication {
                 final String id = param(input, "id", null);
                 final Map<String, Object> result;
                 if (id != null) {
-                    result = consoleService.init(service, id);
+                    result = consoleService.init(service, id, input);
                 } else {
                     result = consoleService.init(service, input);
                 }
@@ -150,6 +151,14 @@ public class ConsoleApplication implements SparkApplication {
                 return toJson(res);
             }
         });
+    }
+
+    private Map<String, Object> queryParamsMap(Request request) {
+        Map<String,Object> result=new HashMap<>();
+        for (String param : request.queryParams()) {
+            result.put(param, request.queryParams(param));
+        }
+        return result;
     }
 
     private String toJson(Object result) {

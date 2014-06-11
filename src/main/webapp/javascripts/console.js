@@ -87,7 +87,7 @@ function isCypher(query) {
 }
 
 function viz(data) {
-    if ($('#graph').is(":hidden")) {
+    if (!vizVisible) {
         return;
     }
     var output = $("#output");
@@ -184,10 +184,14 @@ function store_graph_info() {
     addthis.update('share', 'title', 'Look at this #Neo4j graph: ');
 }
 
+var vizVisible = true;
 function toggleGraph() {
-    $('#graph').toggle();
-    if ($('#graph').is(":visible")) {
+    vizVisible = !vizVisible;
+    if (vizVisible) {
+        $('#graph').show();
         viz();
+    } else {
+        $('#graph').hide();
     }
 }
 
@@ -310,7 +314,7 @@ function showResults(data) {
 
 function send(query) {
     if (isCypher(query)) {
-        post("console/cypher", query, showResults, "json");
+        post("console/cypher"+getPostQueryParams(), query, showResults, "json");
     }
     else {
         post("console/geoff", query, function () {
@@ -406,6 +410,10 @@ function handleMessage(msg) {
     }
 }
 
+function getPostQueryParams() {
+    return vizVisible ? "" : "?viz=none";
+}
+
 function sendNext(msg) {
     if (msg.data.length == 0) return;
     var _query = msg.data.shift();
@@ -413,7 +421,7 @@ function sendNext(msg) {
         inputQuery(_query)
         return;
     }
-    post("console/cypher", _query, function (res) {
+    post("console/cypher"+getPostQueryParams(), _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
             console.log("res",res);
@@ -495,6 +503,9 @@ $(document).ready(
 
 //        if (!session) {
             var params = getParameters();
+            if (params['viz']=="none") {
+                vizVisible=false;
+            }
             sendInit(params);
 //        }
 //        else {
