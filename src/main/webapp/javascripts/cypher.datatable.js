@@ -43,7 +43,7 @@ function convertCell(cell) {
         if (cell["_type"]) {
             return "(" + cell["_start"] + ")-[" + cell["_id"] + ":" + cell["_type"] + props(cell) + "]->(" + cell["_end"] + ")";
         } else
-        if (cell["_id"]) {
+        if (typeof(cell["_id"]) !== "undefined") {
             var labels = "";
             if (cell["_labels"]) {
                 labels = ":" + cell["_labels"].join(":");
