@@ -238,7 +238,7 @@ public class CypherQueryExecutor {
     }
 
     private javax.transaction.Transaction suspendTx(String query) {
-        if (!executionEngine.isPeriodicCommitQuery(query)) return null;
+        if (!executionEngine.isPeriodicCommit(query)) return null;
         try {
             return transactionManager.suspend();
         } catch (SystemException e) {
