@@ -187,10 +187,13 @@ public class CypherQueryExecutor {
     public String prettify(String query) {
         return executionEngine.prettify(query).replaceAll("\n","\n ");
     }
-    public CypherResult cypherQuery(String query, String version) {
+    public CypherResult cypherQuery(String query, String version, Map<String, Object> params) {
         // query = replaceIndex(query);
-        if (version==null || version.isEmpty() || startsWithCypher(query)) return cypherQuery(query);
-        return cypherQuery("CYPHER "+version+" "+query);
+        if (version==null || version.isEmpty() || startsWithCypher(query)) return cypherQuery(query,params);
+        return cypherQuery("CYPHER "+version+" "+query, params);
+    }
+    public CypherResult cypherQuery(String query, String version) {
+        return cypherQuery(query,version,null);
     }
 
     private boolean startsWithCypher(String query) {
@@ -198,25 +201,26 @@ public class CypherQueryExecutor {
         return q.length() > CYPHER_LENGTH && q.substring(0, CYPHER_LENGTH).equalsIgnoreCase("cypher");
     }
 
-    private CypherResult cypherQuery(String query) {
+    private CypherResult cypherQuery(String query, Map<String, Object> params) {
         if (isMutatingQuery(query)) {
             registerProperties(query);
         }
         boolean canProfile = canProfileQuery(query);
         try {
-            return doExecuteQuery(query, canProfile);
+            return doExecuteQuery(query, params, canProfile);
         } catch (NotImplementedError |AssertionError e) {
-            return doExecuteQuery(query, false);
+            return doExecuteQuery(query, params, false);
         }
     }
 
-    private CypherResult doExecuteQuery(String query, boolean canProfile) {
+    private CypherResult doExecuteQuery(String query, Map<String, Object> params, boolean canProfile) {
+        params = params == null ? Collections.<String,Object>emptyMap() : params;
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
         javax.transaction.Transaction resumeTx;
         try {
             resumeTx = suspendTx(query);
-            ExecutionResult result = canProfile ? executionEngine.profile(query) : executionEngine.execute(query);
+            ExecutionResult result = canProfile ? executionEngine.profile(query,params) : executionEngine.execute(query,params);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
             time = System.currentTimeMillis() - time;
             resumeTransaction(resumeTx);

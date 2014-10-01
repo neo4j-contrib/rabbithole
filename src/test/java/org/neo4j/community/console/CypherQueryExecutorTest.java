@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
 import static org.junit.internal.matchers.IsCollectionContaining.hasItems;
+import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh
@@ -194,6 +195,12 @@ public class CypherQueryExecutorTest {
     }
 
     @Test
+    public void testUseParameters() throws Exception {
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("MATCH (n) WHERE id(n) = {id} RETURN count(*)",null, map("id",rootNode.getId()));
+        assertEquals(1,result.getRowCount());
+    }
+
+    @Test
     public void testDontProfileUnionCheck() throws Exception {
         assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n UNION start n=node(*) return n"));
         assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n \nUNION\n start n=node(*) return n"));
@@ -209,10 +216,11 @@ public class CypherQueryExecutorTest {
     @Test
     public void testHandlePeriodicCommit() throws Exception {
         String query = "USING PERIODIC COMMIT\n" +
-                "LOAD CSV WITH HEADERS FROM 'http://docs.neo4j.org/chunked/2.1-SNAPSHOT/csv/import/roles.csv' AS csvLine\n" +
+                "LOAD CSV WITH HEADERS FROM 'http://docs.neo4j.org/chunked/stable/csv/import/roles.csv' AS csvLine\n" +
                 "CREATE (p:Person { id: csvLine.personId})\n" +
                 "RETURN p";
         CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery(query, null);
         assertEquals(6,result.getRowCount());
     }
+
 }

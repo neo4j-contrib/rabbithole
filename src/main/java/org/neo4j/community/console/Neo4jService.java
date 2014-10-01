@@ -63,7 +63,7 @@ class Neo4jService {
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || cypherQueryExecutor.isMutatingQuery(query);
-        return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query));
+        return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query, null));
     }
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
         try (Transaction tx = gdb.beginTx()) {
@@ -107,17 +107,17 @@ class Neo4jService {
 
     public Collection<Map<String,Object>> cypherQueryResults(String query) {
         Collection<Map<String,Object>> result=new ArrayList<>();
-        for (Map<String, Object> row : cypherQuery(query)) {
+        for (Map<String, Object> row : cypherQuery(query, null)) {
             result.add(row);
         }
         return result;
     }
 
-    public CypherQueryExecutor.CypherResult initCypherQuery(String query) {
-        return cypherQueryExecutor.cypherQuery(query,null);
+    public CypherQueryExecutor.CypherResult initCypherQuery(String query, Map<String, Object> queryParams) {
+        return cypherQueryExecutor.cypherQuery(query,null,queryParams);
     }
-    public CypherQueryExecutor.CypherResult cypherQuery(String query) {
-        return cypherQueryExecutor.cypherQuery(query,version);
+    public CypherQueryExecutor.CypherResult cypherQuery(String query, Map<String, Object> queryParams) {
+        return cypherQueryExecutor.cypherQuery(query,version,queryParams);
     }
 
     public String prettify(String query) {

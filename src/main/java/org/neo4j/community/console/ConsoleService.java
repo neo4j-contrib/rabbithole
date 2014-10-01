@@ -100,7 +100,7 @@ public class ConsoleService {
     }
 
     // split init and query on ";\n"
-    public Map<String, Object> execute(Neo4jService service, String init, String query, String version,Map<String,Object> params) {
+    public Map<String, Object> execute(Neo4jService service, String init, String query, String version,Map<String,Object> requestParams,Map<String,Object> queryParams) {
         if (version!=null) service.setVersion(version);
         boolean initial = init != null;
         if (dontInitialize(service) || init==null || init.equalsIgnoreCase("none")) init=null;
@@ -116,7 +116,7 @@ public class ConsoleService {
                     data.put("graph",service.exportToGeoff());
                 } else if (service.isMutatingQuery(init)) {
                     for (String q : splitQuery(init)) {
-                        service.initCypherQuery(q);
+                        service.initCypherQuery(q,queryParams);
                     }
                     data.put("graph",service.exportToGeoff());
                 } else {
@@ -132,7 +132,7 @@ public class ConsoleService {
             CypherQueryExecutor.CypherResult result = null;
             if (query!=null) {
                 for (String q : splitQuery(query)) {
-                    result = service.cypherQuery(q);
+                    result = service.cypherQuery(q,queryParams);
                 }
                 data.put("result", result.getText());
                 data.put("json", result.getJson());
@@ -143,7 +143,7 @@ public class ConsoleService {
                 if (pretty!=null) data.put("query",pretty);
             }
             time = trace("cypher", time);
-            if (!noViz(params)) {
+            if (!noViz(requestParams)) {
                 data.put("visualization", service.cypherQueryViz(result));
             }
             trace("viz", time);
@@ -186,8 +186,8 @@ public class ConsoleService {
         }
     }
 
-    public Map<String, Object> execute(Neo4jService service, GraphInfo info, Map<String,Object> params) {
-        final Map<String, Object> result = this.execute(service, info.getInit(), info.getQuery(), info.getVersion(),params);
+    public Map<String, Object> execute(Neo4jService service, GraphInfo info, Map<String, Object> params, Map<String, Object> queryParams) {
+        final Map<String, Object> result = this.execute(service, info.getInit(), info.getQuery(), info.getVersion(),params,queryParams);
         result.put("message",info.getMessage());
         return result;
     }
@@ -206,7 +206,7 @@ public class ConsoleService {
     public Map<String, Object> init(Neo4jService service, Map<String,Object> input) {
         input.put("init",param(input,"init",DEFAULT_GRAPH_CYPHER));
         input.put("query",param(input,"query",DEFAULT_QUERY));
-        return execute(service, GraphInfo.from(input), input);
+        return execute(service, GraphInfo.from(input), input, (Map)input.get("queryParams"));
     }
 
     protected String baseUri(HttpServletRequest request, String query, final String path) {
@@ -241,7 +241,7 @@ public class ConsoleService {
         final GraphInfo info = storage.find(id);
         Map<String, Object> result;
         if (info!=null) {
-            result = execute(service, info.getInit(), info.getQuery(), info.getVersion(), params);
+            result = execute(service, info.getInit(), info.getQuery(), info.getVersion(), params,(Map)params.get("queryParams"));
             result.put("message",info.getMessage());
         } else {
             result = init(service, params);

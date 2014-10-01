@@ -7,6 +7,7 @@ import static spark.Spark.post;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,11 +44,15 @@ public class ConsoleApplication implements SparkApplication {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 Map<String, Object> result;
                 try {
-                    final String query = request.body();
-                    if (query != null && !query.isEmpty()) {
-                        LOG.warn("cypher: " + query);
+                    final String body = request.body();
+                    if (body != null && !body.isEmpty()) {
+                        LOG.warn("cypher: " + body);
                     }
-                    result = consoleService.execute(service, null, query, null,queryParamsMap(request));
+                    Map<String, Object> requestParams = queryParamsMap(request);
+                    Map data = body.startsWith("{") ? fromJson(body) : Collections.singletonMap("query", body);
+                    String query = (String) data.get("query");
+                    Map<String,Object> queryParams = (Map) data.get("queryParams");
+                    result = consoleService.execute(service, null, query, null, requestParams, queryParams);
                 } catch (Exception e) {
                     result = map("error",e.toString());
                 }
@@ -102,16 +107,16 @@ public class ConsoleApplication implements SparkApplication {
         });
         get(new Route("console/to_yuml") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                String query = param( request,"query", "");
-                String[] props = param( request,"props", "name").split(",");
+                String query = param(request, "query", "");
+                String[] props = param(request, "props", "name").split(",");
                 final String type = param(request, "type", "jpg");
                 final String scale = param(request, "type", "100");
                 SubGraph graph;
                 if (query.trim().isEmpty() || !service.isCypherQuery(query) || service.isMutatingQuery(query)) {
                     graph = SubGraph.from(service.getGraphDatabase());
                 } else {
-                    final CypherQueryExecutor.CypherResult result = service.cypherQuery(query);
-                    graph = SubGraph.from(service.getGraphDatabase(),result);
+                    final CypherQueryExecutor.CypherResult result = service.cypherQuery(query, null);
+                    graph = SubGraph.from(service.getGraphDatabase(), result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s", scale, yuml, type);
@@ -144,10 +149,10 @@ public class ConsoleApplication implements SparkApplication {
         post(new Route("console/geoff") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws SyntaxError, SubgraphError {
                 String geoff = request.body();
-                if (geoff!=null && !geoff.isEmpty()) {
-                    LOG.warn( "geoff: "+geoff );
+                if (geoff != null && !geoff.isEmpty()) {
+                    LOG.warn("geoff: " + geoff);
                 }
-                Map res = service.mergeGeoff( geoff );
+                Map res = service.mergeGeoff(geoff);
                 return toJson(res);
             }
         });
@@ -163,6 +168,9 @@ public class ConsoleApplication implements SparkApplication {
 
     private String toJson(Object result) {
         return new GsonBuilder().serializeNulls().create().toJson(result);
+    }
+    private Map fromJson(String input) {
+        return new GsonBuilder().serializeNulls().create().fromJson(input, Map.class);
     }
 
     private Map requestBodyToMap(Request request) {
