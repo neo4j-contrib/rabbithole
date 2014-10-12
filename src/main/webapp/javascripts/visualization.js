@@ -84,7 +84,7 @@ function GraphVisualization() {
 
     function visualize(id, w, h, data) {
         var vis = d3.select("#" + id).append("svg").attr("id", "graph").attr("width", w / 2).attr("height", h)
-            .attr("style", "pointer-events:fill; margin-left:" + w / 2);
+            .attr("style", "pointer-events:fill; margin-left:" + w / 2+"px");
 
         var force = self.force = d3.layout.force().nodes(data.nodes).links(data.links).gravity(.2).distance(80)
             .charge(-1000).size([ w / 2, h ]).start();

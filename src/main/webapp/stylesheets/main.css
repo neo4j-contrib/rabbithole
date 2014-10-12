@@ -47,6 +47,8 @@ a:link, a:visited {
     bottom: 0;
     left: 0;
     right: 0;
+    min-height: 64px;
+    max-height: 128px;
 }
 
 #graph {
@@ -140,6 +142,7 @@ pre {
     bottom: 1px;
     width: 4.7%;
     margin: 0px;
+    max-height: 128px;
 }
 
 
@@ -165,8 +168,9 @@ h3 {
 }
 
 .CodeMirror-scroll {
-    height: auto;
-    overflow-y: hidden;
+    min-height: 64px;
+    max-height: 128px;
+    overflow-y: scroll;
     overflow-x: auto;
 }
 
@@ -184,4 +188,7 @@ h3 {
 
 #editor .cm-s-neo {
     margin: 0;
+    max-height: 128px;
+    overflow-y: scroll;
+    background: #ffffff;
 }

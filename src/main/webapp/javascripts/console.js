@@ -347,8 +347,9 @@ function showWelcome(json) {
 
 function resizeOutput() {
     var $output = $("#output");
-    var editorHeight = $(".CodeMirror-scroll").height();
+    var editorHeight = Math.min($(".CodeMirror-scroll").height(),128);
     var windowHeight = $(window).height();
+//    console.log("editorHeight",editorHeight,"scrollHeight",$(".CodeMirror-scroll").height(),"windowHeight",windowHeight);
     $output.css({
         'height': ( windowHeight - editorHeight - 15 ) + 'px'
     });
@@ -424,7 +425,7 @@ function sendNext(msg) {
     post("console/cypher"+getPostQueryParams(), _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
-            console.log("res",res);
+//            console.log("res",res);
             graphgistWindow.postMessage(JSON.stringify(res), "*");
         }
         else {
