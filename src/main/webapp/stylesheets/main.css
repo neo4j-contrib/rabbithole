@@ -72,6 +72,10 @@ a:link, a:visited {
    display: none;
 }
 
+div#stats {
+    overflow-y: scroll;
+}
+
 pre {
   font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
 }
