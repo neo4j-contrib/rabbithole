@@ -196,3 +196,7 @@ h3 {
     overflow-y: scroll;
     background: #ffffff;
 }
+
+#stats-output {
+	overflow-y: scroll;
+}
