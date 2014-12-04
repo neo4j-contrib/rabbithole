@@ -374,7 +374,7 @@ function autoFormatSelection(editor) {
 }
 
 function getQuery() {
-    return inputeditor.getValue().replace("\n", " ");
+    return inputeditor.getValue().replace(/\n/g, " ");
 }
 
 function query() {
