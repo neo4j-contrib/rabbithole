@@ -19,6 +19,7 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 class Neo4jService {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Neo4jService.class);
+    public static final String VERSION_REGEXP = "(\\d+\\.\\d+(?:\\.experimental|-cost|-rule)?)";
 
     private GraphDatabaseService gdb;
 
@@ -144,10 +145,14 @@ class Neo4jService {
     public void setVersion(String version) {
         if (version==null || version.trim().isEmpty()) this.version=null;
         else {
-            version = version.replaceAll("^(\\d+\\.\\d+(?:\\.experimental|-cost|-rule)?).*","$1");
-            if (!version.matches("\\d+\\.\\d+(?:\\.experimental)?")) throw new IllegalArgumentException("Incorrect version string "+version);
-            this.version = version;
+            this.version = checkVersion(version);
         }
+    }
+
+    public static String checkVersion(String version) {
+        version = version.replaceAll("^"+VERSION_REGEXP+".*","$1");
+        if (!version.matches(VERSION_REGEXP)) throw new IllegalArgumentException("Incorrect version string "+version);
+        return version;
     }
 
     public boolean isMutatingQuery(String query) {
