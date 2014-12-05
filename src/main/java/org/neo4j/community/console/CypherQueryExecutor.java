@@ -9,10 +9,15 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.TopLevelTransaction;
+import org.neo4j.kernel.api.KernelTransaction;
+import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
 import org.neo4j.kernel.impl.util.StringLogger;
+import org.omg.CORBA.SystemException;
 import scala.NotImplementedError;
 
-import javax.transaction.*;
+//import javax.transaction.*;
+import javax.transaction.InvalidTransactionException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -26,7 +31,7 @@ public class CypherQueryExecutor {
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
     private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
     public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(UNION|OPTIONAL|LOAD)\\b|(\\bMERGE\\b.+){2,}", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
-    private final TransactionManager transactionManager;
+    private final ThreadToStatementContextBridge threadToStatementContextBridge;
     private ServerExecutionEngine executionEngine;
     private final Index index;
 	private final GraphDatabaseService gdb;
@@ -34,7 +39,7 @@ public class CypherQueryExecutor {
 
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
 	    this.gdb = gdb;
-        transactionManager = ((GraphDatabaseAPI) gdb).getDependencyResolver().resolveDependency(TransactionManager.class);
+        threadToStatementContextBridge = ((GraphDatabaseAPI) gdb).getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class);
         this.index = index;
         executionEngine = new ServerExecutionEngine(gdb, StringLogger.SYSTEM);
     }
@@ -217,7 +222,7 @@ public class CypherQueryExecutor {
         params = params == null ? Collections.<String,Object>emptyMap() : params;
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
-        javax.transaction.Transaction resumeTx;
+        TopLevelTransaction resumeTx;
         try {
             resumeTx = suspendTx(query);
             ExecutionResult result = canProfile ? executionEngine.profile(query,params) : executionEngine.execute(query,params);
@@ -241,19 +246,21 @@ public class CypherQueryExecutor {
         }
     }
 
-    private javax.transaction.Transaction suspendTx(String query) {
+    private TopLevelTransaction suspendTx(String query) {
         if (!executionEngine.isPeriodicCommit(query)) return null;
         try {
-            return transactionManager.suspend();
-        } catch (SystemException e) {
+            TopLevelTransaction tx = threadToStatementContextBridge.getTopLevelTransactionBoundToThisThread(true);
+            threadToStatementContextBridge.unbindTransactionFromCurrentThread();
+            return tx;
+        } catch (Exception e) {
             throw new RuntimeException("Error suspending Transaction",e);
         }
     }
-    private void resumeTransaction(javax.transaction.Transaction tx) {
+    private void resumeTransaction(TopLevelTransaction tx) {
         if (tx == null) return;
         try {
-            transactionManager.resume(tx);
-        } catch (SystemException | InvalidTransactionException e) {
+            threadToStatementContextBridge.bindTransactionToCurrentThread(tx);
+        } catch (Exception e) {
             throw new RuntimeException("Error resuming Transaction "+tx,e);
         }
     }

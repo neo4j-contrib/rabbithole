@@ -61,6 +61,7 @@ public class RestGraphStorage implements GraphStorage {
 
     @Override
     public void delete(String id) {
+        index.remove(index.get("id",id).getSingle());
         cypher.query("start n=node:graphs(id={id}) delete n", map("id", id));
     }
 }

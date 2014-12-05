@@ -1,5 +1,7 @@
 package org.neo4j.community.console;
 
+import org.neo4j.kernel.TopLevelTransaction;
+import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
 import org.slf4j.Logger;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.guard.Guard;
@@ -8,8 +10,6 @@ import org.neo4j.kernel.guard.GuardException;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 import java.io.IOException;
 
 import static javax.servlet.http.HttpServletResponse.SC_REQUEST_TIMEOUT;
@@ -31,8 +31,11 @@ public class GuardingRequestFilter implements Filter {
         if (service==null) return;
         GraphDatabaseAPI graphDatabase = (GraphDatabaseAPI) service.getGraphDatabase();
         try {
-            Transaction tx = graphDatabase.getDependencyResolver().resolveDependency(TransactionManager.class).getTransaction();
-            if (tx!=null) tx.rollback();
+            TopLevelTransaction tx = graphDatabase.getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class).getTopLevelTransactionBoundToThisThread(false);
+            if (tx!=null) {
+                tx.failure();
+                tx.close();
+            }
         } catch(Exception e) {
             LOG.error("Error rolling back transaction ",e);
         }

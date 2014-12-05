@@ -72,7 +72,7 @@ public class CypherQueryExecutorTest {
     @Test(expected = SyntaxException.class)
 	@Ignore
     public void testAdhereToCypherVersion16() throws Exception {
-        cypherQueryExecutor.cypherQuery("start n=node(1) match n-[:A|B]-() return n","1.6");
+        cypherQueryExecutor.cypherQuery("match (n) where id(n) = (1) match n-[:A|B]-() return n","1.6");
     }
 
     @Test(expected = SyntaxException.class)
@@ -89,6 +89,20 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery("create (n {})","1.9");
     }
     @Test
+    public void testAdhereToCypherVersion20() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.0 create (n:Label {name:'Foo'})","2.0");
+    }
+    @Test
+    public void testAdhereToCypherVersion21() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.1 create (n:Label {name:'Foo'})","2.1");
+    }
+
+    @Test
+    public void testAdhereToCypherVersion22() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.2-cost create (n:Label {name:'Foo'})","2.2-cost");
+        cypherQueryExecutor.cypherQuery("cypher 2.2-rule create (n:Label {name:'Foo'})","2.2-rule");
+    }
+    @Test
     public void testAdhereToNoCypherVersion() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n:Foo {})",null);
     }
@@ -103,23 +117,24 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testWorksWithCypherPrefix() throws Exception {
-        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.0 start n=node(*) return count(*) as cnt", "cypher 2.0");
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.0 match (n) return count(*) as cnt", "cypher 2.0");
         assertEquals(asList("cnt"),result.getColumns());
         assertEquals(1, result.getRowCount());
     }
 
     @Test
     public void testPrettifyQuery() throws Exception {
-        final String pretty = cypherQueryExecutor.prettify("start n=node(1) match n--> () return n");
+        final String pretty = cypherQueryExecutor.prettify("match (n) where id(n) = (1) match n--> () return n");
         final String lineSeparator =(String)  System.getProperties().get("line.separator");
-        assertEquals("START n=node(1)" +lineSeparator+
+        assertEquals("MATCH (n)"+lineSeparator+
+                " WHERE id(n)=(1)" +lineSeparator+
                 " MATCH n-->()" +lineSeparator+
                 " RETURN n",pretty);
     }
 
     @Test
     public void testCypherQuery() throws Exception {
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n = node("+rootNode.getId()+") return n",null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+rootNode.getId()+") return n",null);
         assertEquals(asList("n"), result.getColumns());
         assertTrue(result.getText(),result.getText().contains("Node[0]"));
         for (Map<String, Object> row : result) {
@@ -137,7 +152,7 @@ public class CypherQueryExecutorTest {
         n1.setProperty("age",10);
         final Relationship rel = rootNode.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         rel.setProperty("name","rel1");
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node("+rootNode.getId()+") match p=n-[r]->m return p,n,r,m", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+rootNode.getId()+") match p=n-[r]->m return p,n,r,m", null);
         System.out.println(result);
         final List<Map<String,Object>> json = result.getJson();
         System.out.println(new Gson().toJson(json));
@@ -175,7 +190,7 @@ public class CypherQueryExecutorTest {
     public void testReplaceIndex() throws Exception {
         String queryAuto="start n=node:node_auto_index(name='foo') return n;";
         assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryAuto));
-        String queryId="start n=node(3,4,5) return n;";
+        String queryId="match (n) where id(n) IN [3,4,5] return n;";
         assertEquals(queryId,cypherQueryExecutor.replaceIndex(queryId));
         String queryEmpty="start n=node:(name='foo') return n;";
         assertEquals(queryAuto,cypherQueryExecutor.replaceIndex(queryEmpty));
@@ -202,15 +217,15 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testDontProfileUnionCheck() throws Exception {
-        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n UNION start n=node(*) return n"));
-        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n \nUNION\n start n=node(*) return n"));
-        assertFalse(cypherQueryExecutor.canProfileQuery("start n=node(*) return n \nunion\n start n=node(*) return n"));
-        assertTrue(cypherQueryExecutor.canProfileQuery("start n=node(*) return n"));
+        assertFalse(cypherQueryExecutor.canProfileQuery("match (n) where id(n) = (*) return n UNION match (n) where id(n) = (*) return n"));
+        assertFalse(cypherQueryExecutor.canProfileQuery("match (n) where id(n) = (*) return n \nUNION\n match (n) where id(n) = (*) return n"));
+        assertFalse(cypherQueryExecutor.canProfileQuery("match (n) where id(n) = (*) return n \nunion\n match (n) where id(n) = (*) return n"));
+        assertTrue(cypherQueryExecutor.canProfileQuery("match (n) where id(n) = (*) return n"));
     }
 
     @Test
     public void testDontProfileUnion() throws Exception {
-        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("start n=node(*) return n UNION start n=node(*) return n", null);
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) return n UNION match (n) return n", null);
         assertEquals(1,result.getRowCount());
     }
     @Test

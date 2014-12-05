@@ -11,8 +11,10 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.server.NeoServer;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.test.TestGraphDatabaseFactory;
+
+import java.io.IOException;
 
 /**
  * @author mh
@@ -20,16 +22,19 @@ import org.neo4j.test.TestGraphDatabaseFactory;
  */
 public class GraphStorageTest {
 
+    // @Rule public Neo4jRule neo4j = new Neo4jRule();
+
     private static final int PORT = 7475;
+    private static NeoServer webServer;
     private GraphStorage storage;
     private static ImpermanentGraphDatabase gdb;
     private Index<Node> index;
-    private static NeoServer webServer;
 
     @BeforeClass
-    public static void startup() {
-        gdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        webServer = ImportRemoteGraphTest.startWebServer(gdb, PORT);
+    public static void startup() throws IOException {
+        GraphStorageTest.webServer = CommunityServerBuilder.server().onPort(PORT).build();
+        webServer.start();
+        gdb = (ImpermanentGraphDatabase) webServer.getDatabase().getGraph();
     }
     @Before
     public void setUp() throws Exception {
@@ -135,6 +140,7 @@ public class GraphStorageTest {
 
     private void delete(Node node) {
         final Transaction tx = gdb.beginTx();
+        index.remove(node);
         node.delete();
         tx.success();tx.close();
     }

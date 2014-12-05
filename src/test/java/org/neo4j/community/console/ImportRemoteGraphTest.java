@@ -11,13 +11,12 @@ import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.rest.graphdb.ExecutingRestRequest;
 import org.neo4j.rest.graphdb.RequestResult;
 import org.neo4j.server.NeoServer;
-import org.neo4j.server.WrappingNeoServer;
-import org.neo4j.server.configuration.Configurator;
-import org.neo4j.server.configuration.ServerConfigurator;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import java.io.IOException;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +41,7 @@ public class ImportRemoteGraphTest {
 
     @Test
     public void testInitFromUrl() throws Exception {
-        consoleService.initFromUrl(service, new URL(CYPHER_URL), "start n=node(" + remoteNode.getId() + ") return n");
+        consoleService.initFromUrl(service, new URL(CYPHER_URL), "match (n) where id(n) = (" + remoteNode.getId() + ") return n");
         checkImportedNode(NAME, VALUE);
     }
 
@@ -57,26 +56,19 @@ public class ImportRemoteGraphTest {
 
     @Test
     public void testInitFromUrl2() throws Exception {
-        consoleService.initFromUrl2(service,new URL(CYPHER_URL), "start n=node("+ remoteNode.getId()+") return n");
+        consoleService.initFromUrl2(service,new URL(CYPHER_URL), "match (n) where id(n) = ("+ remoteNode.getId()+") return n");
         checkImportedNode(NAME, VALUE);
     }
 
 
     @BeforeClass
-    public static void startup() {
-        serverGraphDatabase = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        webServer = startWebServer(serverGraphDatabase, PORT);
-    }
+    public static void startup() throws IOException {
+        webServer = CommunityServerBuilder.server().onPort(PORT).build();
+        webServer.start();
+        serverGraphDatabase = (ImpermanentGraphDatabase) webServer.getDatabase().getGraph();
 
-    public static NeoServer startWebServer(
-			ImpermanentGraphDatabase gdb, int port) {
-    	Configurator configurator = new ServerConfigurator(gdb);
-    	configurator.configuration().setProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY,	port);
-		NeoServer server = new WrappingNeoServer(gdb, configurator );
-		server.start();
         tryConnect();
-		return server;
-	}
+    }
 
     private static void tryConnect() {
         int retryCount = 3;
