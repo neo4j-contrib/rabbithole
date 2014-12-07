@@ -3,6 +3,7 @@ package org.neo4j.community.console;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 
@@ -37,7 +38,7 @@ class Neo4jService {
 
     private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
         try {
-            Map<String,String> config = Collections.singletonMap("execution_guard_enabled","true");
+            Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","50M","keep_logical_logs","false","cache_type","none");
             return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
         } catch(RuntimeException re) {
             Throwable t=re.getCause();
