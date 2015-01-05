@@ -226,7 +226,7 @@ public class CypherQueryExecutor {
         try {
             resumeTx = suspendTx(query);
             ExecutionResult result = canProfile ? executionEngine.profile(query,params) : executionEngine.execute(query,params);
-            final Collection<Map<String, Object>> data = IteratorUtil.asCollection(result);
+            final Collection<Map<String, Object>> data = IteratorUtil.asCollection((Iterator<Map<String, Object>>)result);
             time = System.currentTimeMillis() - time;
             resumeTransaction(resumeTx);
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
