@@ -24,7 +24,7 @@ public class Halt {
             } catch (Exception e) {
                 System.err.println("Error during stopping the server");
             } finally {
-                System.exit(1);
+                System.exit(0);
             }
         }
     }
