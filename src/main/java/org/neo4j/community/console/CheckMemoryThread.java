@@ -22,11 +22,11 @@ public class CheckMemoryThread extends Thread {
             try {
                 long percentFree = runtime.freeMemory()*100 / runtime.maxMemory();
                 System.err.printf("memory %d percent %d free %d available %d max%n", percentFree, runtime.freeMemory(), runtime.totalMemory(), runtime.maxMemory());
-                if (percentFree < 30) {
+                if (percentFree < 40) {
                     System.err.flush();
                     break;
                 }
-                sleep(TimeUnit.MINUTES.toMillis(1));
+                sleep(TimeUnit.SECONDS.toMillis(10));
             } catch (InterruptedException e) {
                 interrupt();
             } catch (Exception e) {
