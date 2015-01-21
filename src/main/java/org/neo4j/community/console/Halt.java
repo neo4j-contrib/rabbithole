@@ -13,17 +13,19 @@ public class Halt {
 
     public static void halt(String message) {
         try {
-            if (message!=null) System.err.println(message);
-            System.err.println("Stopping Server and Console");System.err.flush();
-        } catch(Throwable t) {
+            if (message != null) System.err.println(message);
+            System.err.println("Stopping Server and Console");
+            System.err.flush();
+        } catch (Throwable t) {
             // ignore
-        }
-        try {
-            server.stop();
-        } catch (Exception e) {
-            System.err.println("Error during stopping the server");
         } finally {
-            System.exit(1);
+            try {
+                server.stop();
+            } catch (Exception e) {
+                System.err.println("Error during stopping the server");
+            } finally {
+                System.exit(1);
+            }
         }
     }
 

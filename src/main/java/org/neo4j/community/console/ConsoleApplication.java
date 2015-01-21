@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;
+import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
 import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
@@ -35,6 +36,9 @@ public class ConsoleApplication implements SparkApplication {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable throwable) {
+                if (throwable instanceof Error || throwable instanceof LifecycleException) {
+                    Halt.halt(null);
+                }
                 SessionService.cleanSessions();
                 System.gc();
             }
@@ -51,10 +55,10 @@ public class ConsoleApplication implements SparkApplication {
                     Map<String, Object> requestParams = queryParamsMap(request);
                     Map data = body.startsWith("{") ? fromJson(body) : Collections.singletonMap("query", body);
                     String query = (String) data.get("query");
-                    Map<String,Object> queryParams = (Map) data.get("queryParams");
+                    Map<String, Object> queryParams = (Map) data.get("queryParams");
                     result = consoleService.execute(service, null, query, null, requestParams, queryParams);
                 } catch (Exception e) {
-                    result = map("error",e.toString());
+                    result = map("error", e.toString());
                 }
                 return toJson(result);
             }

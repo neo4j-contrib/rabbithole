@@ -141,6 +141,7 @@ class Neo4jService {
             cypherExportService =null;
             geoffService =null;
             gdb=null;
+            System.gc();
         }
     }
 
