@@ -4,6 +4,7 @@ import org.neo4j.geoff.except.SubgraphError;
 import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 
@@ -40,8 +41,12 @@ class Neo4jService {
         try {
             Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","10M","keep_logical_logs","false","cache_type","none");
             return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
-        } catch(RuntimeException re) {
+        } catch(Throwable re) {
             Throwable t=re.getCause();
+            if (re instanceof LifecycleException || t instanceof LifecycleException || t instanceof Error || re instanceof Error) {
+                re.printStackTrace();
+                Halt.halt("Lifecycle Exception during creation of database "+re.getMessage());
+            }
             if (t instanceof RuntimeException) throw (RuntimeException)t;
             if (t instanceof Error) throw (Error)t;
             throw t;

@@ -52,6 +52,8 @@ public class Console
     public void start(int port) throws Exception {
         LOG.warn("Port used: " + port + " location " + WEBAPP_LOCATION + " " + databaseInfo.toString());
         server = new Server(port);
+        server.setStopAtShutdown(true);
+        Halt.setServer(server);
         WebAppContext root = new WebAppContext();
         root.setContextPath("/");
         root.setDescriptor(WEBAPP_LOCATION + "/WEB-INF/web.xml");
@@ -61,8 +63,9 @@ public class Console
         final HandlerList handlers = new HandlerList();
         // don't remove, needed for neo4j.org proxy
         final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
-        handlers.setHandlers(new Handler[]{resourceHandler,root});
+        handlers.setHandlers(new Handler[]{resourceHandler, root});
         server.setHandler(handlers);
+        new CheckMemoryThread().start();
         server.start();
     }
 
