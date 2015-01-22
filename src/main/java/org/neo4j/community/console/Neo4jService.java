@@ -39,7 +39,7 @@ class Neo4jService {
 
     private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
         try {
-            Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
+            Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","5M","dbms.pagecache.memory","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
             return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
         } catch(Throwable re) {
             Throwable t=re.getCause();

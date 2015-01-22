@@ -23,14 +23,15 @@ public class Halt {
         } catch (Throwable t) {
             // ignore
         } finally {
-            try {
-                server.stop();
-            } catch (Exception e) {
-                System.err.println("Error during stopping the server");
-            } finally {
-                // System.exit(0);
-                restart();
-            }
+            restart();
+//            try {
+//                server.stop();
+//            } catch (Exception e) {
+//                System.err.println("Error during stopping the server");
+//            } finally {
+//                // System.exit(0);
+//                restart();
+//            }
         }
     }
 
