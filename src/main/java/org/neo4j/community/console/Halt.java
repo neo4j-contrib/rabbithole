@@ -1,5 +1,7 @@
 package org.neo4j.community.console;
 
+import com.heroku.api.Heroku;
+import com.heroku.api.HerokuAPI;
 import org.eclipse.jetty.server.Server;
 
 /**
@@ -8,6 +10,8 @@ import org.eclipse.jetty.server.Server;
  */
 public class Halt {
 
+    public static final String APP_NAME = "rabbithole";
+    private static String token = System.getenv("HEROKU_TOKEN");
 
     private static Server server;
 
@@ -24,9 +28,16 @@ public class Halt {
             } catch (Exception e) {
                 System.err.println("Error during stopping the server");
             } finally {
-                System.exit(0);
+                // System.exit(0);
+                restart();
             }
         }
+    }
+
+    private static void restart() {
+        System.err.println("Restarting Heroku Dyno");
+        System.err.flush();
+        new HerokuAPI(token).restart(APP_NAME);
     }
 
     public static void setServer(Server server) {
