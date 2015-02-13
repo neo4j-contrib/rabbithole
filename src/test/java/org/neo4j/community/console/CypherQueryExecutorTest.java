@@ -99,8 +99,8 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testAdhereToCypherVersion22() throws Exception {
-        cypherQueryExecutor.cypherQuery("cypher 2.2-cost create (n:Label {name:'Foo'})","2.2-cost");
-        cypherQueryExecutor.cypherQuery("cypher 2.2-rule create (n:Label {name:'Foo'})","2.2-rule");
+        cypherQueryExecutor.cypherQuery("cypher 2.2 planner cost create (n:Label {name:'Foo'})","2.2 planner cost");
+        cypherQueryExecutor.cypherQuery("cypher 2.2 planner rule create (n:Label {name:'Foo'})","2.2 planner rule");
     }
     @Test
     public void testAdhereToNoCypherVersion() throws Exception {
