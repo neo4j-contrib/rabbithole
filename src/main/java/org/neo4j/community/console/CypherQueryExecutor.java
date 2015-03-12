@@ -1,6 +1,5 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.internal.spi.v2_2.DefaultLogger;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
@@ -42,7 +41,7 @@ public class CypherQueryExecutor {
 	    this.gdb = gdb;
         threadToStatementContextBridge = ((GraphDatabaseAPI) gdb).getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class);
         this.index = index;
-        executionEngine = new ServerExecutionEngine(gdb, new DefaultLogger(StringLogger.SYSTEM));
+        executionEngine = new ServerExecutionEngine(gdb, StringLogger.SYSTEM);
     }
 
     public boolean isMutatingQuery(String query) {
