@@ -99,7 +99,7 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testAdhereToCypherVersion22() throws Exception {
-        cypherQueryExecutor.cypherQuery("cypher 2.2 planner cost create (n:Label {name:'Foo'})","2.2 planner cost");
+        cypherQueryExecutor.cypherQuery("cypher 2.2 planner cost match (n:Label {name:'Foo'}) return n","2.2 planner cost");
         cypherQueryExecutor.cypherQuery("cypher 2.2 planner rule create (n:Label {name:'Foo'})","2.2 planner rule");
     }
     @Test
