@@ -71,7 +71,7 @@ class CypherExportService {
 
     private void formatLabels(StringBuilder sb, Node node) {
         for (Label label : node.getLabels()) {
-            sb.append(":").append(label.name());
+            sb.append(":`").append(label.name()).append("`");
         }
     }
 
@@ -88,7 +88,7 @@ class CypherExportService {
     }
 
     private String removeNameQuotes(String json) {
-        return json.replaceAll("\"([^\"]+)\":","$1:");
+        return json.replaceAll("\"([^\"]+)\":","`$1`:");
     }
 
     Map<String, Object> toMap(PropertyContainer pc) {
