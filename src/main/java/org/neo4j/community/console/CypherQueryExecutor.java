@@ -5,23 +5,21 @@ import org.neo4j.cypher.javacompat.PlanDescription;
 import org.neo4j.cypher.javacompat.QueryStatistics;
 import org.neo4j.cypher.javacompat.internal.ServerExecutionEngine;
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.TopLevelTransaction;
-import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
-import org.neo4j.kernel.impl.util.StringLogger;
-import org.omg.CORBA.SystemException;
+import org.neo4j.logging.FormattedLogProvider;
+import org.neo4j.logging.LogProvider;
 import scala.NotImplementedError;
 
-//import javax.transaction.*;
-import javax.transaction.InvalidTransactionException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+//import javax.transaction.*;
 
 /**
  * @author mh
@@ -39,9 +37,12 @@ public class CypherQueryExecutor {
 
     public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
 	    this.gdb = gdb;
-        threadToStatementContextBridge = ((GraphDatabaseAPI) gdb).getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class);
+        DependencyResolver dependencyResolver = ((GraphDatabaseAPI) gdb).getDependencyResolver();
+
+        threadToStatementContextBridge = dependencyResolver.resolveDependency(ThreadToStatementContextBridge.class);
         this.index = index;
-        executionEngine = new ServerExecutionEngine(gdb, StringLogger.SYSTEM);
+        FormattedLogProvider logProvider = FormattedLogProvider.toOutputStream(System.out);
+        executionEngine = new ServerExecutionEngine(gdb, logProvider);
     }
 
     public boolean isMutatingQuery(String query) {

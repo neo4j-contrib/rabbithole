@@ -70,7 +70,6 @@ public class CypherQueryExecutorTest {
     }
 
     @Test(expected = SyntaxException.class)
-	@Ignore
     public void testAdhereToCypherVersion16() throws Exception {
         cypherQueryExecutor.cypherQuery("match (n) where id(n) = (1) match n-[:A|B]-() return n","1.6");
     }
@@ -80,23 +79,29 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery("create (n {})","1.7");
     }
 
-    @Test @Ignore("only 1.9 and 2.0")
+    @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion18() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
+
     @Test
     public void testAdhereToCypherVersion19() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.9");
     }
-    @Test
+    @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion20() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.0 create (n:Label {name:'Foo'})","2.0");
     }
-    @Test
+    @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion21() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.1 create (n:Label {name:'Foo'})","2.1");
     }
 
+
+    @Test
+    public void testAdhereToCypherVersion23() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) where n.name like 'Foo%' return n","2.3");
+    }
     @Test
     public void testAdhereToCypherVersion22() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.2 planner cost match (n:Label {name:'Foo'}) return n","2.2 planner cost");
@@ -117,7 +122,7 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testWorksWithCypherPrefix() throws Exception {
-        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.0 match (n) return count(*) as cnt", "cypher 2.0");
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.2 match (n) return count(*) as cnt", "cypher 2.0");
         assertEquals(asList("cnt"),result.getColumns());
         assertEquals(1, result.getRowCount());
     }
