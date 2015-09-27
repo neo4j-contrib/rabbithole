@@ -36,7 +36,8 @@ public class Console
     private static GraphDatabaseService embeddedGraphDatabase(String path, boolean expose) {
         GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(path);
         if (!expose) {
-            builder.setConfig(GraphDatabaseSettings.read_only,"true");
+            builder = builder.setConfig(GraphDatabaseSettings.read_only,"true")
+                             .setConfig(GraphDatabaseSettings.execution_guard_enabled,"true");
         }
         return builder.newGraphDatabase();
     }
