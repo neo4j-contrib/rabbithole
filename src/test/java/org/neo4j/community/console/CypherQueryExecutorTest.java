@@ -92,15 +92,16 @@ public class CypherQueryExecutorTest {
     public void testAdhereToCypherVersion20() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.0 create (n:Label {name:'Foo'})","2.0");
     }
+
     @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion21() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.1 create (n:Label {name:'Foo'})","2.1");
     }
 
 
-    @Test
+    @Test @Ignore
     public void testAdhereToCypherVersion23() throws Exception {
-        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) where n.name like 'Foo%' return n","2.3");
+        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) where n.name starts with 'Foo' return n","2.3");
     }
     @Test
     public void testAdhereToCypherVersion22() throws Exception {
