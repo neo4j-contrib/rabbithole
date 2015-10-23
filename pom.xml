@@ -9,7 +9,7 @@
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>2.3.0-M03</neo4j.version>
+        <neo4j.version>2.3.0</neo4j.version>
     </properties>
 
     <repositories>
