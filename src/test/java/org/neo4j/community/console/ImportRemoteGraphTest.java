@@ -1,22 +1,17 @@
 package org.neo4j.community.console;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.IteratorUtil;
-import org.neo4j.rest.graphdb.ExecutingRestRequest;
-import org.neo4j.rest.graphdb.RequestResult;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
@@ -40,6 +35,7 @@ public class ImportRemoteGraphTest {
 
 
     @Test
+    @Ignore
     public void testInitFromUrl() throws Exception {
         consoleService.initFromUrl(service, new URL(CYPHER_URL), "match (n) where id(n) = (" + remoteNode.getId() + ") return n");
         checkImportedNode(NAME, VALUE);
@@ -74,8 +70,10 @@ public class ImportRemoteGraphTest {
         int retryCount = 3;
         for (int i = 0; i < retryCount; i++) {
             try {
-                RequestResult result = new ExecutingRestRequest(SERVER_ROOT_URI).get("");
-                assertEquals(200, result.getStatus());
+                HttpURLConnection conn = (HttpURLConnection) new URL(SERVER_ROOT_URI).openConnection();
+                conn.connect();
+                int status = conn.getResponseCode();
+                assertEquals(200, status);
                 System.err.println("Successful HTTP connection to "+SERVER_ROOT_URI);
                 return;
             } catch (Exception e) {

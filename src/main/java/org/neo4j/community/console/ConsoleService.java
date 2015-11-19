@@ -6,13 +6,9 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.neo4j.rest.graphdb.RestAPIFacade;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.rest.graphdb.RestAPI;
-import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
-import org.neo4j.rest.graphdb.util.QueryResult;
 import spark.Request;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,9 +77,8 @@ public class ConsoleService {
                 }
             }
 
-            if (!restUrl.contains("/db/data")) restUrl += "/db/data";
-            final RestAPI api = new RestAPIFacade(restUrl, login, password);
-            storage = new RestGraphStorage(api);
+            if (restUrl.contains("/db/data")) restUrl = restUrl.replace("/db/data","");
+            storage = new RestGraphStorage(restUrl,login,password);
             log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
         }
         } catch(Exception e) {
@@ -259,15 +254,15 @@ public class ConsoleService {
     public void initFromUrl(Neo4jService service, URL url, final String query) {
         if (!service.doesOwnDatabase()) return;
         final String urlString = url.toString().replaceAll("/cypher/?$", "");
-        final RestAPI restApi = new RestAPIFacade(urlString);
-        final QueryResult<Map<String,Object>> cypherResult = new RestCypherQueryEngine(restApi).query(query, null);
-        final SubGraph graph = new SubGraph();
-        for (Map<String, Object> row : cypherResult) {
-            for (Object value : row.values()) {
-                addResultValue(graph, value);
-            }
-        }
-        service.importGraph(graph);
+//        final RestAPI restApi = new RestAPIFacade(urlString);
+//        final QueryResult<Map<String,Object>> cypherResult = new RestCypherQueryEngine(restApi).query(query, null);
+//        final SubGraph graph = new SubGraph();
+//        for (Map<String, Object> row : cypherResult) {
+//            for (Object value : row.values()) {
+//                addResultValue(graph, value);
+//            }
+//        }
+//        service.importGraph(graph);
     }
 
     private void addResultValue(SubGraph subGraph, Object value) {

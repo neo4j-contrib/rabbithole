@@ -54,7 +54,7 @@ public class QueryStatisticsTest {
     @Test
     public void testCreate() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create n-[:FOO]->m", null);
+                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create (n)-[:FOO]->(m)", null);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
@@ -92,7 +92,7 @@ public class QueryStatisticsTest {
     @Test
     public void testDelete() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create n-[r:FOO]->m delete r,m", null);
+                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create (n)-[r:FOO]->(m) delete r,m", null);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();

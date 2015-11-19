@@ -25,6 +25,14 @@ public class GraphInfo {
         this.version = (String) node.getProperty("version",null);
         this.noRoot = (Boolean) node.getProperty("no_root",false);
     }
+    public GraphInfo(Map map) {
+        this.id = (String) map.get("id");
+        this.init = (String) map.get("init");
+        this.query = (String) map.get("query");
+        this.message = (String) map.get("message");
+        this.version = (String) map.get("version");
+        this.noRoot =  map.containsKey("no_root") ? (Boolean)map.get("no_root") : false;
+    }
 
     GraphInfo(String id, String init, String query, String message) {
         this(id,init,query,message,null);

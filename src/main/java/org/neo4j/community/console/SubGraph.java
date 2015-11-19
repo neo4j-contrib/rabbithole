@@ -1,8 +1,6 @@
 package org.neo4j.community.console;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.rest.graphdb.entity.RestNode;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
@@ -47,10 +45,8 @@ public class SubGraph {
 
     public static List<String> getLabelNames(Node node) {
         List<String> labelNames = new ArrayList<>();
-        if (!(node instanceof RestNode)) {
-            for (Label label : node.getLabels()) {
-                labelNames.add(label.name());
-            }
+        for (Label label : node.getLabels()) {
+            labelNames.add(label.name());
         }
         return labelNames;
     }
@@ -109,12 +105,11 @@ public class SubGraph {
     }
 
     public static SubGraph from(GraphDatabaseService gdb) {
-        final GlobalGraphOperations operations = GlobalGraphOperations.at(gdb);
         final SubGraph graph = new SubGraph();
-        for (Node node : operations.getAllNodes()) {
+        for (Node node : gdb.getAllNodes()) {
             graph.add(node);
         }
-        for (Relationship relationship : operations.getAllRelationships()) {
+        for (Relationship relationship : gdb.getAllRelationships()) {
             graph.add(relationship);
         }
         return graph;

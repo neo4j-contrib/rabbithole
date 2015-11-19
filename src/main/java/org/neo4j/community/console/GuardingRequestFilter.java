@@ -1,6 +1,6 @@
 package org.neo4j.community.console;
 
-import org.neo4j.kernel.TopLevelTransaction;
+import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
 import org.slf4j.Logger;
 import org.neo4j.kernel.GraphDatabaseAPI;
@@ -31,7 +31,7 @@ public class GuardingRequestFilter implements Filter {
         if (service==null) return;
         GraphDatabaseAPI graphDatabase = (GraphDatabaseAPI) service.getGraphDatabase();
         try {
-            TopLevelTransaction tx = graphDatabase.getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class).getTopLevelTransactionBoundToThisThread(false);
+            KernelTransaction tx = graphDatabase.getDependencyResolver().resolveDependency(ThreadToStatementContextBridge.class).getTopLevelTransactionBoundToThisThread(false);
             if (tx!=null) {
                 tx.failure();
                 tx.close();

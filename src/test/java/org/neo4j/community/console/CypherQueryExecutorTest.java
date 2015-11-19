@@ -82,10 +82,6 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
 
-    @Test
-    public void testAdhereToCypherVersion19() throws Exception {
-        cypherQueryExecutor.cypherQuery("create (n {})","1.9");
-    }
     @Test(expected = SyntaxException.class)
     public void testAdhereToCypherVersion20() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.0 create (n:Label {name:'Foo'})","2.0");
@@ -97,14 +93,21 @@ public class CypherQueryExecutorTest {
     }
 
 
-    @Test @Ignore
+    @Test
     public void testAdhereToCypherVersion23() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) where n.name starts with 'Foo' return n","2.3");
+        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) return n['name']","2.3");
+        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) detach delete n","2.3");
+    }
+
+    @Test
+    public void testAdhereToCypherVersion30() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.3 match (n:Label) where n.name starts with 'Foo' return n","3.0");
     }
     @Test
-    public void testAdhereToCypherVersion22() throws Exception {
-        cypherQueryExecutor.cypherQuery("cypher 2.2 planner cost match (n:Label {name:'Foo'}) return n","2.2 planner cost");
-        cypherQueryExecutor.cypherQuery("cypher 2.2 planner rule create (n:Label {name:'Foo'})","2.2 planner rule");
+    public void testAdhereToCypherVersion23_1() throws Exception {
+        cypherQueryExecutor.cypherQuery("cypher 2.3 planner=cost match (n:Label {name:'Foo'}) return n","2.3 planner cost");
+        cypherQueryExecutor.cypherQuery("cypher 2.3 planner=rule create (n:Label {name:'Foo'})","2.3 planner rule");
     }
     @Test
     public void testAdhereToNoCypherVersion() throws Exception {
@@ -121,7 +124,7 @@ public class CypherQueryExecutorTest {
 
     @Test
     public void testWorksWithCypherPrefix() throws Exception {
-        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.2 match (n) return count(*) as cnt", "cypher 2.0");
+        CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("cypher 2.3 match (n) return count(*) as cnt", "cypher 2.0");
         assertEquals(asList("cnt"),result.getColumns());
         assertEquals(1, result.getRowCount());
     }
@@ -156,7 +159,7 @@ public class CypherQueryExecutorTest {
         n1.setProperty("age",10);
         final Relationship rel = rootNode.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         rel.setProperty("name","rel1");
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+rootNode.getId()+") match p=n-[r]->m return p,n,r,m", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+rootNode.getId()+") match p=(n)-[r]->(m) return p,n,r,m", null);
         System.out.println(result);
         final List<Map<String,Object>> json = result.getJson();
         System.out.println(new Gson().toJson(json));

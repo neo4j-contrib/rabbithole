@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.neo4j</groupId>
     <artifactId>rabbithole</artifactId>
-    <version>2.3</version>
+    <version>3.0</version>
     <packaging>jar</packaging>
     <name>Neo4j Console Backend</name>
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>2.3.1</neo4j.version>
+        <neo4j.version>3.0.0-M03</neo4j.version>
     </properties>
 
     <repositories>
@@ -39,34 +39,8 @@
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rest-graphdb</artifactId>
-            <version>2.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>server-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j-kernel</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j-lucene-index</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>neo4j-jdbc</artifactId>
+            <version>2.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>

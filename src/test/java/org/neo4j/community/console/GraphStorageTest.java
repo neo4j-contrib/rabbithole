@@ -7,6 +7,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import org.junit.*;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
@@ -28,7 +30,6 @@ public class GraphStorageTest {
     private static NeoServer webServer;
     private GraphStorage storage;
     private static ImpermanentGraphDatabase gdb;
-    private Index<Node> index;
 
     @BeforeClass
     public static void startup() throws IOException {
@@ -39,12 +40,7 @@ public class GraphStorageTest {
     @Before
     public void setUp() throws Exception {
         gdb.cleanContent();
-        storage = new RestGraphStorage("http://localhost:"+PORT+"/db/data");
-
-        try (Transaction tx = gdb.beginTx()) {
-            index = gdb.index().forNodes("graphs");
-            tx.success();
-        }
+        storage = new RestGraphStorage("http://localhost:"+PORT+"/db/data",null,null);
     }
 
     @AfterClass
@@ -59,7 +55,7 @@ public class GraphStorageTest {
         final GraphInfo info2 = info.newQuery("query2");
         storage.update(info2);
         try (Transaction tx = gdb.beginTx()) {
-            final Node node = index.get("id", info.getId()).getSingle();
+            final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
             assertNotNull(node);
             assertEquals("query2", node.getProperty("query"));
             assertEquals(info.getId(), node.getProperty("id"));
@@ -78,7 +74,7 @@ public class GraphStorageTest {
     public void testCreateWithVersion() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version"));
         Transaction tx = gdb.beginTx();
-        final Node node = index.get("id", info.getId()).getSingle();
+        final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         assertEquals(info.getVersion(),node.getProperty("version"));
@@ -89,7 +85,7 @@ public class GraphStorageTest {
     public void testCreateWithNoRoot() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version",true));
         Transaction tx = gdb.beginTx();
-        final Node node = index.get("id", info.getId()).getSingle();
+        final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         assertEquals(info.getVersion(),node.getProperty("version"));
@@ -102,7 +98,7 @@ public class GraphStorageTest {
         final GraphInfo info = storage.create(new GraphInfo(null, "init", "query", "message"));
         Transaction tx = gdb.beginTx();
         assertNotNull(info.getId());
-        final Node node = index.get("id", info.getId()).getSingle();
+        final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         tx.success();tx.close();
@@ -116,8 +112,8 @@ public class GraphStorageTest {
         assertNotNull(info.getId());
         assertNotSame(id,info.getId());
         assertFalse(info.getId().trim().isEmpty());
-        final Node node = index.get("id", info.getId()).getSingle();
-        assertNull(index.get("id", id).getSingle());
+        final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
+        assertNull(gdb.findNode(DynamicLabel.label("Graph"),"id", id));
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         tx.success();tx.close();
@@ -131,8 +127,9 @@ public class GraphStorageTest {
         assertNotNull(info.getId());
         assertNotSame(id,info.getId());
         assertFalse(info.getId().trim().isEmpty());
-        final Node node = index.get("id", info.getId()).getSingle();
-        assertNull(index.get("id", id).getSingle());
+        final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
+
+        assertNull(gdb.findNode(DynamicLabel.label("Graph"),"id", id));
         assertNotNull(node);
         assertEquals(info.getId(), node.getProperty("id"));
         tx.success();tx.close();
@@ -140,7 +137,6 @@ public class GraphStorageTest {
 
     private void delete(Node node) {
         final Transaction tx = gdb.beginTx();
-        index.remove(node);
         node.delete();
         tx.success();tx.close();
     }
@@ -150,7 +146,7 @@ public class GraphStorageTest {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
         try (Transaction tx2 = gdb.beginTx()) {
             assertNotNull(info);
-            final Node node = index.get("id", info.getId()).getSingle();
+            final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
             assertNotNull(node);
             assertEquals("query", node.getProperty("query"));
             tx2.success();
@@ -162,7 +158,7 @@ public class GraphStorageTest {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
         storage.delete(info.getId());
         try (Transaction tx = gdb.beginTx()) {
-            final Node node = index.get("id", info.getId()).getSingle();
+            final Node node = gdb.findNode(DynamicLabel.label("Graph"),"id", info.getId());
             assertNull(node);
             tx.success();
         }

@@ -8,7 +8,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.TopLevelTransaction;
+import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
 import org.neo4j.logging.FormattedLogProvider;
 import scala.NotImplementedError;
@@ -215,7 +215,7 @@ public class CypherQueryExecutor {
         params = params == null ? Collections.<String,Object>emptyMap() : params;
         long time=System.currentTimeMillis();
         Transaction tx = gdb.beginTx();
-        TopLevelTransaction resumeTx;
+        KernelTransaction resumeTx;
         try {
             resumeTx = suspendTx(query);
             ExecutionResult result = canProfile ? executionEngine.profile(query,params) : executionEngine.execute(query,params);
@@ -239,17 +239,17 @@ public class CypherQueryExecutor {
         }
     }
 
-    private TopLevelTransaction suspendTx(String query) {
+    private KernelTransaction suspendTx(String query) {
         if (!executionEngine.isPeriodicCommit(query)) return null;
         try {
-            TopLevelTransaction tx = threadToStatementContextBridge.getTopLevelTransactionBoundToThisThread(true);
+            KernelTransaction tx = threadToStatementContextBridge.getTopLevelTransactionBoundToThisThread(true);
             threadToStatementContextBridge.unbindTransactionFromCurrentThread();
             return tx;
         } catch (Exception e) {
             throw new RuntimeException("Error suspending Transaction",e);
         }
     }
-    private void resumeTransaction(TopLevelTransaction tx) {
+    private void resumeTransaction(KernelTransaction tx) {
         if (tx == null) return;
         try {
             threadToStatementContextBridge.bindTransactionToCurrentThread(tx);
