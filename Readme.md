@@ -60,3 +60,5 @@ to embed in iframes, see [usage.html](http://rabbithole.herokuapp.com/usage.html
 The console can also import the data from a remote server
 
     http://console.neo4j.org?init=http://server:port/db/data/cypher
+
+
