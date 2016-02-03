@@ -11,7 +11,6 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.TopLevelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
 import org.neo4j.logging.FormattedLogProvider;
-import org.neo4j.logging.LogProvider;
 import scala.NotImplementedError;
 
 import java.util.*;
@@ -26,33 +25,29 @@ import java.util.regex.Pattern;
  * @since 21.04.12
  */
 public class CypherQueryExecutor {
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile("((\\w+)\\s*:|\\w+\\.(\\w+)\\s*=)",Pattern.MULTILINE|Pattern.DOTALL);
-    private static final Pattern INDEX_PATTERN = Pattern.compile("(node|relationship)\\s*:\\s*(\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}+|`[^`]+`|)\\s*\\(",Pattern.MULTILINE);
-    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(UNION|OPTIONAL|LOAD)\\b|(\\bMERGE\\b.+){2,}", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
+    public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(PERIODIC)\\b", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
     private final ThreadToStatementContextBridge threadToStatementContextBridge;
     private ServerExecutionEngine executionEngine;
-    private final Index index;
 	private final GraphDatabaseService gdb;
     public static final int CYPHER_LENGTH = "CYPHER".length();
 
-    public CypherQueryExecutor(GraphDatabaseService gdb, Index index) {
+    public CypherQueryExecutor(GraphDatabaseService gdb) {
 	    this.gdb = gdb;
         DependencyResolver dependencyResolver = ((GraphDatabaseAPI) gdb).getDependencyResolver();
 
         threadToStatementContextBridge = dependencyResolver.resolveDependency(ThreadToStatementContextBridge.class);
-        this.index = index;
         FormattedLogProvider logProvider = FormattedLogProvider.toOutputStream(System.out);
         executionEngine = new ServerExecutionEngine(gdb, logProvider);
     }
 
     public boolean isMutatingQuery(String query) {
-        return query.matches("(?is).*\\b(create|relate|merge|delete|set)\\b.*");
+        return query.matches("(?is).*\\b(create|drop|add|remove|merge|delete|set)\\b.*");
     }
     public boolean isIndexQuery(String query) {
         return query.matches("(?is).*\\bcreate (index|constraint)\\b.*");
     }
     public boolean isCypherQuery(String query) {
-        return query.matches("(?is).*\\b(drop|start|merge|match|return|where|skip|limit|create|relate|delete|set)\\b.*");
+        return query.matches("(?is).*\\b(drop|start|add|remove|merge|match|return|where|skip|limit|create|delete|set)\\b.*");
     }
 
     public static class CypherResult implements Iterable<Map<String, Object>> {
@@ -208,9 +203,6 @@ public class CypherQueryExecutor {
     }
 
     private CypherResult cypherQuery(String query, Map<String, Object> params) {
-        if (isMutatingQuery(query)) {
-            registerProperties(query);
-        }
         boolean canProfile = canProfileQuery(query);
         try {
             return doExecuteQuery(query, params, canProfile);
@@ -270,33 +262,5 @@ public class CypherQueryExecutor {
 //        return false;
         Matcher matcher = CANNOT_PROFILE_PATTERN.matcher(query);
         return !matcher.find();
-    }
-
-    private void registerProperties(String query) {
-        Set<String> properties = extractProperties(query);
-        index.registerProperty(properties);
-    }
-    
-    String replaceIndex(String query) {
-        Matcher matcher = INDEX_PATTERN.matcher(query);
-        if (!matcher.find()) return query;
-        StringBuffer sb=new StringBuffer();
-        do  {
-            matcher.appendReplacement(sb,"$1:$1_auto_index(");
-        } while (matcher.find());
-        matcher.appendTail(sb);
-        return sb.toString();
-    }
-
-    // TODO should get metadata from the cypher query
-    // does not take care of quoted, non-identifier properties
-    Set<String> extractProperties(String query) {
-        final Matcher matcher = PROPERTY_PATTERN.matcher(query);
-        final Set<String> properties = new HashSet<>();
-        while (matcher.find()) {
-            if (matcher.group(2)!=null) properties.add(matcher.group(2));
-            if (matcher.group(3)!=null) properties.add(matcher.group(3));
-        }
-        return properties;
     }
 }

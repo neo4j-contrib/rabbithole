@@ -10,6 +10,8 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.slf4j.Logger;
 
+import java.util.concurrent.*;
+
 public class Console
 {
 
@@ -17,6 +19,7 @@ public class Console
     private Server server;
     private final DatabaseInfo databaseInfo;
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Console.class);
+    private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
 
     public Console(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
@@ -65,9 +68,11 @@ public class Console
         final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
         handlers.setHandlers(new Handler[]{resourceHandler, root});
         server.setHandler(handlers);
-        new CheckMemoryThread().start();
+        pool.scheduleAtFixedRate(new CheckMemoryThread(),60,10, TimeUnit.SECONDS);
         server.start();
     }
+
+
 
 
     private Handler createResourceHandler(String context, String resourceBase) {

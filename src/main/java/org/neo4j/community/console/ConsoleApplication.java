@@ -14,8 +14,6 @@ import java.util.Map;
 import com.google.gson.GsonBuilder;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
-import org.neo4j.geoff.except.SubgraphError;
-import org.neo4j.geoff.except.SyntaxError;
 
 import spark.Request;
 import spark.Response;
@@ -104,11 +102,6 @@ public class ConsoleApplication implements SparkApplication {
                 return toJson(service.cypherQueryViz(query));
             }
         });
-        get(new Route("console/to_geoff") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) {
-                return service.exportToGeoff();
-            }
-        });
         get(new Route("console/to_yuml") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param(request, "query", "");
@@ -131,12 +124,6 @@ public class ConsoleApplication implements SparkApplication {
                 return service.exportToCypher();
             }
         });
-        get(new Route("console/url") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
-                final String uri = baseUri(request.raw(), "init=" + URLEncoder.encode(service.exportToGeoff(), "UTF-8"), null);
-                return consoleService.shortenUrl(uri);
-            }
-        });
         get(new Route("console/shorten") {
             protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
                 return consoleService.shortenUrl(request.queryParams("url"));
@@ -147,17 +134,6 @@ public class ConsoleApplication implements SparkApplication {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 reset(request);
                 return "deleted";
-            }
-        });
-
-        post(new Route("console/geoff") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) throws SyntaxError, SubgraphError {
-                String geoff = request.body();
-                if (geoff != null && !geoff.isEmpty()) {
-                    LOG.warn("geoff: " + geoff);
-                }
-                Map res = service.mergeGeoff(geoff);
-                return toJson(res);
             }
         });
     }

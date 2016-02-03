@@ -1,7 +1,5 @@
 package org.neo4j.community.console;
 
-import org.neo4j.geoff.except.SubgraphError;
-import org.neo4j.geoff.except.SyntaxError;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.lifecycle.LifecycleException;
@@ -25,10 +23,7 @@ class Neo4jService {
 
     private GraphDatabaseService gdb;
 
-    private Index index;
     private CypherQueryExecutor cypherQueryExecutor;
-    private GeoffImportService geoffService;
-    private GeoffExportService geoffExportService;
     private CypherExportService cypherExportService;
     private String version;
     private boolean initialized;
@@ -61,10 +56,7 @@ class Neo4jService {
         if (gdb == null) throw new IllegalArgumentException("Graph Database must not be null");
         this.gdb = gdb;
         this.ownsDatabase = ownsDatabase;
-        index = new Index(this.gdb);
-        cypherQueryExecutor = new CypherQueryExecutor(gdb,index);
-        geoffService = new GeoffImportService(gdb, index);
-        geoffExportService = new GeoffExportService(gdb);
+        cypherQueryExecutor = new CypherQueryExecutor(gdb);
         cypherExportService = new CypherExportService(gdb);
     }
 
@@ -81,34 +73,11 @@ class Neo4jService {
         }
     }
 
-    public String exportToGeoff() {
-        try (Transaction tx = gdb.beginTx()) {
-            String result = geoffExportService.export();
-            tx.success();
-            return result;
-        }
-    }
-    
     public String exportToCypher() {
         try (Transaction tx = gdb.beginTx()) {
             String cypher = cypherExportService.export();
             tx.success();
             return cypher;
-        }
-    }
-
-    public Map<String,Object> mergeGeoff(String geoff) {
-        try (Transaction tx = gdb.beginTx()) {
-            final Map<String,Object> result = new LinkedHashMap<>();
-            for (Map.Entry<String, PropertyContainer> entry : geoffService.mergeGeoff(geoff).entrySet()) {
-                result.put(entry.getKey(),geoffExportService.toMap(entry.getValue()));
-            }
-            tx.success();
-            return result;
-        } catch (SubgraphError subgraphError) {
-            throw new RuntimeException("Error merging:\n"+geoff,subgraphError);
-        } catch (SyntaxError syntaxError) {
-            throw new RuntimeException("Syntax error merging:\n"+geoff,syntaxError);
         }
     }
 
@@ -135,11 +104,8 @@ class Neo4jService {
         if (gdb!=null) {
             LOG.warn("Shutting down service "+this);
             if (ownsDatabase) gdb.shutdown();
-            index = null;
             cypherQueryExecutor=null;
-            geoffExportService =null;
             cypherExportService =null;
-            geoffService =null;
             gdb=null;
             System.gc();
         }

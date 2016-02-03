@@ -91,23 +91,18 @@
 
         <p>To interactively build the Graph you can
             use <a target="neo4j-console" href="http://docs.neo4j.org/chunked/snapshot/query-create.html">Cypher</a> to
-            create nodes <code type="cypher">CREATE neo={ name : "Neo" }</code> and<br/> to create relationships
-            <code type="cypher">CREATE neo-[:KNOWS {since:"2 days"}]->morpheus</code>.
+            create nodes <code type="cypher">CREATE (neo:Person { name : "Neo" })</code> and<br/> to create relationships
+            <code type="cypher">CREATE (neo)-[:KNOWS {since:"2 days"}]->(morpheus)</code>.
             <br/><br/>
-
-            Alternatively with <a href="http://twitter.com/technige">Nigel Small's</a> graph exchange format <a target="neo4j-console" href="http://geoff.nigelsmall.net/hello-subgraph">Geoff</a>
-            use 
-            <code>(Neo) {"name":"Neo"}</code> create nodes and <code>(Neo)-[:LOVES]->(Trinity)</code> create
-            relationships. Connect to or update existing nodes by referring to (nodeId).</p>
         <h4>Querying</h4>
 
         <p>
             For querying and updating the graph, <a target="neo4j-console" href="http://neo4j.org/resources/cypher">Cypher</a>
             is your friend. For example:
         <ul>
-            <li><code type="cypher">MATCH (user {name:"Neo"})-[:KNOWS]->(friend) WHERE friend.age > 20 RETURN user,friend ORDER BY
+            <li><code type="cypher">MATCH (user:Person {name:"Neo"})-[:KNOWS]->(friend) WHERE friend.age > 20 RETURN user,friend ORDER BY
                 friend.age LIMIT 10</code></li>
-            <li><code type="cypher">MATCH (n) WHERE has(n.name) CREATE (m:Actor { name : "actor of " + n.name }), (m)-[r:ACTS_AS]->(n) RETURN
+            <li><code type="cypher">MATCH (n:Person) WHERE exists(n.name) CREATE (m:Actor { name : "actor of " + n.name }), (m)-[r:ACTS_AS]->(n) RETURN
                 m,r</code></li>
         </ul>
         </p>
@@ -127,8 +122,7 @@
     </div>
     <div id="shareUrl" class="popup">
         <button type="button" class="btn_pretty btn_close">Close</button>
-        <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a> or <a href="#"
-                                                                                                             onclick="export_graph('geoff');return false;">Geoff</a>):
+        <h3>Initial graph setup (<a href="#" onclick="export_graph('cypher');return false;">Cypher</a>):
         </h3><textarea id="share_init" rows="5" cols="80" style="width:80%"></textarea>
 
         <h3>Initial Query (Cypher):</h3><input type="text" id="share_query" style="width:80%"/><br/>

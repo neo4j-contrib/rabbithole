@@ -26,12 +26,6 @@ public class Neo4jServiceTest {
     }
 
     @Test
-    public void testMergeGeoff() throws Exception {
-        final Map map = neo4jService.mergeGeoff("(0) {\"foo\":\"bar\"}");
-        assertEquals(MapUtil.map("foo", "bar"),map.get("(0)"));
-        assertEquals("{\"(0)\":{\"foo\":\"bar\"}}",new Gson().toJson(map));
-    }
-    @Test
     public void testQueryCypher() throws Exception {
         try (Transaction tx = gdb.beginTx()) {
             final CypherQueryExecutor.CypherResult newNode = neo4jService.initCypherQuery("CREATE (n:Person {name:{name}}) RETURN id(n) as id", MapUtil.map("name", "Anders"));

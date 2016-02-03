@@ -26,7 +26,7 @@ public class QueryStatisticsTest {
     @Before
     public void setUp() throws Exception {
         gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        cypherQueryExecutor = new CypherQueryExecutor(gdb, new Index(gdb));
+        cypherQueryExecutor = new CypherQueryExecutor(gdb);
         tx = gdb.beginTx();
         aNode = gdb.createNode();
     }

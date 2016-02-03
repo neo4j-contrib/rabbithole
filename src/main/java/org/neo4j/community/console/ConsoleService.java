@@ -113,16 +113,10 @@ public class ConsoleService {
                 final URL url = service.toUrl(init);
                 if (url!=null) {
                     initFromUrl(service, url, "start n=node(*) match n-[r?]->() return n,r");
-                    data.put("graph",service.exportToGeoff());
                 } else if (service.isMutatingQuery(init)) {
                     for (String q : splitQuery(init)) {
                         service.initCypherQuery(q,queryParams);
                     }
-                    data.put("graph",service.exportToGeoff());
-                } else {
-                    final Map<String,Object> graph = service.mergeGeoff(init);
-
-                    data.put("graph", service.exportToJson(graph));
                 }
             }
             if (initial) {

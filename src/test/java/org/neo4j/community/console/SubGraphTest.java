@@ -176,7 +176,7 @@ public class SubGraphTest {
         final Node n0 = aNode;
         final Relationship relationship = n0.createRelationshipTo(n1, DynamicRelationshipType.withName("REL"));
         final SubGraph graph = SubGraph.from(gdb);
-        final CypherQueryExecutor executor = new CypherQueryExecutor(gdb, null);
+        final CypherQueryExecutor executor = new CypherQueryExecutor(gdb);
         final CypherQueryExecutor.CypherResult result = executor.cypherQuery("match (n) where id(n)=0 match n-[r*]-() return n,r", null);
         graph.markSelection(result);
         final Map<String, Object> nodeData = graph.getNodes().get(n0.getId());
