@@ -15,7 +15,7 @@ public class CheckMemoryThread implements Runnable {
 
     @Override
     public void run() {
-        long percentFree = runtime.freeMemory() * 100 / runtime.maxMemory();
+        long percentFree = runtime.freeMemory() * 100 / runtime.totalMemory();
         System.err.printf("memory %d percent %d free %d available %d max%n", percentFree, runtime.freeMemory(), runtime.totalMemory(), runtime.maxMemory());
         if (percentFree < THRESHOLD_PERCENT) {
             System.err.flush();

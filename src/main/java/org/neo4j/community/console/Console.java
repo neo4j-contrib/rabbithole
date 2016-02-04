@@ -68,7 +68,7 @@ public class Console
         final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
         handlers.setHandlers(new Handler[]{resourceHandler, root});
         server.setHandler(handlers);
-        pool.scheduleAtFixedRate(new CheckMemoryThread(),60,10, TimeUnit.SECONDS);
+        pool.scheduleAtFixedRate(new CheckMemoryThread(),0,10, TimeUnit.SECONDS);
         server.start();
     }
 
