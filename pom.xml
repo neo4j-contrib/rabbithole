@@ -249,7 +249,7 @@
                         </goals>
                         <configuration>
                             <assembleDirectory>target</assembleDirectory>
-                            <extraJvmArguments>-Xmx750m -Dfile.encoding=UTF-8</extraJvmArguments>
+                            <!--extraJvmArguments>-Xmx750m -Dfile.encoding=UTF-8</extraJvmArguments-->
                             <programs>
                                 <program>
                                     <mainClass>org.neo4j.community.console.Console</mainClass>
