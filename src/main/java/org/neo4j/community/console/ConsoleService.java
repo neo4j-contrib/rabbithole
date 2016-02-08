@@ -1,11 +1,18 @@
 package org.neo4j.community.console;
 
 import com.google.gson.Gson;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -14,6 +21,7 @@ import spark.Request;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.Map;
@@ -44,7 +52,7 @@ public class ConsoleService {
         "(Cypher)-[:KNOWS]->(Smith), " +
         "(Smith)-[:CODED_BY]->(Architect)";
 
-    static final String DEFAULT_QUERY = "match (n:Crew)-[r:KNOWS*]-m where n.name='Neo' return n as Neo,r,m";
+    static final String DEFAULT_QUERY = "match (n:Crew)-[r:KNOWS*]-(m) where n.name='Neo' return n as Neo,r,m";
 
     private GraphStorage storage;
 
@@ -107,7 +115,7 @@ public class ConsoleService {
             if (init!=null) {
                 final URL url = service.toUrl(init);
                 if (url!=null) {
-                    initFromUrl(service, url, "start n=node(*) match n-[r?]->() return n,r");
+                    initFromUrl(service, url, "match (n) optional match (n)-[r]->() return n,r");
                 } else if (service.isMutatingQuery(init)) {
                     for (String q : splitQuery(init)) {
                         service.initCypherQuery(q,queryParams);
@@ -282,28 +290,31 @@ public class ConsoleService {
     private <T> T post(URL url, Map<String, Object> data, Class<T> resultType) {
         try {
             final HttpClient client = clientFor(url);
-            final PostMethod post = new PostMethod(url.toString());
-            post.setDoAuthentication(true);
-            post.setRequestHeader("Accept", "application/json;stream=true");
+            final HttpPost post = new HttpPost(url.toString());
+            post.setHeader("Accept", "application/json;stream=true");
             final Gson gson = new Gson();
             final String postData = gson.toJson(data);
-            post.setRequestEntity(new StringRequestEntity(postData, "application/json", "UTF-8"));
-            final int status = client.executeMethod(post);
-            if (status != 200) throw new RuntimeException("Return Status Code "+post.getStatusCode()+" "+post.getStatusLine());
-            return gson.fromJson(post.getResponseBodyAsString(), resultType);
+            post.setEntity(new StringEntity(postData, "application/json", "UTF-8"));
+            HttpResponse response = client.execute(post);
+            final int status = (int) response.getStatusLine().getStatusCode();
+            if (status != 200) throw new RuntimeException("Return Status Code "+status+" "+response.getStatusLine());
+            return gson.fromJson(new InputStreamReader(response.getEntity().getContent()), resultType);
         } catch (Exception e) {
             throw new RuntimeException("Error executing request to "+url+" with "+data+":" + e.getMessage());
         }
     }
 
     private HttpClient clientFor(URL url) {
-        final HttpClient client = new HttpClient();
+        HttpClientBuilder builder = HttpClients.custom();
         final String userInfo = url.getUserInfo();
         if (userInfo != null) {
+            CredentialsProvider credsProvider = new BasicCredentialsProvider();
             final String[] usernamePassword = userInfo.split(":");
-            client.getState().setCredentials(new AuthScope(url.getHost(), url.getPort()), new UsernamePasswordCredentials(usernamePassword[0], usernamePassword[1]));
+            credsProvider.setCredentials(new AuthScope(url.getHost(), url.getPort()),
+                    new UsernamePasswordCredentials(usernamePassword[0], usernamePassword[1]));
+            builder = builder.setDefaultCredentialsProvider(credsProvider);
         }
-        return client;
+        return builder.build();
     }
     public void initFromUrl2(Neo4jService service, URL url, final String query) {
         final Map cypherResult = post(url, map("query", query), Map.class);
