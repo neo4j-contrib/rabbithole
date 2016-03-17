@@ -102,7 +102,7 @@ class Neo4jService {
 
     public void stop() {
         if (gdb!=null) {
-            LOG.warn("Shutting down service "+this);
+            LOG.warn("Shutting down service "+this+" owns db "+ownsDatabase);
             if (ownsDatabase) gdb.shutdown();
             cypherQueryExecutor=null;
             cypherExportService =null;

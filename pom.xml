@@ -9,7 +9,7 @@
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>3.0.0-M04</neo4j.version>
+        <neo4j.version>3.0.0-M05</neo4j.version>
     </properties>
 
     <repositories>
@@ -206,8 +206,8 @@
                 <artifactId>maven-compiler-plugin</artifactId> 
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

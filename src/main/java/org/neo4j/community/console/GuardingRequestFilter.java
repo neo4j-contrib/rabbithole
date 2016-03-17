@@ -2,8 +2,8 @@ package org.neo4j.community.console;
 
 import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.slf4j.Logger;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.guard.Guard;
 import org.neo4j.kernel.guard.GuardException;
 

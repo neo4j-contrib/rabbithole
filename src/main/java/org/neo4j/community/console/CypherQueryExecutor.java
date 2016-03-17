@@ -1,15 +1,11 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.cypher.javacompat.PlanDescription;
-import org.neo4j.cypher.javacompat.QueryStatistics;
-import org.neo4j.cypher.javacompat.internal.ServerExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.FormattedLogProvider;
 import scala.NotImplementedError;
 
@@ -18,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//import javax.transaction.*;
-
 /**
  * @author mh
  * @since 21.04.12
@@ -27,7 +21,6 @@ import java.util.regex.Pattern;
 public class CypherQueryExecutor {
     public static final Pattern CANNOT_PROFILE_PATTERN = Pattern.compile("\\b(PERIODIC)\\b", Pattern.CASE_INSENSITIVE|Pattern.MULTILINE|Pattern.DOTALL);
     private final ThreadToStatementContextBridge threadToStatementContextBridge;
-    private ServerExecutionEngine executionEngine;
 	private final GraphDatabaseService gdb;
     public static final int CYPHER_LENGTH = "CYPHER".length();
 
@@ -37,11 +30,13 @@ public class CypherQueryExecutor {
 
         threadToStatementContextBridge = dependencyResolver.resolveDependency(ThreadToStatementContextBridge.class);
         FormattedLogProvider logProvider = FormattedLogProvider.toOutputStream(System.out);
-        executionEngine = new ServerExecutionEngine(gdb, logProvider);
     }
 
     public boolean isMutatingQuery(String query) {
         return query.matches("(?is).*\\b(create|drop|add|remove|merge|delete|set)\\b.*");
+    }
+    public boolean isPeriodicCommit(String query) {
+        return query.matches("(?is).*\\b(using\\s+periodic\\s+commit)\\b.*");
     }
     public boolean isIndexQuery(String query) {
         return query.matches("(?is).*\\bcreate (index|constraint)\\b.*");
@@ -57,10 +52,10 @@ public class CypherQueryExecutor {
         private final Collection<Map<String, Object>> rows;
         private final List<Map<String, Object>> json;
         private QueryStatistics queryStatistics;
-        private final PlanDescription plan;
+        private final ExecutionPlanDescription plan;
         private final long time;
 
-        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, PlanDescription plan, String query) {
+        public CypherResult(List<String> columns, Collection<Map<String, Object>> rows, QueryStatistics queryStatistics, long time, ExecutionPlanDescription plan, String query) {
             this.query = query;
             this.columns = new ArrayList<>(columns);
             this.queryStatistics = queryStatistics;
@@ -90,8 +85,8 @@ public class CypherQueryExecutor {
             );
             if (queryStatistics!=null && queryStatistics.containsUpdates()) {
                 stats.put("containsUpdates", queryStatistics.containsUpdates());
-                stats.put("nodesDeleted", queryStatistics.getDeletedNodes());
-                stats.put("relationshipsDeleted", queryStatistics.getDeletedRelationships());
+                stats.put("nodesDeleted", queryStatistics.getNodesDeleted());
+                stats.put("relationshipsDeleted", queryStatistics.getRelationshipsDeleted());
                 stats.put("nodesCreated", queryStatistics.getNodesCreated());
                 stats.put("relationshipsCreated", queryStatistics.getRelationshipsCreated());
                 stats.put("propertiesSet", queryStatistics.getPropertiesSet());
@@ -186,7 +181,7 @@ public class CypherQueryExecutor {
     }
 
     public String prettify(String query) {
-        return executionEngine.prettify(query).replaceAll("\n","\n ");
+        return query; // TODO PRETTIFY executionEngine.prettify(query).replaceAll("\n","\n ");
     }
     public CypherResult cypherQuery(String query, String version, Map<String, Object> params) {
         // query = replaceIndex(query);
@@ -218,11 +213,11 @@ public class CypherQueryExecutor {
         KernelTransaction resumeTx;
         try {
             resumeTx = suspendTx(query);
-            ExecutionResult result = canProfile ? executionEngine.profile(query,params) : executionEngine.execute(query,params);
+            Result result = canProfile ? gdb.execute("PROFILE "+query,params) : gdb.execute(query,params);
             final Collection<Map<String, Object>> data = IteratorUtil.asCollection((Iterator<Map<String, Object>>)result);
             time = System.currentTimeMillis() - time;
             resumeTransaction(resumeTx);
-            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.executionPlanDescription() : null, prettify(query));
+            CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.getExecutionPlanDescription() : null, prettify(query));
             tx.success();
             return cypherResult;
         } finally {
@@ -240,7 +235,7 @@ public class CypherQueryExecutor {
     }
 
     private KernelTransaction suspendTx(String query) {
-        if (!executionEngine.isPeriodicCommit(query)) return null;
+        if (!isPeriodicCommit(query)) return null;
         try {
             KernelTransaction tx = threadToStatementContextBridge.getTopLevelTransactionBoundToThisThread(true);
             threadToStatementContextBridge.unbindTransactionFromCurrentThread();

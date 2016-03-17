@@ -67,27 +67,27 @@ public class CypherQueryExecutorTest {
         cypherQueryExecutor.cypherQuery( "create (n {});\n " ,null);
     }
 
-    @Test(expected = SyntaxException.class)
+    @Test(expected = QueryExecutionException.class)
     public void testAdhereToCypherVersion16() throws Exception {
         cypherQueryExecutor.cypherQuery("match (n) where id(n) = (1) match n-[:A|B]-() return n","1.6");
     }
 
-    @Test(expected = SyntaxException.class)
+    @Test(expected = QueryExecutionException.class)
     public void testAdhereToCypherVersion17() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.7");
     }
 
-    @Test(expected = SyntaxException.class)
+    @Test(expected = QueryExecutionException.class)
     public void testAdhereToCypherVersion18() throws Exception {
         cypherQueryExecutor.cypherQuery("create (n {})","1.8");
     }
 
-    @Test(expected = SyntaxException.class)
+    @Test(expected = QueryExecutionException.class)
     public void testAdhereToCypherVersion20() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.0 create (n:Label {name:'Foo'})","2.0");
     }
 
-    @Test(expected = SyntaxException.class)
+    @Test(expected = QueryExecutionException.class)
     public void testAdhereToCypherVersion21() throws Exception {
         cypherQueryExecutor.cypherQuery("cypher 2.1 create (n:Label {name:'Foo'})","2.1");
     }
@@ -130,6 +130,7 @@ public class CypherQueryExecutorTest {
     }
 
     @Test
+    @Ignore
     public void testPrettifyQuery() throws Exception {
         final String pretty = cypherQueryExecutor.prettify("match (n) where id(n) = (1) match n--> () return n");
         final String lineSeparator =(String)  System.getProperties().get("line.separator");

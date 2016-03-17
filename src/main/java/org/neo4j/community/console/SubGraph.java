@@ -5,7 +5,7 @@ import org.neo4j.graphdb.*;
 import java.util.*;
 
 import static java.util.Arrays.asList;
-import static org.neo4j.graphdb.DynamicLabel.label;
+import static org.neo4j.graphdb.Label.label;
 
 /**
  * @author mh
@@ -311,7 +311,7 @@ public class SubGraph {
             Long end = (Long) relData.get("end");
             final Node endNode = gdb.getNodeById(nodeMapping.get(end));
             String type = (String) relData.get("type");
-            final Relationship rel = startNode.createRelationshipTo(endNode, DynamicRelationshipType.withName(type));
+            final Relationship rel = startNode.createRelationshipTo(endNode, RelationshipType.withName(type));
             setProperties(rel, relData, relSkipProps);
         }
     }

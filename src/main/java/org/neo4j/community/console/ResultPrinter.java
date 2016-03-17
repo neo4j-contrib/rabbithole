@@ -1,8 +1,8 @@
 package org.neo4j.community.console;
 
-import org.neo4j.cypher.javacompat.QueryStatistics;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.QueryStatistics;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.IteratorUtil;
 
@@ -210,9 +210,9 @@ public class ResultPrinter {
         addIfNonZero(sb, "Properties set: ",
                 queryStatistics.getPropertiesSet());
         addIfNonZero(sb, "Nodes deleted: ",
-                queryStatistics.getDeletedNodes());
+                queryStatistics.getNodesDeleted());
         addIfNonZero(sb, "Relationships deleted: ",
-                queryStatistics.getDeletedRelationships());
+                queryStatistics.getRelationshipsDeleted());
 
         return sb.toString();
     }
