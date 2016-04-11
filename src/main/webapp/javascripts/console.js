@@ -83,7 +83,7 @@ function share(fn) {
 }
 
 function isCypher(query) {
-    return query && query.match(/\b(start|merge|match|foreach|drop|create|delete|relate|return)\b/i);
+    return query && query.match(/\b(start|merge|match|call|load|foreach|drop|create|delete|relate|return)\b/i);
 }
 
 function viz(data) {
@@ -313,14 +313,7 @@ function showResults(data) {
 }
 
 function send(query) {
-    if (isCypher(query)) {
-        post("console/cypher"+getPostQueryParams(), query, showResults, "json");
-    }
-    else {
-        post("console/geoff", query, function () {
-            viz();
-        });
-    }
+    post("console/cypher"+getPostQueryParams(), query, showResults, "json");
 }
 
 function showVersion(json) {
