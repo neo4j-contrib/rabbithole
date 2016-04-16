@@ -1,7 +1,7 @@
 package org.neo4j.community.console;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.api.KernelTransaction;
 import org.neo4j.kernel.impl.core.ThreadToStatementContextBridge;
@@ -214,7 +214,7 @@ public class CypherQueryExecutor {
         try {
             resumeTx = suspendTx(query);
             Result result = canProfile ? gdb.execute("PROFILE "+query,params) : gdb.execute(query,params);
-            final Collection<Map<String, Object>> data = IteratorUtil.asCollection((Iterator<Map<String, Object>>)result);
+            final Collection<Map<String, Object>> data = Iterators.asCollection(result);
             time = System.currentTimeMillis() - time;
             resumeTransaction(resumeTx);
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.getExecutionPlanDescription() : null, prettify(query));

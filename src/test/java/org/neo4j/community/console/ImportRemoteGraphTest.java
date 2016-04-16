@@ -4,11 +4,11 @@ import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.HostnamePort;
+import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -44,7 +44,7 @@ public class ImportRemoteGraphTest {
     private void checkImportedNode(String prop, String value) {
         GraphDatabaseService gdb = service.getGraphDatabase();
         try (Transaction tx = gdb.beginTx()) {
-            Node imported = IteratorUtil.single(GlobalGraphOperations.at(gdb).getAllNodes());
+            Node imported = Iterables.single(gdb.getAllNodes());
             assertEquals(value, imported.getProperty(prop));
             tx.success();
         }
@@ -59,7 +59,7 @@ public class ImportRemoteGraphTest {
 
     @BeforeClass
     public static void startup() throws IOException {
-        webServer = CommunityServerBuilder.server().onPort(PORT).build();
+        webServer = CommunityServerBuilder.server().onAddress(new HostnamePort("localhost",PORT)).build();
         webServer.start();
         serverGraphDatabase = (ImpermanentGraphDatabase) webServer.getDatabase().getGraph();
 

@@ -5,7 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphalgo.impl.util.PathImpl;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collections;
@@ -98,7 +99,7 @@ public class SubGraphTest {
         graph.add(rel);
         graph.add(node2);
         assertEquals(3, graph.getNodes().size());
-        final Map<String, Object> relData = IteratorUtil.first(graph.getRelationshipsWithIndexedEnds().values());
+        final Map<String, Object> relData = Iterables.first(graph.getRelationshipsWithIndexedEnds().values());
         assertEquals(1L, relData.get("start"));
         assertEquals(3L, relData.get("end"));
         assertEquals(0, relData.get("source"));

@@ -4,7 +4,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.QueryStatistics;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.collection.IteratorUtil;
+import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.helpers.collection.Iterators;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,7 +22,7 @@ public class ResultPrinter {
     }
 
     public void outputResults(List<String> columns, Iterable<Map<String, Object>> result, long time, QueryStatistics queryStatistics, PrintWriter out)  {
-        Collection<Map<String, Object>> rows = (result instanceof Collection) ? (Collection<Map<String, Object>>) result : IteratorUtil.asCollection(result);
+        Collection<Map<String, Object>> rows = (result instanceof Collection) ? (Collection<Map<String, Object>>) result : Iterables.asCollection(result);
 
         Map<String, Integer> columnSizes = calculateColumnSizes(columns, rows);
         int totalWidth = totalWith(columnSizes.values());

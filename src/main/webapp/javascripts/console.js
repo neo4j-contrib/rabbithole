@@ -28,7 +28,7 @@ function highlight(text) {
             newtext = newtext + text;
         }
         else {
-            newtext = newtext + "<span class=\"cm-" + typeClass + "\">" + text + "</span>";
+            newtext = newtext + "<span data-lang='"+typeClass+"' class='code cm-" + typeClass + "'>" + text + "</span>";
         }
     }
 
@@ -267,7 +267,7 @@ function computeInfo(data) {
 function inputQuery(query) {
     inputeditor.setValue(query); // .replace(/\n/g, ' ').trim()
     CodeMirror.commands["selectAll"](inputeditor);
-    autoFormatSelection(inputeditor);
+    //autoFormatSelection(inputeditor);
     resizeOutput();
 }
 

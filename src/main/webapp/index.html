@@ -3,17 +3,16 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="icon" href="http://neo4j.org/favicon.ico"/>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.min.css">
-    <link rel="stylesheet" href="http://gist.neo4j.org/css/codemirror-neo.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/theme/neo.min.css">
     <title>Neo4j Console</title>
     <!-- don't remove "console_assets/" context prefix, needed for neo4j.org proxy disambiguation -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/visualization.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.min.js"></script>
-    <script type="text/javascript" src="console_assets/javascripts/cypher.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/formatting.min.js"></script>
-    <script type="text/javascript" src="console_assets/javascripts/runmode.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/addon/runmode/runmode.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/mode/cypher/cypher.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/cypher.datatable.js"></script>
     <script type="text/javascript" src="console_assets/javascripts/console.js"></script>
@@ -69,8 +68,8 @@
 
     <div id="output" class="console cm-s-neo">
     </div>
-    <form id="form" action="#">
-        <textarea id="input"></textarea>
+    <form id="form" action="#"  >
+        <textarea id="input" data-lang="cypher" class="code form-control"></textarea>
     </form>
     <!--div id="graph">
     </div-->

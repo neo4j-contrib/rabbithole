@@ -10,6 +10,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.util.concurrent.*;
 
 public class Console
@@ -37,7 +38,7 @@ public class Console
     }
 
     private static GraphDatabaseService embeddedGraphDatabase(String path, boolean expose) {
-        GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(path);
+        GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(path));
         if (!expose) {
             builder.setConfig(GraphDatabaseSettings.read_only,"true");
         }

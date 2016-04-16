@@ -2,7 +2,6 @@ package org.neo4j.community.console;
 
 import com.google.gson.Gson;
 import org.neo4j.graphdb.*;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,7 +31,7 @@ class CypherExportService {
     }
 
     private int appendRelationships(StringBuilder sb, int count) {
-        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
+        for (Node node : gdb.getAllNodes()) {
             for (Relationship rel : node.getRelationships(Direction.OUTGOING)) {
                 if (count > 0) { sb.append(",\n"); }
                 count++;
@@ -52,7 +51,7 @@ class CypherExportService {
 
     private int appendNodes(StringBuilder sb) {
         int count = 0;
-        for (Node node : GlobalGraphOperations.at(gdb).getAllNodes()) {
+        for (Node node : gdb.getAllNodes()) {
             if (count > 0) { sb.append(",\n"); }
             count++;
             appendNode(sb, node);
