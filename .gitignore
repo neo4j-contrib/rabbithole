@@ -1,3 +1,8 @@
+.shell_history
+*.hprof
+*.patch
+data/
+neo4j-home
 target
 *.iml
 *.ipr

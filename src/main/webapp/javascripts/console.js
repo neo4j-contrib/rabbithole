@@ -1,7 +1,9 @@
 'use strict';
 
 var inputeditor;
-var visualizer = new GraphVisualization();
+//var visualizer = new GraphVisualization();
+var visualizer = new Neod3Renderer();
+
 var graphgistWindow;
 
 function append(element, text, doHighlight) {
@@ -92,9 +94,16 @@ function viz(data) {
     }
     var output = $("#output");
     output.children('#graph').remove();
+    var container = $("<div id='graph'></div>");
+    output.append(container);
     if (data) {
         var h = output.height();
-        visualizer.visualize("output", output.width(), h, data);
+        var show_result_only = false; // todo
+        var style = null; // todo custom styles like from adoc
+        //if (style == "{style}") style = null;
+        var selectedVisualization = handleSelection(data, show_result_only);
+        visualizer.render("graph", container, selectedVisualization, style);
+        //visualizer.visualize("output", output.width(), h, data);
     }
     else {
         var query = getQuery();
@@ -106,7 +115,12 @@ function viz(data) {
             beforeSend: setSessionHeader,
             dataType: "json",
             success: function (data) {
-                visualizer.visualize("output", output.width(), output.height(),data)
+                var show_result_only = false; // todo
+                var style = null; // todo custom styles like from adoc
+                var selectedVisualization = handleSelection(data, show_result_only);
+                visualizer.render("graph", container, selectedVisualization, style);
+
+                //visualizer.visualize("output", output.width(), output.height(),data)
             }
         });
     }
@@ -456,6 +470,30 @@ function guid() {
         s4() + '-' + s4() + s4() + s4();
 }
 
+function handleSelection(data, show_result_only) {
+    if (!show_result_only) return data;
+    var nodes = [];
+    var links = [];
+    var i;
+    for (i = 0; i < data.nodes.length; i++) {
+        var node = data.nodes[i];
+        if (node.selected) {
+            node['$index'] = nodes.length;
+            nodes.push(node);
+        }
+    }
+    var hasSelectedRels = data.links.filter(function(link) { return link.selected; }).length > 0
+    for (i = 0; i < data.links.length; i++) {
+        var link = data.links[i];
+        if (link.selected || (!hasSelectedRels && data.nodes[link.source].selected && data.nodes[link.target].selected)) {
+            link.source = data.nodes[link.source]['$index'];
+            link.target = data.nodes[link.target]['$index'];
+            links.push(link);
+        }
+    }
+    return {nodes: nodes, links: links};
+}
+
 var session_id=guid();
 
 $(document).ready(
@@ -463,9 +501,15 @@ $(document).ready(
         inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
             lineNumbers: false,
             readOnly: false,
+            smartIndent: false,
+            lineWrapping:true,
+            scrollbarStyle:null,
+            allowDropFileTypes:["cypher","cql","cyp"],
             mode: "cypher",
-            theme: "neo",
+            theme: "neo" //,
+/*
             onKeyEvent: function (inputeditor, e) {
+                console.log(e);
                 if (e.type == 'keydown') {
                     // resize output while typing...
                     resizeOutput();
@@ -479,6 +523,13 @@ $(document).ready(
                     return false;
                 }
             }
+*/
+        });
+        inputeditor.setOption("extraKeys", {
+            "Enter": function(cm) {cm.execCommand("newlineAndIndent"); },
+            "Cmd-Enter": query,
+            "Shift-Enter": query,
+            "Ctrl-Enter": query
         });
         // set id to align with CSS from Neo4j Browser
         $("#form > div.CodeMirror").first().attr("id", "editor");
@@ -532,8 +583,8 @@ $(document).ready(
         $(".popup .btn_close").click(function () {
             close($(this).parent());
         });
-        $("code[type=cypher]").each(function() {
-	       var text=highlight($(this).text());
-	       $(this).html(text);
-		});
+        //$("code[type=cypher]").each(function() {
+	     //  var text=highlight($(this).text());
+	     //  $(this).html(text);
+		//});
     });

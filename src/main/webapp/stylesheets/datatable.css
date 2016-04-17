@@ -3,7 +3,7 @@ table {
 /*
     clear: both;
 */
-    color: #C2B470;
+    color: #111;
 /*    border-left: 2px dashed white;*/
 /*    border-bottom: 2px dashed white;*/
 /*    border-top: 2px dashed white;*/
@@ -21,20 +21,22 @@ thead {
 th, td {
 /*    border-right: 2px dashed white;*/
     padding: 5px;
+    border: none;
 }
 
 table.dataTable th {
     border-bottom-width: 2px;
     font-weight: normal;
-    background-color: #f8f8f8;
+    background-color: white;
+    border: none;
 }
 
 .even, thead {
-    background: #eeeeee;
+    background: whitesmoke;
 }
 
 .odd {
-    background: #dddddd;
+    background: white;
 }
 
 .dataTables_wrapper {
@@ -68,7 +70,7 @@ table.dataTable th {
 }
 .paginate_enabled_previous, .paginate_enabled_next {
     padding: 3px;
-    color: #090
+    color: darkmagenta;
 }
 
 .css_right {

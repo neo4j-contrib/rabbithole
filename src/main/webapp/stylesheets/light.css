@@ -1,7 +1,7 @@
 /* main */
 
 body, .console, #output {
-    background-color: #f5f5f5;
+    background-color: ghostwhite;
 }
 
 .console {
@@ -13,7 +13,7 @@ a:link, a:visited {
 }
 
 .popup {
-    background-color: #EEE;
+    background-color: ghostwhite;
     color: #111;
     border-color: #a9a9a9;
 }
@@ -69,11 +69,11 @@ table, thead, th, td {
 
 
 .even, thead {
-    background: #CCC;
+    background: whitesmoke;
 }
 
 .odd {
-    background: #EEE;
+    background: white;
 }
 
 /* d3 */

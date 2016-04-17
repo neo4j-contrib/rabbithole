@@ -9,22 +9,15 @@ body, html, div, form, input {
 
 body {
     height: 99%;
-    background-color: black;
 }
 
 .console {
     left: 0;
     right: 0;
-    color: #EEE;
-    background-color: black;
     font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
     margin: 0;
     border: none;
     padding: 5px;
-}
-
-a:link, a:visited {
-    color: white;
 }
 
 #output {
@@ -38,8 +31,17 @@ a:link, a:visited {
     word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
-#form, #query_button, #form .CodeMirror {
+#form, #query_button, #form, .CodeMirror {
 	z-index: 100;
+}
+
+#execute {
+    font-size:40px;
+    position:absolute;
+    bottom: 0.2em;
+    right: 0.2em;
+    z-index: 110;
+    color: darkmagenta;
 }
 
 #form {
@@ -57,7 +59,7 @@ a:link, a:visited {
     height: 90%;
     position: absolute;
     background: none;
-    z-index: 10;
+    z-index: 1;
     top: 0px;
     right: 15px;
 
@@ -82,8 +84,6 @@ pre {
 
 .popup {
   	font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
-    background-color: #202020;
-    color: #EEE;
     border: 2px solid #a9a9a9;
     position: absolute;
     top: 10%;
@@ -140,19 +140,8 @@ pre {
     top:5px;
 }
 
-#query_button {
-    position: fixed;
-    right: 1px;
-    bottom: 1px;
-    width: 4.7%;
-    margin: 0px;
-    max-height: 128px;
-}
-
-
 code {
     font-family: 'Bitstream Vera Sans Mono', 'DejaVu Sans Mono', 'Consolas', 'Monaco', Courier, monospace !important;
-    background-color: #3d3d3d;
 }
 
 .welcome {
@@ -167,9 +156,14 @@ h3 {
 .CodeMirror {
     border: 1px solid #eee;
     position: absolute;
-    width: 94%;
+    width: 100%;
     bottom: 0px;
 }
+
+.CodeMirror, .CodeMirror-scroll {
+    height:auto;
+}
+
 
 .CodeMirror-scroll {
     min-height: 64px;

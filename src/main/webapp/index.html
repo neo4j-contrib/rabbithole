@@ -5,11 +5,13 @@
     <link rel="icon" href="http://neo4j.org/favicon.ico"/>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/theme/neo.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.1/css/font-awesome.css">
     <title>Neo4j Console</title>
     <!-- don't remove "console_assets/" context prefix, needed for neo4j.org proxy disambiguation -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.min.js"></script>
-    <script type="text/javascript" src="console_assets/javascripts/visualization.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/neod3.js"></script>
+    <script type="text/javascript" src="console_assets/javascripts/neod3-visualization.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/addon/runmode/runmode.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/mode/cypher/cypher.min.js"></script>
@@ -18,8 +20,9 @@
     <script type="text/javascript" src="console_assets/javascripts/console.js"></script>
     <style type="text/css">
         @import url("console_assets/stylesheets/main.css");
-        @import url("console_assets/stylesheets/highlight.css");
+        /* @import url("console_assets/stylesheets/highlight.css");*/
         @import url("console_assets/stylesheets/d3.css");
+        @import url("console_assets/stylesheets/neod3.css");
         @import url("console_assets/stylesheets/light.css");
         @import url("console_assets/stylesheets/datatable.css");
     </style>
@@ -63,13 +66,12 @@
             <option value="2.3 planner cost">Cypher compiler 2.3-cost</option>
             <option value="2.3 planner rule">Cypher compiler 2.3-rule</option>
         </select>
-        </span>
     </div>
 
     <div id="output" class="console cm-s-neo">
     </div>
     <form id="form" action="#"  >
-        <textarea id="input" data-lang="cypher" class="code form-control"></textarea>
+        <textarea id="input" data-lang="cypher" class="code form-control" rows="4" cols="120" ></textarea>
     </form>
     <!--div id="graph">
     </div-->
@@ -161,7 +163,8 @@
         <input type="url" id="share_iFrame" style="width:80%" onclick="this.select();"/><br/>
         If you nee a fresh, blank console, <a target="_blank" class="btn_pretty" href="http://console.neo4j.org/?init=&amp;no_root=true">click here</a>. 
     </div>
-    <div id="query_button" class="btn_pretty" onclick="query();return false;">Run</div>
+    <!--div id="query_button" class="btn_pretty" onclick="query();return false;">Run</div-->
+    <a href="#" title="Execute" id="execute" onclick="query();return false;"><i class="fa fa-play-circle-o"></i></a>
 </div>
 </body>
 </html>
