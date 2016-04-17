@@ -48,9 +48,15 @@ table.dataTable th {
 
 .dataTables_length {
     float: left;
+    padding: 3px;
+    vertical-align: middle;
+    display: inline-block;
 }
 .dataTables_filter {
-    text-align: right;
+    padding: 3px;
+    vertical-align: middle;
+    display: inline-block;
+    /*text-align: right;*/
 }
 .dataTables_info {
     float: left;
@@ -59,7 +65,7 @@ table.dataTable th {
 
 .dataTables_paginate {
     margin: 3px;
-    text-align: right;
+    /*text-align: right;*/
 }
 .paging_two_button {
 

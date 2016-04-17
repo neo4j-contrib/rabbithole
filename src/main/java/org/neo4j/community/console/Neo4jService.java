@@ -1,7 +1,21 @@
 package org.neo4j.community.console;
 
+import apoc.coll.Coll;
+import apoc.convert.Json;
+import apoc.create.Create;
+import apoc.date.*;
+import apoc.index.FulltextIndex;
+import apoc.load.LoadJson;
+import apoc.load.Xml;
+import apoc.lock.*;
+import apoc.meta.Meta;
+import apoc.path.PathExplorer;
+import apoc.refactor.GraphRefactoring;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
@@ -10,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static java.util.Arrays.asList;
 import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
@@ -35,7 +50,18 @@ class Neo4jService {
     private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
         try {
             Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","5M","dbms.pagecache.memory","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
-            return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
+            GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
+            Procedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(Procedures.class);
+            List<Class<?>> apocProcedures = asList(Coll.class, apoc.map.MapUtil.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
+                    Xml.class, PathExplorer.class, Meta.class, GraphRefactoring.class);
+            apocProcedures.forEach((proc) -> {
+                try {
+                    procedures.register(proc);
+                } catch (KernelException e) {
+                    throw new RuntimeException("Error registering "+proc,e);
+                }
+            });
+            return db;
         } catch(Throwable re) {
             Throwable t=re.getCause();
             if (re instanceof LifecycleException || t instanceof LifecycleException || t instanceof Error || re instanceof Error) {
