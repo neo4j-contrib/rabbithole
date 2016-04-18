@@ -185,7 +185,7 @@ function Neod3Renderer() {
             .style(styleSheet)
             .width($container.width()).height($container.height()).on('nodeClicked', dummyFunc).on('relationshipClicked', dummyFunc).on('nodeDblClicked', dummyFunc);
         //console.log("width",$container.width(),"height",$container.height(),$container);
-        var renderer = d3.select("#" + id).append("svg").style("width",$container.width()).style("height",$container.height()).data([graphModel]);
+        var renderer = d3.select("#" + id).append("svg").style("width",$container.width()+"px").style("height",$container.height()+"px").data([graphModel]);
         var zoomHandlers = {};
         var zoomBehavior = d3.behavior.zoom().on("zoom", applyZoom).scaleExtent([0.2, 8]);
 
