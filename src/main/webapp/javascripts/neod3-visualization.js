@@ -33,12 +33,12 @@ function Neod3Renderer() {
     var URLSupport = 'URL' in window && 'createObjectURL' in window.URL;
     var msBlobSupport = typeof window.navigator.msSaveOrOpenBlob !== 'undefined';
     var svgStyling = '<style>\ntext{font-family:sans-serif}\n</style>';
-    var stylingUrl = window.location.hostname === 'www.neo4j.org' ? 'http://gist.neo4j.org/css/neod3' : 'css/neod3';
-    if (window.isInternetExplorer) {
-        stylingUrl += '-ie.css';
-    } else {
-        stylingUrl += '.css';
-    }
+    //var stylingUrl = window.location.hostname === 'www.neo4j.org' ? 'http://gist.neo4j.org/css/neod3' : 'css/neod3';
+    //if (window.isInternetExplorer) {
+    //    stylingUrl += '-ie.css';
+    //} else {
+    //    stylingUrl += '.css';
+    //}
 
     var existingStyles = {};
     var currentColor = 1;
