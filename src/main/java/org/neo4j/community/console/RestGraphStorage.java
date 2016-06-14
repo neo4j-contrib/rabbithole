@@ -59,7 +59,7 @@ public class RestGraphStorage implements GraphStorage {
     @Override
     public GraphInfo create(GraphInfo info) {
         if (isEmpty(info)) info = info.withId(Util.randomId());
-        Map node = query("MERGE (n:Graph {id:{id}}) ON CREATE SET n += {data} RETURN n",map("id",info.getId(),"data",info.toMap()));
+        Map node = query("MERGE (n:Graph {id:{id}}) ON CREATE SET n = {data} RETURN n",map("id",info.getId(),"data",info.toMap()));
         return new GraphInfo(node);
     }
 
