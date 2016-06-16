@@ -43,11 +43,13 @@ class CypherExportService {
     }
 
     private void appendRelationship(StringBuilder sb, Relationship rel) {
+        sb.append("(");
         formatNode(sb, rel.getStartNode());
-        sb.append("-[:").append(rel.getType().name());
+        sb.append(")-[:`").append(rel.getType().name()).append("`");
         formatProperties(sb, rel);
-        sb.append("]->");
+        sb.append("]->(");
         formatNode(sb, rel.getEndNode());
+        sb.append(")");
     }
 
     private int appendNodes(StringBuilder sb) {
