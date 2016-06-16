@@ -76,7 +76,7 @@ class CypherExportService {
     }
 
     private void formatNode(StringBuilder sb, Node n) {
-        sb.append("_").append(n.getId());
+        sb.append("(_").append(n.getId()).append(")");
     }
 
     private void formatProperties(StringBuilder sb, PropertyContainer pc) {
