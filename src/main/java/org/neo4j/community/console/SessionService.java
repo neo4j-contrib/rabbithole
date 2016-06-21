@@ -126,7 +126,7 @@ class SessionService {
         }
     }
 
-    private static String getSessionId(HttpServletRequest request) {
+    static String getSessionId(HttpServletRequest request) {
         return request.getHeader(SESSION_HEADER);
     }
 

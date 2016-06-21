@@ -86,6 +86,10 @@ abstract class Route extends spark.Route {
         return now;
     }
 
+    protected String getSessionId(Request request) {
+        return SessionService.getSessionId(request.raw());
+    }
+
     protected void reset(Request request) {
         SessionService.reset(request.raw());
     }

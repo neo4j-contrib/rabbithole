@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 
 public class ConsoleApplication implements SparkApplication {
 
-    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(ConsoleApplication.class);
+    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger("spark.Console");
 
     private ConsoleService consoleService;
 
