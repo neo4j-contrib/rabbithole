@@ -42,6 +42,7 @@ class Neo4jService {
     private CypherExportService cypherExportService;
     private String version;
     private boolean initialized;
+    private String id;
 
     Neo4jService() throws Throwable {
         this(createInMemoryDatabase(),true);
@@ -215,5 +216,17 @@ class Neo4jService {
             if (data!=null) result.put(entry.getKey(),data);
         }
         return result;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean hasId(String id) {
+        return id == null || id.equals(this.id);
+    }
+
+    public void clear() {
+        gdb.execute("MATCH (n) detach delete n").close();
     }
 }

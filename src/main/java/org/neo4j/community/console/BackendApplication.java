@@ -57,9 +57,9 @@ public class BackendApplication implements SparkApplication {
         });
         post(new Route("/backend/cypher/:id") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
-                if (!service.isInitialized()) {
-                    String id = request.params("id");
-                    Map<String, Object> result = consoleService.init(service, id,null);
+                String id = request.params("id");
+                if (!service.isInitialized() || !service.hasId(id)) {
+                    Map<String, Object> result = consoleService.init(service, id,map("initialize","true"));
                     if (result.containsKey("error")) {
                         return gson().toJson(result);
                     }

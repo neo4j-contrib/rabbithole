@@ -105,14 +105,17 @@ public class ConsoleService {
     // split init and query on ";\n"
     public Map<String, Object> execute(Neo4jService service, String init, String query, String version, Map<String, Object> requestParams, Map<String, Object> queryParams) {
         if (version != null) service.setVersion(version);
-        boolean initial = init != null;
-        if (dontInitialize(service) || init == null || init.equalsIgnoreCase("none")) init = null;
+        boolean initial = init != null || mustInitialize(requestParams);
+        if (!mustInitialize(requestParams)) {
+            if (dontInitialize(service) || init == null || init.equalsIgnoreCase("none")) init = null;
+        }
         if (query == null || query.equalsIgnoreCase("none")) query = null;
         final Map<String, Object> data = map("init", init, "query", query, "version", service.getVersion());
         long start = System.currentTimeMillis(), time = start;
         try {
             time = trace("service", time);
-            if (init != null) {
+            if (initial) service.clear();
+            if (initial) {
                 final URL url = service.toUrl(init);
                 if (url != null) {
                     initFromUrl(service, url, "match (n) optional match (n)-[r]->() return n,r");
@@ -155,6 +158,9 @@ public class ConsoleService {
 
     private boolean noViz(Map<String, Object> params) {
         return params != null && "none".equals(params.get("viz"));
+    }
+    private boolean mustInitialize(Map<String, Object> params) {
+        return params != null && "true".equals(params.get("initialize"));
     }
 
     private String[] splitQuery(String allQueries) {
@@ -241,6 +247,7 @@ public class ConsoleService {
         if (info != null) {
             Map<String, Object> queryParams = params != null ? (Map<String, Object>) params.get("queryParams") : null;
             result = execute(service, info.getInit(), info.getQuery(), info.getVersion(), params, queryParams);
+            service.setId(id);
             result.put("message", info.getMessage());
         } else {
             result = init(service, params);
