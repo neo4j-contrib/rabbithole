@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.neo4j</groupId>
     <artifactId>rabbithole</artifactId>
-    <version>3.0</version>
+    <version>3.1</version>
     <packaging>jar</packaging>
     <name>Neo4j Console Backend</name>
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>3.0.3</neo4j.version>
+        <neo4j.version>3.1.0-M04</neo4j.version>
     </properties>
 
     <repositories>
