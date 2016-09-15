@@ -107,7 +107,9 @@ public class ConsoleService {
         if (version != null) service.setVersion(version);
         boolean initial = init != null || mustInitialize(requestParams);
         if (!mustInitialize(requestParams)) {
-            if (dontInitialize(service) || init == null || init.equalsIgnoreCase("none")) init = null;
+            if (dontInitialize(service) || init == null || init.equalsIgnoreCase("none")) {
+	          init = null; initial = false;
+	        }
         }
         if (query == null || query.equalsIgnoreCase("none")) query = null;
         final Map<String, Object> data = map("init", init, "query", query, "version", service.getVersion());
