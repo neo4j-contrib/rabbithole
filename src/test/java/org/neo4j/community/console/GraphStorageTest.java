@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.HostnamePort;
+import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -32,7 +33,7 @@ public class GraphStorageTest {
 
     @BeforeClass
     public static void startup() throws IOException {
-        GraphStorageTest.webServer = CommunityServerBuilder.server().onAddress(new HostnamePort("localhost",PORT)).build();
+        GraphStorageTest.webServer = CommunityServerBuilder.server().onAddress(new ListenSocketAddress("localhost",PORT)).build();
         webServer.start();
         gdb = (ImpermanentGraphDatabase) webServer.getDatabase().getGraph();
     }

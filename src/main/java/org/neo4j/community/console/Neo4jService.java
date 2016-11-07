@@ -50,14 +50,15 @@ class Neo4jService {
 
     private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
         try {
-            Map<String,String> config = MapUtil.stringMap("execution_guard_enabled", "true","mapped_memory_total_size","5M","dbms.pagecache.memory","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
+            Map<String,String> config = MapUtil.stringMap("dbms.transaction.timeout", "2s","mapped_memory_total_size","5M","dbms.pagecache.memory","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
             GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
             Procedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(Procedures.class);
             List<Class<?>> apocProcedures = asList(Coll.class, apoc.map.Maps.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
                     Xml.class, PathExplorer.class, Meta.class, GraphRefactoring.class);
             apocProcedures.forEach((proc) -> {
                 try {
-                    procedures.register(proc);
+                    procedures.registerProcedure(proc);
+                    procedures.registerFunction(proc);
                 } catch (KernelException e) {
                     throw new RuntimeException("Error registering "+proc,e);
                 }

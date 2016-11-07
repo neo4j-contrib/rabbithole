@@ -5,6 +5,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.HostnamePort;
+import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
@@ -59,7 +60,7 @@ public class ImportRemoteGraphTest {
 
     @BeforeClass
     public static void startup() throws IOException {
-        webServer = CommunityServerBuilder.server().onAddress(new HostnamePort("localhost",PORT)).build();
+        webServer = CommunityServerBuilder.server().onAddress(new ListenSocketAddress("localhost",PORT)).build();
         webServer.start();
         serverGraphDatabase = (ImpermanentGraphDatabase) webServer.getDatabase().getGraph();
 
