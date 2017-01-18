@@ -21,11 +21,11 @@
         <filter-class>org.neo4j.community.console.GuardingRequestFilter</filter-class>
         <init-param>
             <param-name>timeout</param-name>
-            <param-value>10000</param-value>
+            <param-value>20000</param-value>
         </init-param>
         <init-param>
             <param-name>maxOps</param-name>
-            <param-value>1000000</param-value>
+            <param-value>2000000</param-value>
         </init-param>
     </filter>
 
