@@ -9,7 +9,7 @@
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>3.0.7</neo4j.version>
+        <neo4j.version>3.0.9</neo4j.version>
     </properties>
 
     <repositories>
@@ -174,7 +174,7 @@
         <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
-            <version>3.0.4.1</version>
+            <version>3.0.8.4</version>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
