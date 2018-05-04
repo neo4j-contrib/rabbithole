@@ -4,10 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -20,26 +19,25 @@ import static org.junit.Assert.assertTrue;
 public class QueryStatisticsTest {
     private GraphDatabaseService gdb;
     private CypherQueryExecutor cypherQueryExecutor;
-    private Node aNode;
-    private Transaction tx;
+    private Long nodeId;
+    private Map<String,Object> params;
 
     @Before
     public void setUp() throws Exception {
         gdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
         cypherQueryExecutor = new CypherQueryExecutor(gdb);
-        tx = gdb.beginTx();
-        aNode = gdb.createNode();
+        nodeId = gdb.execute("CREATE (n) RETURN id(n) as id").<Long>columnAs("id").next();
+        params = Collections.singletonMap("id", nodeId);
     }
 
     @After
     public void tearDown() throws Exception {
-        tx.success();tx.close();
         gdb.shutdown();
     }
 
     @Test
     public void testNoUpdate() throws Exception {
-        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") return n", null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("match (n) where id(n) = $id return n", null, params);
         final int rowCount = result.getRowCount();
         assertEquals(1, rowCount);
         final long time = result.getTime();
@@ -54,7 +52,7 @@ public class QueryStatisticsTest {
     @Test
     public void testCreate() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create (n)-[:FOO]->(m)", null);
+                cypherQueryExecutor.cypherQuery("match (n) where id(n) = $id create (n)-[:FOO]->(m)", null, params);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
@@ -73,7 +71,7 @@ public class QueryStatisticsTest {
     @Test
     public void testSet() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") set n.foo='bar'", null);
+                cypherQueryExecutor.cypherQuery("match (n) where id(n) = $id set n.foo='bar'", null, params);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();
@@ -92,7 +90,7 @@ public class QueryStatisticsTest {
     @Test
     public void testDelete() throws Exception {
         final CypherQueryExecutor.CypherResult result =
-                cypherQueryExecutor.cypherQuery("match (n) where id(n) = ("+aNode.getId()+") create (n)-[r:FOO]->(m) delete r,m", null);
+                cypherQueryExecutor.cypherQuery("match (n) where id(n) = $id create (n)-[r:FOO]->(m) delete r,m", null, params);
         final int rowCount = result.getRowCount();
         assertEquals(0, rowCount);
         final long time = result.getTime();

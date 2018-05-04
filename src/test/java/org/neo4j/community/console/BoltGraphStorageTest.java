@@ -1,31 +1,23 @@
 package org.neo4j.community.console;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.internal.InProcessServerBuilder;
-import org.neo4j.helpers.HostnamePort;
-import org.neo4j.helpers.ListenSocketAddress;
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.helpers.CommunityServerBuilder;
-import org.neo4j.test.ImpermanentGraphDatabase;
 
-import java.io.IOException;
+import static org.junit.Assert.*;
 
 /**
  * @author mh
  * @since 30.05.12
  */
-public class GraphStorageTest {
+public class BoltGraphStorageTest {
 
     public static ServerControls neo4j = new InProcessServerBuilder().newServer();
 
@@ -33,19 +25,19 @@ public class GraphStorageTest {
     private static GraphDatabaseService gdb;
 
     @BeforeClass
-    public static void startup() throws IOException {
+    public static void before() {
         gdb = neo4j.graph();
-    }
-    @Before
-    public void setUp() throws Exception {
-        gdb.execute("MATCH (n) DETACH DELETE n");
-        storage = new RestGraphStorage(neo4j.httpURI().toString()+"/db/data",null,null);
     }
 
     @AfterClass
-    public static void stop() throws Exception {
+    public static void after() throws Exception {
         neo4j.close();
-        gdb.shutdown();
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        gdb.execute("MATCH (n) DETACH DELETE n");
+        storage = new BoltGraphStorage(neo4j.boltURI().toString(),null,null);
     }
 
     @Test

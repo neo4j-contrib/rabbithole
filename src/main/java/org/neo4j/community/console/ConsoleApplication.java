@@ -31,15 +31,12 @@ public class ConsoleApplication implements SparkApplication {
     public void init() {
         SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable throwable) {
-                if (throwable instanceof Error || throwable instanceof LifecycleException) {
-                    Halt.halt(null);
-                }
-                SessionService.cleanSessions();
-                System.gc();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            if (throwable instanceof Error || throwable instanceof LifecycleException) {
+                Halt.halt(null);
             }
+            SessionService.cleanSessions();
+            System.gc();
         });
 
         post(new Route("console/cypher") {

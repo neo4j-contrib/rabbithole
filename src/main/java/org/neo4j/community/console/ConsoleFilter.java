@@ -30,7 +30,7 @@ public class ConsoleFilter extends SparkFilter {
             throw new IllegalArgumentException("null context not allowed here");
         }
         if (context.getAttribute(DATABASE_ATTRIBUTE) == null) {
-            context.setAttribute(DATABASE_ATTRIBUTE, DatabaseInfo.sandbox(null));
+            context.setAttribute(DATABASE_ATTRIBUTE, DatabaseInfo.sandbox());
             return null;
         }
         return (DatabaseInfo) context.getAttribute(DATABASE_ATTRIBUTE);

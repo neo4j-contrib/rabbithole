@@ -30,9 +30,7 @@ public class Console
     {
         System.setProperty("file.encoding","UTF-8");
         int port = (args.length>0) ? Integer.parseInt(args[0]): getPort();
-        boolean expose = args.length>2 && args[2].equalsIgnoreCase("expose");
-        GraphDatabaseService database = (args.length>1) ? embeddedGraphDatabase(args[1],expose) : null;
-        final Console console = expose ? Console.expose(database) : Console.sandbox(database);
+        final Console console = Console.sandbox();
         console.start(port);
         console.join();
     }
@@ -45,12 +43,8 @@ public class Console
         return builder.newGraphDatabase();
     }
 
-    public static Console sandbox(GraphDatabaseService database) {
-        return new Console(DatabaseInfo.sandbox(database));
-    }
-
-    public static Console expose(GraphDatabaseService database) {
-        return new Console(DatabaseInfo.expose(database));
+    public static Console sandbox() {
+        return new Console(DatabaseInfo.sandbox());
     }
 
     public void start(int port) throws Exception {

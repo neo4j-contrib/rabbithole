@@ -218,6 +218,7 @@ public class CypherQueryExecutor {
             time = System.currentTimeMillis() - time;
             resumeTransaction(resumeTx);
             CypherResult cypherResult = new CypherResult(result.columns(), data, result.getQueryStatistics(), time, canProfile ? result.getExecutionPlanDescription() : null, prettify(query));
+            result.close();
             tx.success();
             return cypherResult;
         } finally {

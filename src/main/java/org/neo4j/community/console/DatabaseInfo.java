@@ -20,8 +20,8 @@ public class DatabaseInfo {
         return new DatabaseInfo(database,false);
     }
 
-    public static DatabaseInfo sandbox(GraphDatabaseService database) {
-        return new DatabaseInfo(database,true);
+    public static DatabaseInfo sandbox() {
+        return new DatabaseInfo(null,true);
     }
 
     public GraphDatabaseService getDatabase() {

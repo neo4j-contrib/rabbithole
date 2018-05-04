@@ -86,7 +86,7 @@ public class ConsoleService {
                 }
 
                 if (restUrl.contains("/db/data")) restUrl = restUrl.replace("/db/data", "");
-                storage = new RestGraphStorage(restUrl, login, password);
+                storage = restUrl.startsWith("bolt") ? new BoltGraphStorage(restUrl, login, password) : new RestGraphStorage(restUrl, login, password);
                 log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
             }
         } catch (Exception e) {
@@ -358,12 +358,5 @@ public class ConsoleService {
             builder = builder.setDefaultCredentialsProvider(credsProvider);
         }
         return builder.build();
-    }
-
-    public void initFromUrl2(Neo4jService service, URL url, final String query) {
-        final Map cypherResult = post(url, map("query", query), Map.class);
-        SubGraph graph = SubGraph.fromRaw(cypherResult, false);
-        service.importGraph(graph);
-
     }
 }
