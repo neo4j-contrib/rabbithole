@@ -40,7 +40,7 @@ function highlight(text) {
 
 function post(uri, data, done, dataType) {
     data = data.trim();
-    // console.log("Post data: " + data);
+    console.log("Post data: " + data);
     $.ajax(uri, {
         type: "POST",
         data: data,
@@ -403,7 +403,10 @@ function parseMessage(data) {
         if (result.data && typeof(result.data) == "string") result.data = [result.data];
         return  result;
     }
-    return {data: [data], action: "query"};
+    if (data.indexOf(' ') != -1 )
+        return {data: [data], action: "query"};
+    else
+        return {data: [data], action: "unknown"};
 }
 
 function handleMessage(msg) {
@@ -429,6 +432,7 @@ function sendNext(msg) {
         inputQuery(_query)
         return;
     }
+    if (_query.trim().length == 0) return;
     post("console/cypher"+getPostQueryParams(), _query, function (res) {
         if (msg.action === "query" && msg.call_id && graphgistWindow) {
             res.call_id = msg.call_id;
