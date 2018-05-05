@@ -32,6 +32,7 @@ public class BoltGraphStorageTest {
     @AfterClass
     public static void after() throws Exception {
         neo4j.close();
+        gdb.shutdown();
     }
 
     @Before

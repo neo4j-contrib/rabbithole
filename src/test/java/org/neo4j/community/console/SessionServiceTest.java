@@ -45,6 +45,7 @@ public class SessionServiceTest {
         serviceForId(SESSION_ID, true);
         serviceForId(SESSION_ID, false);
         noServiceForId(SESSION_ID+"foo",false);
+        database.shutdown();
     }
 
     @Test
