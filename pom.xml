@@ -78,6 +78,11 @@
             <artifactId>heroku-api</artifactId>
             <version>0.16</version>
         </dependency>
+        <dependency>
+            <groupId>com.heroku.api</groupId>
+            <artifactId>heroku-http-ning-async</artifactId>
+            <version>0.16</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
