@@ -37,7 +37,7 @@ public class Halt {
     private static void restart() {
         System.err.println("Restarting Heroku Dyno");
         System.err.flush();
-        new HerokuAPI(TOKEN).restart(APP_NAME);
+        new HerokuAPI(TOKEN).restartDynos(APP_NAME);
     }
 
     public static void setServer(Server server) {
