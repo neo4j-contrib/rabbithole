@@ -30,12 +30,12 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.8.v20171121</version>
+            <version>9.4.11.v20180605</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.4.8.v20171121</version>
+            <version>9.4.11.v20180605</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -50,10 +50,6 @@
                 <exclusion>
                     <groupId>org.neo4j</groupId>
                     <artifactId>neo4j-jmx</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j-udc</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
