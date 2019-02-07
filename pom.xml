@@ -132,11 +132,11 @@
             <artifactId>neo4j-java-driver</artifactId>
             <version>1.4.4</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
-            <version>3.3.0.2</version>
-        </dependency-->
+            <version>3.4.0.4</version>
+        </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>

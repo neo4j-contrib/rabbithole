@@ -1,6 +1,5 @@
 package org.neo4j.community.console;
 
-/*
 import apoc.coll.Coll;
 import apoc.convert.Json;
 import apoc.create.Create;
@@ -12,9 +11,9 @@ import apoc.lock.*;
 import apoc.meta.Meta;
 import apoc.path.PathExplorer;
 import apoc.refactor.GraphRefactoring;
-*/
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.internal.kernel.api.exceptions.KernelException;
 import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.kernel.lifecycle.LifecycleException;
@@ -56,7 +55,6 @@ class Neo4jService {
             File storeDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
             GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder(storeDir).setConfig(config).newGraphDatabase();
             Procedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(Procedures.class);
-/*
             List<Class<?>> apocProcedures = asList(Coll.class, apoc.text.Strings.class, apoc.map.Maps.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
                     Xml.class, PathExplorer.class, Meta.class, GraphRefactoring.class);
             apocProcedures.forEach((proc) -> {
@@ -67,7 +65,6 @@ class Neo4jService {
                     throw new RuntimeException("Error registering "+proc,e);
                 }
             });
-*/
             return db;
         } catch(Throwable re) {
             Throwable t=re.getCause();
