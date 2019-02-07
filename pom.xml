@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.neo4j</groupId>
     <artifactId>rabbithole</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
     <packaging>jar</packaging>
     <name>Neo4j Console Backend</name>
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>3.4.0</neo4j.version>
+        <neo4j.version>3.5.2</neo4j.version>
     </properties>
 
     <repositories>
@@ -30,22 +30,17 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.0.5.v20130815</version>
+            <version>9.4.8.v20171121</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.0.5.v20130815</version>
+            <version>9.4.8.v20171121</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-jdbc</artifactId>
             <version>2.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-shell</artifactId>
-            <version>${neo4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -96,7 +91,11 @@
             <version>${neo4j.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.neo4j.community</groupId>
+            <artifactId>it-test-support</artifactId>
+            <version>${neo4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
@@ -132,11 +131,11 @@
             <artifactId>neo4j-java-driver</artifactId>
             <version>1.4.4</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
-            <version>3.3.0.2</version>
-        </dependency-->
+            <version>3.5.0.1</version>
+        </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>

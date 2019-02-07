@@ -238,7 +238,7 @@ public class CypherQueryExecutor {
     private KernelTransaction suspendTx(String query) {
         if (!isPeriodicCommit(query)) return null;
         try {
-            KernelTransaction tx = threadToStatementContextBridge.getTopLevelTransactionBoundToThisThread(true);
+            KernelTransaction tx = threadToStatementContextBridge.getKernelTransactionBoundToThisThread(true);
             threadToStatementContextBridge.unbindTransactionFromCurrentThread();
             return tx;
         } catch (Exception e) {
