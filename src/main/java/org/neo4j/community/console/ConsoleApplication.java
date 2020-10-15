@@ -1,25 +1,17 @@
 package org.neo4j.community.console;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
-import static spark.Spark.delete;
-import static spark.Spark.get;
-import static spark.Spark.post;
-
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
-
 import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
 
-import com.google.gson.Gson;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static spark.Spark.*;
 
 public class ConsoleApplication implements SparkApplication {
 
@@ -29,17 +21,19 @@ public class ConsoleApplication implements SparkApplication {
 
     @Override
     public void init() {
-        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
+        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
+        SessionService.setDriver(consoleService.getDriver());
+
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            if (throwable instanceof Error || throwable instanceof LifecycleException) {
+            if (throwable instanceof Error) {
                 Halt.halt(null);
             }
             SessionService.cleanSessions();
             System.gc();
         });
 
-        post(new Route("console/cypher") {
+        post("console/cypher", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 Map<String, Object> result;
                 try {
@@ -53,25 +47,25 @@ public class ConsoleApplication implements SparkApplication {
                     Map<String, Object> queryParams = (Map) data.get("queryParams");
                     result = consoleService.execute(service, null, query, null, requestParams, queryParams);
                 } catch (Exception e) {
-                    result = map("error", e.toString());
+                    result = MapUtil.map("error", e.toString());
                 }
                 return toJson(result);
             }
         });
-        post(new Route("console/version") {
+        post("console/version", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String version = request.body();
                 service.setVersion(version);
-                return toJson(map("version", service.getVersion()));
+                return toJson(MapUtil.map("version", service.getVersion()));
             }
         });
-        get(new Route("console/cypher") {
+        get("console/cypher", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param(request, "query", "");
-                    return service.cypherQueryResults(query).toString();
+                return service.cypherQueryResults(query).toString();
             }
         });
-        post(new Route("console/init") {
+        post("console/init", new Route() {
             @Override
             protected void doBefore(Request request, Response response) {
                 Neo4jService service = SessionService.getService(request.raw(), true);
@@ -93,13 +87,13 @@ public class ConsoleApplication implements SparkApplication {
             }
 
         });
-        get(new Route("console/visualization") {
+        get("console/visualization",new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = request.queryParams("query");
                 return toJson(service.cypherQueryViz(query));
             }
         });
-        get(new Route("console/to_yuml") {
+        get("console/to_yuml", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String query = param(request, "query", "");
                 String[] props = param(request, "props", "name").split(",");
@@ -107,27 +101,27 @@ public class ConsoleApplication implements SparkApplication {
                 final String scale = param(request, "type", "100");
                 SubGraph graph;
                 if (query.trim().isEmpty() || !service.isCypherQuery(query) || service.isMutatingQuery(query)) {
-                    graph = SubGraph.from(service.getGraphDatabase());
+                    graph = SubGraph.from(consoleService.getDriver(), service.getDb());
                 } else {
                     final CypherQueryExecutor.CypherResult result = service.cypherQuery(query, null);
-                    graph = SubGraph.from(service.getGraphDatabase(), result);
+                    graph = SubGraph.from(result);
                 }
                 final String yuml = new YumlExport().toYuml(graph, props);
                 return String.format("http://yuml.me/diagram/scruffy;dir:LR;scale:%s;/class/%s.%s", scale, yuml, type);
             }
         });
-        get(new Route("console/to_cypher") {
+        get("console/to_cypher", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return service.exportToCypher();
             }
         });
-        get(new Route("console/shorten") {
-            protected Object doHandle(Request request, Response response, Neo4jService service) throws IOException {
+        get("console/shorten", new Route() {
+            protected Object doHandle(Request request, Response response, Neo4jService service) {
                 return consoleService.shortenUrl(request.queryParams("url"));
             }
         });
 
-        delete(new Route("console") {
+        delete("console", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 reset(request);
                 return "deleted";
@@ -136,7 +130,7 @@ public class ConsoleApplication implements SparkApplication {
     }
 
     private Map<String, Object> queryParamsMap(Request request) {
-        Map<String,Object> result=new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         for (String param : request.queryParams()) {
             result.put(param, request.queryParams(param));
         }
@@ -146,12 +140,13 @@ public class ConsoleApplication implements SparkApplication {
     private String toJson(Object result) {
         return new GsonBuilder().serializeNulls().create().toJson(result);
     }
+
     private Map fromJson(String input) {
         return new GsonBuilder().serializeNulls().create().fromJson(input, Map.class);
     }
 
     private Map requestBodyToMap(Request request) {
         Map result = new Gson().fromJson(request.body(), Map.class);
-        return result!=null ? result : map();
+        return result != null ? result : Collections.emptyMap();
     }
 }

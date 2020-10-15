@@ -1,6 +1,6 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.Node;
+import org.neo4j.driver.types.Node;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,13 +18,9 @@ public class GraphInfo {
     private final boolean noRoot;
 
     public GraphInfo(Node node) {
-        this.id = (String) node.getProperty("id");
-        this.init = (String) node.getProperty("init",null);
-        this.query = (String) node.getProperty("query",null);
-        this.message = (String) node.getProperty("message",null);
-        this.version = (String) node.getProperty("version",null);
-        this.noRoot = (Boolean) node.getProperty("no_root",false);
+        this(node.asMap());
     }
+
     public GraphInfo(Map map) {
         this.id = (String) map.get("id");
         this.init = (String) map.get("init");

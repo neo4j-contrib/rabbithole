@@ -1,21 +1,25 @@
 package org.neo4j.community.console;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.neo4j.driver.AuthToken;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Config;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 import org.slf4j.Logger;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import spark.Request;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.Map;
 import java.util.Scanner;
-
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
 * @author mh
@@ -52,50 +54,71 @@ public class ConsoleService {
                     "(Cypher)-[:KNOWS]->(Smith), " +
                     "(Smith)-[:CODED_BY]->(Architect)";
 
-    static final String DEFAULT_QUERY = "match (n:Crew)-[r:KNOWS*]-(m) where n.name='Neo' return n as Neo,r,m";
+    static final String DEFAULT_QUERY = "match p = (n:Crew)-[:KNOWS*]-(m) where n.name='Neo' return n as Neo, relationships(p) as r, m";
 
     private GraphStorage storage;
+    private Driver driver;
 
     public ConsoleService() {
-        createGraphStorage();
+        init();
     }
 
-    private void createGraphStorage() {
-        try {
-            System.setProperty("org.neo4j.rest.read_timeout", "5");
-            System.setProperty("org.neo4j.rest.connect_timeout", "10");
-            String restUrlVar = System.getenv("NEO4J_REST_URL_VAR");
-            if (restUrlVar == null) restUrlVar = "NEO4J_URL";
-            String restUrl = System.getenv(restUrlVar);
+    static class ConnectionInfo {
+        String url;
+        String login;
+        String password;
+        String db;
 
-            String login = null, password = null;
-            if (restUrl != null) {
+        public static ConnectionInfo fromEnv() {
+            return new ConnectionInfo();
+        }
+
+        ConnectionInfo() {
+            String urlVar = System.getenv("NEO4J_REST_URL_VAR");
+            if (urlVar == null) urlVar = "NEO4J_URL";
+            url = System.getenv(urlVar);
+            db = System.getenv("NEO4J_DATABASE");
+            if (db == null) db = "neo4j";
+            if (url != null) {
                 login = System.getenv("NEO4J_LOGIN");
                 password = System.getenv("NEO4J_PASSWORD");
                 if (login == null) {
                     try {
-                        URL url = new URL(restUrl);
-                        String userInfo = url.getUserInfo();
+                        URL u = new URL(url);
+                        String userInfo = u.getUserInfo();
                         if (userInfo != null) {
                             login = userInfo.split(":")[0];
                             password = userInfo.split(":")[1];
                         }
                     } catch (MalformedURLException e) {
-                        throw new RuntimeException("Invalid Neo4j-Server-URL " + restUrl);
+                        throw new RuntimeException("Invalid Neo4j-Server-URL " + url);
                     }
                 }
-
-                if (restUrl.contains("/db/data")) restUrl = restUrl.replace("/db/data", "");
-                storage = restUrl.startsWith("bolt") ? new BoltGraphStorage(restUrl, login, password) : new RestGraphStorage(restUrl, login, password);
-                log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
             }
+        }
+    }
+
+    private void init() {
+        ConnectionInfo ci = ConnectionInfo.fromEnv();
+        try {
+            AuthToken authToken = ci.password == null ? AuthTokens.none() : AuthTokens.basic(ci.login, ci.password);
+            // todo configure
+            Config config = Config.builder().withoutEncryption().build();
+            driver = GraphDatabase.driver(ci.url, authToken, config);
+                storage = new BoltGraphStorage(driver, ci.db);
+                log("Graph Storage " + ci.url + " login " + ci.login + " " + storage);
         } catch (Exception e) {
             LOG.error("Error creating graph storage", e);
+            throw new RuntimeException("Error connecting to url "+ci.url+" login "+ci.login + " db "+ci.db, e);
         }
         if (storage == null) {
             storage = new MemoryGraphStorage();
         }
         log("Graph Storage " + storage);
+    }
+
+    Driver getDriver() {
+        return driver;
     }
 
     private void log(String msg) {
@@ -112,7 +135,7 @@ public class ConsoleService {
 	        }
         }
         if (query == null || query.equalsIgnoreCase("none")) query = null;
-        final Map<String, Object> data = map("init", init, "query", query, "version", service.getVersion());
+        final Map<String, Object> data = MapUtil.map("init", init, "query", query, "version", service.getVersion());
         long start = System.currentTimeMillis(), time = start;
         try {
             time = trace("service", time);
@@ -140,7 +163,7 @@ public class ConsoleService {
                 data.put("json", result.getJson());
                 data.put("plan", result.getPlan().toString());
                 data.put("columns", result.getColumns());
-                data.put("stats", result.getQueryStatistics());
+                data.put("stats", result.getQueryStatisticsMap());
                 String pretty = service.prettify(query);
                 if (pretty != null) data.put("query", pretty);
             }
@@ -272,7 +295,7 @@ public class ConsoleService {
 
     public Map<String, Object> save(String id, String init) {
         if (storage==null) {
-            return map("error","no storage configured");
+            return MapUtil.map("error","no storage configured");
         }
         GraphInfo existingState = storage.find(id);
         GraphInfo info = new GraphInfo(id, init, "none", "none").noRoot();
@@ -322,6 +345,7 @@ public class ConsoleService {
         if (value instanceof Relationship) {
             subGraph.add((Relationship) value);
         }
+        // TODO
         if (value instanceof Iterable) {
             for (Object inner : (Iterable) value) {
                 addResultValue(subGraph, inner);
@@ -336,9 +360,9 @@ public class ConsoleService {
             post.setHeader("Accept", "application/json;stream=true");
             final Gson gson = new Gson();
             final String postData = gson.toJson(data);
-            post.setEntity(new StringEntity(postData, "application/json", "UTF-8"));
+            post.setEntity(new StringEntity(postData, ContentType.APPLICATION_JSON));
             HttpResponse response = client.execute(post);
-            final int status = (int) response.getStatusLine().getStatusCode();
+            final int status = response.getStatusLine().getStatusCode();
             if (status != 200)
                 throw new RuntimeException("Return Status Code " + status + " " + response.getStatusLine());
             return gson.fromJson(new InputStreamReader(response.getEntity().getContent()), resultType);

@@ -1,32 +1,20 @@
 package org.neo4j.community.console;
 
-import apoc.coll.Coll;
-import apoc.convert.Json;
-import apoc.create.Create;
-import apoc.date.*;
-import apoc.index.FulltextIndex;
-import apoc.load.LoadJson;
-import apoc.load.Xml;
-import apoc.lock.*;
-import apoc.meta.Meta;
-import apoc.path.PathExplorer;
-import apoc.refactor.GraphRefactoring;
-import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.internal.kernel.api.exceptions.KernelException;
-import org.neo4j.kernel.impl.proc.Procedures;
-import org.neo4j.kernel.internal.GraphDatabaseAPI;
-import org.neo4j.kernel.lifecycle.LifecycleException;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.slf4j.Logger;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.types.Entity;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
-
-import static java.util.Arrays.asList;
-import static org.neo4j.helpers.collection.MapUtil.map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
 * @author mh
@@ -34,10 +22,11 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 */
 class Neo4jService {
 
-    private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Neo4jService.class);
+    private static final Logger LOG = Logger.getLogger(Neo4jService.class.getName());
     public static final String VERSION_REGEXP = "(\\d+\\.\\d+(?:\\.experimental|-cost|-rule)?)";
 
-    private GraphDatabaseService gdb;
+    private Driver driver;
+    private String db;
 
     private CypherQueryExecutor cypherQueryExecutor;
     private CypherExportService cypherExportService;
@@ -45,76 +34,36 @@ class Neo4jService {
     private boolean initialized;
     private String id;
 
-    Neo4jService() throws Throwable {
-        this(createInMemoryDatabase(),true);
-    }
-
-    private static GraphDatabaseService createInMemoryDatabase() throws Throwable {
-        try {
-            Map<String,String> config = MapUtil.stringMap("dbms.transaction.timeout", "10s","mapped_memory_total_size","5M","dbms.pagecache.memory","5M","keep_logical_logs","false","cache_type","none","query_cache_size","15");
-            File storeDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-            GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder(storeDir).setConfig(config).newGraphDatabase();
-            Procedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(Procedures.class);
-            List<Class<?>> apocProcedures = asList(Coll.class, apoc.text.Strings.class, apoc.map.Maps.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
-                    Xml.class, PathExplorer.class, Meta.class, GraphRefactoring.class);
-            apocProcedures.forEach((proc) -> {
-                try {
-                    procedures.registerProcedure(proc);
-                    procedures.registerFunction(proc);
-                } catch (KernelException e) {
-                    throw new RuntimeException("Error registering "+proc,e);
-                }
-            });
-            return db;
-        } catch(Throwable re) {
-            Throwable t=re.getCause();
-            if (re instanceof LifecycleException || t instanceof LifecycleException || t instanceof Error || re instanceof Error) {
-                re.printStackTrace();
-                Halt.halt("Lifecycle Exception during creation of database "+re.getMessage());
-            }
-            if (t instanceof RuntimeException) throw (RuntimeException)t;
-            if (t instanceof Error) throw (Error)t;
-            throw t;
-        }
-    }
-
-    Neo4jService(GraphDatabaseService gdb) throws Throwable {
-        this(gdb,false);
-    }
-
-    private Neo4jService(GraphDatabaseService gdb, boolean ownsDatabase) {
-        if (gdb == null) throw new IllegalArgumentException("Graph Database must not be null");
-        this.gdb = gdb;
+    public Neo4jService(Driver driver, String db, boolean ownsDatabase) {
+        if (driver == null) throw new IllegalArgumentException("Driver must not be null");
+        if (db == null) throw new IllegalArgumentException("Database must not be null");
+        this.driver = driver;
+        this.db = db;
         this.ownsDatabase = ownsDatabase;
-        cypherQueryExecutor = new CypherQueryExecutor(gdb);
-        cypherExportService = new CypherExportService(gdb);
+        cypherQueryExecutor = new CypherQueryExecutor(driver,db);
+        cypherExportService = new CypherExportService(driver,db);
     }
 
     public Map cypherQueryViz(String query) {
         final boolean invalidQuery = query == null || query.trim().isEmpty() || cypherQueryExecutor.isMutatingQuery(query);
         return invalidQuery ? cypherQueryViz((CypherQueryExecutor.CypherResult) null) : cypherQueryViz(cypherQuery(query, null));
     }
+
     public Map cypherQueryViz(CypherQueryExecutor.CypherResult result) {
-        try (Transaction tx = gdb.beginTx()) {
-            final SubGraph subGraph = SubGraph.from(gdb).markSelection(result);
-            Map<String, Object> viz = map("nodes", subGraph.getNodes().values(), "links", subGraph.getRelationshipsWithIndexedEnds().values());
-            tx.success();
-            return viz;
-        }
+        final SubGraph subGraph = SubGraph.from(driver, db).markSelection(result);
+        Map<String, Object> viz = MapUtil.map("nodes", subGraph.getNodesForViz().values(), "links", subGraph.getRelationshipsForViz().values());
+        return viz;
     }
 
     public String exportToCypher() {
-        try (Transaction tx = gdb.beginTx()) {
-            String cypher = cypherExportService.export();
-            tx.success();
-            return cypher;
-        }
+        return cypherExportService.export();
     }
 
     public Collection<Map<String,Object>> cypherQueryResults(String query) {
-        Collection<Map<String,Object>> result=new ArrayList<>();
-        for (Map<String, Object> row : cypherQuery(query, null)) {
-            result.add(row);
+        CypherQueryExecutor.CypherResult records = cypherQuery(query, null);
+        Collection<Map<String,Object>> result=new ArrayList<>(records.getRowCount());
+        for (Record row : records) {
+            result.add(row.asMap());
         }
         return result;
     }
@@ -131,12 +80,12 @@ class Neo4jService {
     }
 
     public void stop() {
-        if (gdb!=null) {
-            LOG.warn("Shutting down service "+this+" owns db "+ownsDatabase);
-            if (ownsDatabase) gdb.shutdown();
+        if (driver !=null) {
+            LOG.warning("Shutting down service "+this+" owns db "+ownsDatabase);
+            driver.close();
             cypherQueryExecutor=null;
             cypherExportService =null;
-            gdb=null;
+            driver =null;
             System.gc();
         }
     }
@@ -165,15 +114,12 @@ class Neo4jService {
         return cypherQueryExecutor.isCypherQuery(query);
     }
 
-    public GraphDatabaseService getGraphDatabase() {
-        return gdb;
+    public Driver getGraphDatabase() {
+        return driver;
     }
 
     public void importGraph(SubGraph graph) {
-        try (Transaction tx = gdb.beginTx()) {
-            graph.importTo(gdb);
-            tx.success();
-        }
+        graph.importTo(driver, db);
     }
 
     public URL toUrl(String url) {
@@ -211,9 +157,11 @@ class Neo4jService {
                 //noinspection unchecked
                 data = (Map<String, Object>) entry.getValue();
             }
-            if (entry.getValue() instanceof PropertyContainer) {
-                final PropertyContainer value = (PropertyContainer) entry.getValue();
-                if (value instanceof Node) data=SubGraph.toMap((Node)value);
+            if (entry.getValue() instanceof Entity) {
+                final Entity value = (Entity) entry.getValue();
+                if (value instanceof Node) {
+                    data=SubGraph.toMap((Node)value);
+                }
                 if (value instanceof Relationship) data=SubGraph.toMap((Relationship)value);
             }
             if (data!=null) result.put(entry.getKey(),data);
@@ -230,6 +178,10 @@ class Neo4jService {
     }
 
     public void clear() {
-        gdb.execute("MATCH (n) detach delete n").close();
+        cypherQueryExecutor.cypherQuery("MATCH (n) detach delete n",null);
+    }
+
+    public String getDb() {
+        return db;
     }
 }

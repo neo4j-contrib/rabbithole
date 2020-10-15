@@ -3,20 +3,16 @@ package org.neo4j.community.console;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphalgo.impl.util.PathImpl;
-import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.Iterators;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.driver.types.Node;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.SortedMap;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh
@@ -99,7 +95,7 @@ public class SubGraphTest {
         graph.add(rel);
         graph.add(node2);
         assertEquals(3, graph.getNodes().size());
-        final Map<String, Object> relData = Iterables.first(graph.getRelationshipsWithIndexedEnds().values());
+        final Map<String, Object> relData = Iterables.first(graph.getRelationshipsForViz().values());
         assertEquals(1L, relData.get("start"));
         assertEquals(3L, relData.get("end"));
         assertEquals(0, relData.get("source"));
@@ -149,7 +145,7 @@ public class SubGraphTest {
         graph.addNode(0L, map("name", "node0"));
         graph.addNode(10L, map("name", "node10"));
         graph.addRel(0L, map("name", "rel0", "start", 0L, "end", 10L, "type", "REL"));
-        graph.importTo(gdb);
+        graph.importTo(gdb, db);
         assertEquals("node0", gdb.getNodeById(1).getProperty("name"));
         assertEquals("node10", gdb.getNodeById(2).getProperty("name"));
         final Relationship rel = gdb.getRelationshipById(0);
@@ -202,7 +198,7 @@ public class SubGraphTest {
         assertEquals(2, node.size());
         assertEquals(n1.getId(), node.get("id"));
         assertEquals(n1.getProperty("name"), node.get("name"));
-        final Map<Long, Map<String, Object>> rels = graph.getRelationships();
+        final SortedMap<Long, org.neo4j.driver.types.Relationship> rels = graph.getRelationships();
         assertEquals(1, rels.size());
         final Map<String, Object> rel = rels.get(relationship.getId());
         assertEquals(7, rel.size());

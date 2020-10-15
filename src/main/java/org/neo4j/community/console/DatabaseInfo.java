@@ -1,22 +1,20 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-
 /**
 * @author mh
 * @since 05.06.12
 */
 public class DatabaseInfo {
 
-    private boolean sandbox;
-    private final GraphDatabaseService database;
+    private final boolean sandbox;
+    private final String database;
 
-    public DatabaseInfo(GraphDatabaseService database, boolean sandbox) {
+    public DatabaseInfo(String database, boolean sandbox) {
         this.database = database;
         this.sandbox = sandbox;
     }
 
-    public static DatabaseInfo expose(GraphDatabaseService database) {
+    public static DatabaseInfo expose(String database) {
         return new DatabaseInfo(database,false);
     }
 
@@ -24,7 +22,7 @@ public class DatabaseInfo {
         return new DatabaseInfo(null,true);
     }
 
-    public GraphDatabaseService getDatabase() {
+    public String getDatabase() {
         return database;
     }
 

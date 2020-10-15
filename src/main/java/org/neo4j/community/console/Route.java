@@ -1,7 +1,6 @@
 package org.neo4j.community.console;
 
 import org.slf4j.Logger;
-import org.neo4j.kernel.lifecycle.LifecycleException;
 import spark.HaltException;
 import spark.Request;
 import spark.Response;
@@ -13,18 +12,16 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import static spark.Spark.halt;
+
 /**
  * @author mh
  * @since 08.04.12
  */
-abstract class Route extends spark.Route {
+abstract class Route implements spark.Route {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(Route.class);
 
-    Route(String path) {
-        super(path);
-    }
-    
     public String stop(int status, String message) {
         halt(status, message);
         return message;
@@ -35,10 +32,6 @@ abstract class Route extends spark.Route {
         try {
             doBefore(request,response);
             return doHandle(request, response, service(request));
-        } catch (LifecycleException e) {
-            reset(request);
-            SessionService.cleanSessions();
-            return handleException(e);
         } catch (OutOfMemoryError e) {
             reset(request);
             SessionService.cleanSessions();

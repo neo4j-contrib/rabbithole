@@ -3,6 +3,8 @@ package org.neo4j.community.console;
 import org.junit.Test;
 import org.neo4j.helpers.collection.MapUtil;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 /**

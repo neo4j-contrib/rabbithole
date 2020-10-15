@@ -1,29 +1,31 @@
 package org.neo4j.community.console;
 
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.QueryStatistics;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.Iterators;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Value;
+import org.neo4j.driver.summary.SummaryCounters;
+import org.neo4j.driver.types.Entity;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResultPrinter {
 
-    public String generateText(List<String> columns, Iterable<Map<String, Object>> result, long time, QueryStatistics queryStatistics)  {
+    public String generateText(CypherQueryExecutor.CypherResult result, long time)  {
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
-        outputResults(columns,result,time,queryStatistics,out);
+        outputResults(result,time,out);
         return sw.toString();
     }
 
-    public void outputResults(List<String> columns, Iterable<Map<String, Object>> result, long time, QueryStatistics queryStatistics, PrintWriter out)  {
-        Collection<Map<String, Object>> rows = (result instanceof Collection) ? (Collection<Map<String, Object>>) result : Iterables.asCollection(result);
+    public void outputResults(CypherQueryExecutor.CypherResult result, long time, PrintWriter out)  {
+        Collection<Map<String, Object>> rows = result.getRows().stream().map(Record::asMap).collect(Collectors.toList());
 
+        List<String> columns = result.getColumns();
         Map<String, Integer> columnSizes = calculateColumnSizes(columns, rows);
         int totalWidth = totalWith(columnSizes.values());
 
@@ -40,7 +42,7 @@ public class ResultPrinter {
             out.println(_________);
         }
         out.println(rowsTime(time, rows.size()));
-        final String stats = info(queryStatistics, hasData);
+        final String stats = info(result.getQueryStatistics(), hasData);
         if (!stats.isEmpty()) {
             out.println(stats);
         }
@@ -115,21 +117,29 @@ public class ResultPrinter {
         if (value == null) {
             return "<null>";
         }
-        if (value instanceof String) {
-            return "\"" + value + "\"";
+        if (value instanceof Value) {
+            Value v = (Value) value;
+            if (v.isNull()) {
+                return "<null>";
+            }
+            if (value instanceof Node) {
+                return value.toString() + props((Entity) value);
+            }
+            if (value instanceof Relationship) {
+                Relationship rel = (Relationship) value;
+                return ":" + rel.type() + "[" + rel.id() + "] " + props(rel);
+            }
+            value = v.asObject();
         }
-        if (value instanceof Node) {
-            return value.toString() + props((PropertyContainer) value);
-        }
-        if (value instanceof Relationship) {
-            Relationship rel = (Relationship) value;
-            return ":" + rel.getType().name() + "[" + rel.getId() + "] " + props(rel);
-        }
+        // TODO
         if (value instanceof Iterable) {
             return formatIterator(((Iterable) value).iterator());
         }
         if (value.getClass().isArray()) {
             return formatArray(value);
+        }
+        if (value instanceof String) {
+            return "'" + value + "'";
         }
         return value.toString();
     }
@@ -159,13 +169,13 @@ public class ResultPrinter {
         return sb.toString();
     }
 
-    private String props(PropertyContainer pc) {
+    private String props(Entity pc) {
         final StringBuilder sb = new StringBuilder("{");
-        final Iterator<String> keys = pc.getPropertyKeys().iterator();
+        final Iterator<String> keys = pc.keys().iterator();
         while (keys.hasNext()) {
             String prop = keys.next();
             sb.append(prop).append(":");
-            final Object value = pc.getProperty(prop);
+            final Value value = pc.get(prop);
             sb.append(text(value));
             if (keys.hasNext()) {
                 sb.append(",");
@@ -175,7 +185,7 @@ public class ResultPrinter {
         return sb.toString();
     }
 
-    private String info(QueryStatistics queryStatistics, boolean hasData) {
+    private String info(SummaryCounters queryStatistics, boolean hasData) {
         boolean hasStatistics = queryStatistics != null && queryStatistics.containsUpdates();
         if (hasData) {
             if (hasStatistics) {
@@ -199,21 +209,21 @@ public class ResultPrinter {
         }
     }
 
-    private String toString(QueryStatistics queryStatistics) {
+    private String toString(SummaryCounters queryStatistics) {
         if (!queryStatistics.containsUpdates()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
         addIfNonZero(sb, "Nodes created: ",
-                queryStatistics.getNodesCreated());
+                queryStatistics.nodesCreated());
         addIfNonZero(sb, "Relationships created: ",
-                queryStatistics.getRelationshipsCreated());
+                queryStatistics.relationshipsCreated());
         addIfNonZero(sb, "Properties set: ",
-                queryStatistics.getPropertiesSet());
+                queryStatistics.propertiesSet());
         addIfNonZero(sb, "Nodes deleted: ",
-                queryStatistics.getNodesDeleted());
+                queryStatistics.nodesDeleted());
         addIfNonZero(sb, "Relationships deleted: ",
-                queryStatistics.getRelationshipsDeleted());
+                queryStatistics.relationshipsDeleted());
 
         return sb.toString();
     }

@@ -4,17 +4,11 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.slf4j.Logger;
 
-import java.io.File;
 import java.util.concurrent.*;
 
-public class Console
-{
+public class Console {
 
     private static final String WEBAPP_LOCATION = "src/main/webapp/";
     private Server server;
@@ -26,21 +20,12 @@ public class Console
         this.databaseInfo = databaseInfo;
     }
 
-    public static void main(String[] args) throws Exception
-    {
-        System.setProperty("file.encoding","UTF-8");
-        int port = (args.length>0) ? Integer.parseInt(args[0]): getPort();
+    public static void main(String[] args) throws Exception {
+        System.setProperty("file.encoding", "UTF-8");
+        int port = (args.length > 0) ? Integer.parseInt(args[0]) : getPort();
         final Console console = Console.sandbox();
         console.start(port);
         console.join();
-    }
-
-    private static GraphDatabaseService embeddedGraphDatabase(String path, boolean expose) {
-        GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(path));
-        if (!expose) {
-            builder.setConfig(GraphDatabaseSettings.read_only,"true");
-        }
-        return builder.newGraphDatabase();
     }
 
     public static Console sandbox() {
@@ -63,11 +48,9 @@ public class Console
         final Handler resourceHandler = createResourceHandler("/console_assets", WEBAPP_LOCATION);
         handlers.setHandlers(new Handler[]{resourceHandler, root});
         server.setHandler(handlers);
-        pool.scheduleAtFixedRate(new CheckMemoryThread(),0,10, TimeUnit.SECONDS);
+        pool.scheduleAtFixedRate(new CheckMemoryThread(), 0, 10, TimeUnit.SECONDS);
         server.start();
     }
-
-
 
 
     private Handler createResourceHandler(String context, String resourceBase) {
@@ -89,7 +72,7 @@ public class Console
 
     private static int getPort() {
         String webPort = System.getenv("PORT");
-        if(webPort == null || webPort.isEmpty()) {
+        if (webPort == null || webPort.isEmpty()) {
             return 8080;
         }
         return Integer.parseInt(webPort);

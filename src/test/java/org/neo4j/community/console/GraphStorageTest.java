@@ -39,7 +39,7 @@ public class GraphStorageTest {
     @Before
     public void setUp() throws Exception {
         gdb.execute("MATCH (n) DETACH DELETE n");
-        storage = new RestGraphStorage(neo4j.httpURI().toString()+"/db/data",null,null);
+        storage = new RemoteGraphStorage(neo4j.httpURI().toString()+"/db/data",null,null);
     }
 
     @AfterClass

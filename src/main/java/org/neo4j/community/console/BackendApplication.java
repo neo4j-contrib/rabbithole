@@ -1,21 +1,16 @@
 package org.neo4j.community.console;
 
-import static org.neo4j.helpers.collection.MapUtil.map;
-import static spark.Spark.delete;
-import static spark.Spark.get;
-import static spark.Spark.post;
-
-import java.util.Map;
-
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
-
 import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
 
-import com.google.gson.Gson;
+import java.util.Map;
+
+import static spark.Spark.delete;
+import static spark.Spark.post;
 
 /**
  * @author mh
@@ -31,20 +26,18 @@ public class BackendApplication implements SparkApplication {
 
     @Override
     public void init() {
-        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
         consoleService = new ConsoleService();
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable throwable) {
-                if (throwable instanceof Error || throwable instanceof LifecycleException) {
-                    Halt.halt(null);
-                }
-                SessionService.cleanSessions();
-                System.gc();
+        SessionService.setDatabaseInfo(ConsoleFilter.getDatabase());
+        SessionService.setDriver(consoleService.getDriver());
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            if (throwable instanceof Error) {
+                Halt.halt(null);
             }
+            SessionService.cleanSessions();
+            System.gc();
         });
 
-        post(new Route("/backend/cypher") {
+        post("/backend/cypher", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 final String query = request.body();
                 if (query!=null && !query.isEmpty()) {
@@ -55,11 +48,11 @@ public class BackendApplication implements SparkApplication {
                 return result;
             }
         });
-        post(new Route("/backend/cypher/:id") {
+        post("/backend/cypher/:id", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String id = request.params("id");
                 if (!service.isInitialized() || !service.hasId(id)) {
-                    Map<String, Object> result = consoleService.init(service, id,map("initialize","true"));
+                    Map<String, Object> result = consoleService.init(service, id,MapUtil.map("initialize","true"));
                     if (result.containsKey("error")) {
                         return gson().toJson(result);
                     }
@@ -75,7 +68,7 @@ public class BackendApplication implements SparkApplication {
                 return result;
             }
         });
-        post(new Route("/backend/graph/:id") {
+        post("/backend/graph/:id", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String id = request.params("id");
                 String init = request.body();
@@ -83,23 +76,23 @@ public class BackendApplication implements SparkApplication {
                 return gson().toJson(result);
             }
         });
-        delete(new Route("/backend/graph/:id") {
+        delete("/backend/graph/:id", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 String id = request.params("id");
                 SessionService.cleanSession(id);
                 return consoleService.delete(id);
             }
         });
-        post( new Route( "/backend/version" )
+        post("/backend/version", new Route()
         {
             protected Object doHandle( Request request, Response response, Neo4jService service )
             {
                 final String version = request.body();
                 service.setVersion( version );
-                return gson().toJson(map("version", service.getVersion()));
+                return gson().toJson(MapUtil.map("version", service.getVersion()));
             }
         } );
-        delete(new Route("/backend") {
+        delete("/backend", new Route() {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 reset(request);
                 return "deleted";
@@ -109,10 +102,5 @@ public class BackendApplication implements SparkApplication {
 
     private Gson gson() {
         return new GsonBuilder().disableHtmlEscaping().create();
-    }
-
-    private Map requestBodyToMap(Request request) {
-        Map result = gson().fromJson(request.body(), Map.class);
-        return result!=null ? result : map();
     }
 }
