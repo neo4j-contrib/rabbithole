@@ -86,7 +86,7 @@ public class ConsoleService {
                 }
 
                 if (restUrl.contains("/db/data")) restUrl = restUrl.replace("/db/data", "");
-                storage = restUrl.startsWith("bolt") ? new BoltGraphStorage(restUrl, login, password) : new RestGraphStorage(restUrl, login, password);
+                if (restUrl.startsWith("bolt")) storage = new BoltGraphStorage(restUrl, login, password);
                 log("Graph Storage " + restUrl + " login " + login + " " + password + " " + storage);
             }
         } catch (Exception e) {

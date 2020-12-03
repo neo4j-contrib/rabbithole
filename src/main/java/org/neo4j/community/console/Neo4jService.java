@@ -55,7 +55,7 @@ class Neo4jService {
             File storeDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
             GraphDatabaseService db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder(storeDir).setConfig(config).newGraphDatabase();
             Procedures procedures = ((GraphDatabaseAPI) db).getDependencyResolver().resolveDependency(Procedures.class);
-            List<Class<?>> apocProcedures = asList(Coll.class, apoc.text.Strings.class, apoc.map.Maps.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
+            List<Class<?>> apocProcedures = asList(apoc.spatial.Geocode.class, Coll.class, apoc.text.Strings.class, apoc.map.Maps.class, Json.class, Create.class, apoc.date.Date.class, FulltextIndex.class, apoc.lock.Lock.class, LoadJson.class,
                     Xml.class, PathExplorer.class, Meta.class, GraphRefactoring.class);
             apocProcedures.forEach((proc) -> {
                 try {
