@@ -6,18 +6,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.neo4j.cypher.SyntaxException;
-import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.junit.internal.matchers.IsCollectionContaining.hasItem;
-import static org.junit.internal.matchers.IsCollectionContaining.hasItems;
-import static org.neo4j.helpers.collection.MapUtil.map;
 
 /**
  * @author mh

@@ -1,13 +1,12 @@
 package org.neo4j.community.console;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.junit.*;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Values;
+import org.neo4j.driver.types.Node;
+import org.testcontainers.containers.Neo4jContainer;
 
 import static org.junit.Assert.*;
 
@@ -17,26 +16,35 @@ import static org.junit.Assert.*;
  */
 public class BoltGraphStorageTest {
 
-    public static ServerControls neo4j = new InProcessServerBuilder().newServer();
+    private static final Neo4jContainer neo4j = new Neo4jContainer("latest").withEnterpriseEdition().withAdminPassword("test");
 
     private GraphStorage storage;
-    private static GraphDatabaseService gdb;
+    private Driver driver;
 
     @BeforeClass
     public static void before() {
-        gdb = neo4j.graph();
+        neo4j.start();
     }
 
     @AfterClass
     public static void after() throws Exception {
-        neo4j.close();
-        gdb.shutdown();
+        neo4j.stop();
     }
 
     @Before
     public void setUp() throws Exception {
-        gdb.execute("MATCH (n) DETACH DELETE n");
-        storage = new BoltGraphStorage(neo4j.boltURI().toString(),null,null);
+        driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic("neo4j","test"));
+        driver.session().run("MATCH (n) DETACH DELETE n").consume();
+        storage = new BoltGraphStorage(driver,"neo4j");
+    }
+
+    @After
+    public void tearDown() {
+        driver.close();
+    }
+
+    private Node find(String id) {
+        return driver.session().run("OPTIONAL MATCH (n:Graph {id:$id} RETURN n", Values.parameters("id",id)).single().get("n").asNode();
     }
 
     @Test
@@ -44,113 +52,90 @@ public class BoltGraphStorageTest {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message"));
         final GraphInfo info2 = info.newQuery("query2");
         storage.update(info2);
-        try (Transaction tx = gdb.beginTx()) {
-            final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+            final Node node = find(info.getId());
             assertNotNull(node);
-            assertEquals("query2", node.getProperty("query"));
-            assertEquals(info.getId(), node.getProperty("id"));
-            assertEquals(info.getInit(), node.getProperty("init"));
-            assertEquals(info.getMessage(),node.getProperty("message"));
+            assertEquals("query2", node.get("query").asString());
+            assertEquals(info.getId(), node.get("id").asString());
+            assertEquals(info.getInit(), node.get("init").asString());
+            assertEquals(info.getMessage(),node.get("message").asString());
             delete(node);
-            tx.success();
-        }
 
-        try (Transaction tx2 = gdb.beginTx()) {
             assertNull(storage.find(info.getId()));
-            tx2.success();
-        }
     }
+    
     @Test
     public void testCreateWithVersion() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version"));
-        Transaction tx = gdb.beginTx();
-        final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+        final Node node = find(info.getId());
         assertNotNull(node);
-        assertEquals(info.getId(), node.getProperty("id"));
-        assertEquals(info.getVersion(),node.getProperty("version"));
-        tx.success();tx.close();
+        assertEquals(info.getId(), node.get("id").asString());
+        assertEquals(info.getVersion(),node.get("version").asString());
     }
 
     @Test
     public void testCreateWithNoRoot() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(Util.randomId(), "init", "query", "message","version",true));
-        Transaction tx = gdb.beginTx();
-        final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+        final Node node = find(info.getId());
         assertNotNull(node);
-        assertEquals(info.getId(), node.getProperty("id"));
-        assertEquals(info.getVersion(),node.getProperty("version"));
-        assertEquals(!info.hasRoot(),(Boolean)node.getProperty("no_root"));
-        tx.success();tx.close();
+        assertEquals(info.getId(), node.get("id").asString());
+        assertEquals(info.getVersion(),node.get("version").asString());
+        assertEquals(!info.hasRoot(), node.get("no_root").asBoolean());
     }
 
     @Test
     public void testCreateWithNullId() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo(null, "init", "query", "message"));
-        Transaction tx = gdb.beginTx();
         assertNotNull(info.getId());
-        final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+        final Node node = find(info.getId());
         assertNotNull(node);
-        assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.close();
+        assertEquals(info.getId(), node.get("id").asString());
     }
 
     @Test
     public void testCreateWithEmptyId() throws Exception {
         final String id = " ";
         final GraphInfo info = storage.create(new GraphInfo(id, "init", "query", "message"));
-        Transaction tx = gdb.beginTx();
         assertNotNull(info.getId());
         assertNotSame(id,info.getId());
         assertFalse(info.getId().trim().isEmpty());
-        final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
-        assertNull(gdb.findNode(Label.label("Graph"),"id", id));
+        final Node node = find(info.getId());
+        assertNull(find(id));
         assertNotNull(node);
-        assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.close();
+        assertEquals(info.getId(), node.get("id").asString());
     }
 
     @Test
     public void testCreateWithIdWithSpace() throws Exception {
         final String id = "";
         final GraphInfo info = storage.create(new GraphInfo(id, "init", "query", "message"));
-        Transaction tx = gdb.beginTx();
         assertNotNull(info.getId());
         assertNotSame(id,info.getId());
         assertFalse(info.getId().trim().isEmpty());
-        final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+        final Node node = find(info.getId());
 
-        assertNull(gdb.findNode(Label.label("Graph"),"id", id));
+        assertNull(find(id));
         assertNotNull(node);
-        assertEquals(info.getId(), node.getProperty("id"));
-        tx.success();tx.close();
+        assertEquals(info.getId(), node.get("id").asString());
     }
 
     private void delete(Node node) {
-        final Transaction tx = gdb.beginTx();
-        node.delete();
-        tx.success();tx.close();
+        driver.session().run("MATCH (n) WHERE id(n) = $id DELETE n", Values.parameters("id",node.id())).consume();
     }
 
     @Test
     public void testCreate() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
-        try (Transaction tx2 = gdb.beginTx()) {
             assertNotNull(info);
-            final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+            final Node node = find(info.getId());
             assertNotNull(node);
-            assertEquals("query", node.getProperty("query"));
-            tx2.success();
+            assertEquals("query", node.get("query").asString());
             delete(node);
-        }
     }
     @Test
     public void testDelete() throws Exception {
         final GraphInfo info = storage.create(new GraphInfo("id", "init", "query", "message"));
         storage.delete(info.getId());
-        try (Transaction tx = gdb.beginTx()) {
-            final Node node = gdb.findNode(Label.label("Graph"),"id", info.getId());
+            final Node node = find(info.getId());
             assertNull(node);
-            tx.success();
-        }
     }
 }
