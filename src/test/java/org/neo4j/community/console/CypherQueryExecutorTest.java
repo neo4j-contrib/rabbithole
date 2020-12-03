@@ -115,6 +115,15 @@ public class CypherQueryExecutorTest {
     }
 
     @Test
+    public void testCallDbSchema() throws Exception {
+        cypherQueryExecutor.cypherQuery("create (n:Foo {name:'Joe'})",null);
+        final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("call db.schema()",null);
+        assertEquals(1,result.getRowCount());
+        final List value = (List)result.getRows().iterator().next().get("nodes");
+        assertEquals(1, value.size());
+    }
+
+    @Test
     public void testWorksWithMerge() throws Exception {
         final CypherQueryExecutor.CypherResult result = cypherQueryExecutor.cypherQuery("merge (n {name:'foobar'}) return n.name", null);
         assertEquals(1,result.getRowCount());

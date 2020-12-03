@@ -98,7 +98,7 @@ public class SubGraph {
 
     public static Map<String, Object> toMap(PropertyContainer pc) {
         Map<String, Object> result = new TreeMap<>();
-        for (String prop : pc.getPropertyKeys()) {
+        for (String prop : pc.getAllProperties().keySet()) {
             result.put(prop, pc.getProperty(prop));
         }
         return result;

@@ -161,7 +161,7 @@ public class ResultPrinter {
 
     private String props(PropertyContainer pc) {
         final StringBuilder sb = new StringBuilder("{");
-        final Iterator<String> keys = pc.getPropertyKeys().iterator();
+        final Iterator<String> keys = pc.getAllProperties().keySet().iterator();
         while (keys.hasNext()) {
             String prop = keys.next();
             sb.append(prop).append(":");
