@@ -1,11 +1,11 @@
 # Interactive Neo4j Console - Graph REPL  
 
      
-Heroku App: http://rabbithole.heroku.com or http://console.neo4j.org
+Heroku App: https://rabbithole.heroku.com or https://console.neo4j.org
 
-to embed in iframes, see [usage.html](http://rabbithole.herokuapp.com/usage.html)
+to embed in iframes, see [usage.html](https://rabbithole.herokuapp.com/usage.html)
 
-    <iframe src="http://rabbithole.heroku.com?init=URI%20ENCODED%20CYPHER%20SETUP&query=URI%20ENCODED%20CYPHER%20QUERY" width="500" height="400" id="window"/>
+    <iframe src="https://rabbithole.heroku.com?init=URI%20ENCODED%20CYPHER%20SETUP&query=URI%20ENCODED%20CYPHER%20QUERY" width="500" height="400" id="window"/>
         
 ### Features:
 
@@ -60,6 +60,6 @@ to embed in iframes, see [usage.html](http://rabbithole.herokuapp.com/usage.html
 
 The console can also import the data from a remote server
 
-    http://console.neo4j.org?init=http://server:port/db/data/cypher
+    https://console.neo4j.org?init=http://server:port/db/data/cypher
 
 

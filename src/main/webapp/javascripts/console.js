@@ -44,10 +44,11 @@ function post(uri, data, done, dataType) {
     $.ajax(uri, {
         type: "POST",
         data: data,
+        redirect: "follow",
         dataType: dataType || "text",
         beforeSend: setSessionHeader,
         success: function (data) {
-            if (dataType == "text") {
+            if (dataType === "text") {
                 append($("#output"), data);
             }
             if (done) {
@@ -69,7 +70,7 @@ function getParameters() {
     for (var i = 0; i < pairs.length; ++i) {
         var pair = pairs[i].split('=');
         //console.log( pair );
-        if (pair.length != 2) {
+        if (pair.length !== 2) {
             continue;
         }
         result[pair[0]] = decodeURIComponent(pair[1].replace(/\+/g, " "));
@@ -80,6 +81,7 @@ function getParameters() {
 function share(fn) {
     $.ajax("console/url", {
         type: "GET",
+        redirect: "follow",
         success: fn
     });
 }
@@ -112,6 +114,7 @@ function viz(data) {
         }
         $.ajax("console/visualization?query=" + encodeURIComponent(query), {
             type: "GET",
+            redirect: "follow",
             beforeSend: setSessionHeader,
             dataType: "json",
             success: function (data) {
@@ -134,6 +137,7 @@ function reset(done) {
     $.ajax("console", {
         beforeSend: setSessionHeader,
         type: "DELETE",
+        redirect: "follow",
         success: done
     });
     return false;
@@ -145,6 +149,7 @@ function share_yuml(query) {
     }
     $.ajax("console/to_yuml?query=" + encodeURIComponent(query), {
         type: "GET",
+        redirect: "follow",
         beforeSend: setSessionHeader,
         dataType: "text",
         success: function (data) {
@@ -164,7 +169,7 @@ function store_graph_info() {
     var version = $('#share_version').val();
     var no_root = $("#share_no_root").is(":checked");
     var id = $('#share_short').val();
-    if (id && ( id.length == 0 || id.match("http://.+") )) {
+    if (id && ( id.length == 0 || id.match("https?://.+")  )) {
         id = null;
     }
     var message = null;
@@ -175,6 +180,7 @@ function store_graph_info() {
     $.ajax("/r/share", {
         type: "POST",
         dataType: "text",
+        redirect: "follow",
         contentType: "application/json",
         data: JSON.stringify({
             id: id,
@@ -212,6 +218,7 @@ function toggleGraph() {
 function toggleShare() {
     $.ajax("console/to_cypher", {
         type: "GET",
+        redirect: "follow",
         beforeSend: setSessionHeader,
         dataType: "text",
         success: function (data) {
@@ -231,6 +238,7 @@ function toggleShare() {
 function export_graph(format) {
     $.ajax("console/to_" + format, {
         type: "GET",
+        redirect: "follow",
         dataType: "text",
         beforeSend: setSessionHeader,
         success: function (data) {
