@@ -45,7 +45,7 @@ public class ConsoleApplication implements SparkApplication {
             @Override
             public void handle(Request request, Response response) {
             if ("http".equalsIgnoreCase(request.headers(X_FORWARDED_PROTO))) {
-                response.redirect(request.url().replaceAll("(?i)^http://","https://"));
+                response.redirect(request.url().replaceAll("(?i)^http://","https://"),307);
             }}}
         );
         post(new Route("console/cypher") {

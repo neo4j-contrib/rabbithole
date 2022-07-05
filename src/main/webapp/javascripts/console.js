@@ -510,6 +510,10 @@ var session_id=guid();
 
 $(document).ready(
     function () {
+        if (document.location.protocol==="http:" && !document.location.host.match(/^localhost/)) {
+            document.location.protocol="https:";
+            return;
+        }
         inputeditor = CodeMirror.fromTextArea(document.getElementById("input"), {
             lineNumbers: false,
             readOnly: false,
