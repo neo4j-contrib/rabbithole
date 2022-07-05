@@ -4,6 +4,7 @@ import static org.neo4j.helpers.collection.MapUtil.map;
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.before;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -15,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.slf4j.Logger;
 
+import spark.Filter;
 import spark.Request;
 import spark.Response;
 import spark.servlet.SparkApplication;
@@ -24,6 +26,7 @@ import com.google.gson.Gson;
 public class ConsoleApplication implements SparkApplication {
 
     private static final Logger LOG = org.slf4j.LoggerFactory.getLogger("spark.Console");
+    private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
     private ConsoleService consoleService;
 
@@ -38,7 +41,13 @@ public class ConsoleApplication implements SparkApplication {
             SessionService.cleanSessions();
             System.gc();
         });
-
+        before(new Filter() {
+            @Override
+            public void handle(Request request, Response response) {
+            if ("http".equalsIgnoreCase(request.headers(X_FORWARDED_PROTO))) {
+                response.redirect(request.url().replaceAll("(?i)^http://","https://"));
+            }}}
+        );
         post(new Route("console/cypher") {
             protected Object doHandle(Request request, Response response, Neo4jService service) {
                 Map<String, Object> result;

@@ -9,38 +9,24 @@
     <description><![CDATA[]]></description>
     <url>http://github.com/neo4j-contrib/rabbithole</url>
     <properties>
-        <neo4j.version>3.5.2</neo4j.version>
+        <neo4j.version>3.5.34</neo4j.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>Neo4j releases</id>
-            <url>http://m2.neo4j.org/content/repositories/releases</url>
-        </repository>
-        <repository>
-            <id>Neo4j snapshots</id>
-            <url>http://m2.neo4j.org/content/repositories/snapshots</url>
-        </repository>
-        <repository>
-            <id>mandubian-mvn</id>
-            <url>http://mandubian-mvn.googlecode.com/svn/trunk/mandubian-mvn/repository</url>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.11.v20180605</version>
+            <version>9.4.43.v20210629</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.4.11.v20180605</version>
+            <version>9.4.43.v20210629</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-jdbc</artifactId>
-            <version>3.0</version>
+            <version>3.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -135,7 +121,7 @@
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
-            <version>1.1.1</version>
+            <version>1.1.1</version> <!-- 2.9.3 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
