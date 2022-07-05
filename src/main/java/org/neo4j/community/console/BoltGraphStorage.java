@@ -22,7 +22,7 @@ public class BoltGraphStorage implements GraphStorage {
 
     @Override
     public GraphInfo find(String id) {
-        Map map = query("MATCH (n:Graph {id:{id}}) set n.count = coalesce(n.count,0)+1, n.time={time} return n", map("id", id, "time", System.currentTimeMillis()));
+        Map map = query("MATCH (n:Graph {id:$id}) set n.count = coalesce(n.count,0)+1, n.time=$time return n", map("id", id, "time", System.currentTimeMillis()));
         return map == null ? null : new GraphInfo(map);
     }
 
