@@ -121,7 +121,7 @@
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
-            <version>1.1.1</version> <!-- 2.9.3 -->
+            <version>2.7.2</version> <!-- 2.9.3 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.aggregate</groupId>
